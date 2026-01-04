@@ -2,6 +2,7 @@
 
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { PRESET_GRADIENTS, SOLID_COLORS, MESH_GRADIENTS } from '@/lib/constants/gradients';
 import { cn } from '@/lib/utils';
@@ -12,6 +13,7 @@ export function BackgroundPicker() {
         backgroundType,
         backgroundColor,
         gradientColors,
+        gradientAngle,
         meshGradientCSS,
         setBackgroundColor,
         setGradient,
@@ -87,22 +89,30 @@ export function BackgroundPicker() {
                         ))}
                     </div>
 
-                    {/* Custom Color Picker */}
-                    <div className="relative">
-                        <input
-                            type="color"
+                    {/* Custom Color Picker & Input */}
+                    <div className="flex gap-2">
+                        <div className="relative flex-1">
+                            <input
+                                type="color"
+                                value={backgroundColor}
+                                onChange={(e) => setBackgroundColor(e.target.value)}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            />
+                            <Button variant="outline" size="sm" className="w-full justify-start">
+                                <Pipette className="w-4 h-4 mr-2" />
+                                Picker
+                                <div
+                                    className="w-4 h-4 rounded ml-auto border border-zinc-600"
+                                    style={{ backgroundColor: backgroundColor }}
+                                />
+                            </Button>
+                        </div>
+                        <Input
                             value={backgroundColor}
                             onChange={(e) => setBackgroundColor(e.target.value)}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                            className="w-28 font-mono text-xs uppercase"
+                            placeholder="#HEX or RGB"
                         />
-                        <Button variant="outline" size="sm" className="w-full">
-                            <Pipette className="w-4 h-4 mr-2" />
-                            Custom Color
-                            <div
-                                className="w-4 h-4 rounded ml-auto border border-zinc-600"
-                                style={{ backgroundColor: backgroundColor }}
-                            />
-                        </Button>
                     </div>
                 </div>
             )}
@@ -110,6 +120,63 @@ export function BackgroundPicker() {
             {/* Gradients - Show for both 'gradient' and 'mesh' background types */}
             {(backgroundType === 'gradient' || backgroundType === 'mesh') && (
                 <div className="space-y-4">
+                    {/* Custom Gradient Controls - Only show when standard gradient is active */}
+                    {isGradientActive && (
+                        <div className="space-y-2 p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
+                            <Label className="text-[10px] uppercase text-zinc-500">Custom Gradient</Label>
+
+                            <div className="flex gap-2">
+                                {/* Start Color */}
+                                <div className="space-y-1 flex-1">
+                                    <div className="relative">
+                                        <input
+                                            type="color"
+                                            value={gradientColors[0]}
+                                            onChange={(e) => setGradient([e.target.value, gradientColors[1]], gradientAngle)}
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                        />
+                                        <Button variant="outline" size="sm" className="w-full h-8 px-2 justify-between">
+                                            <span className="text-[10px]">Start</span>
+                                            <div
+                                                className="w-3 h-3 rounded border border-zinc-600"
+                                                style={{ backgroundColor: gradientColors[0] }}
+                                            />
+                                        </Button>
+                                    </div>
+                                    <Input
+                                        value={gradientColors[0]}
+                                        onChange={(e) => setGradient([e.target.value, gradientColors[1]], gradientAngle)}
+                                        className="h-7 text-[10px] font-mono px-2"
+                                    />
+                                </div>
+
+                                {/* End Color */}
+                                <div className="space-y-1 flex-1">
+                                    <div className="relative">
+                                        <input
+                                            type="color"
+                                            value={gradientColors[1]}
+                                            onChange={(e) => setGradient([gradientColors[0], e.target.value], gradientAngle)}
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                        />
+                                        <Button variant="outline" size="sm" className="w-full h-8 px-2 justify-between">
+                                            <span className="text-[10px]">End</span>
+                                            <div
+                                                className="w-3 h-3 rounded border border-zinc-600"
+                                                style={{ backgroundColor: gradientColors[1] }}
+                                            />
+                                        </Button>
+                                    </div>
+                                    <Input
+                                        value={gradientColors[1]}
+                                        onChange={(e) => setGradient([gradientColors[0], e.target.value], gradientAngle)}
+                                        className="h-7 text-[10px] font-mono px-2"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <div>
                         <Label className="text-zinc-500 text-xs mb-2 block">Presets</Label>
                         <div className="grid grid-cols-5 gap-2">
