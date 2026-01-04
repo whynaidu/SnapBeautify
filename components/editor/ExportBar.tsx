@@ -56,9 +56,11 @@ export function ExportBar() {
         setIsMobile(isMobileDevice());
     }, []);
 
-    const createExportCanvas = () => {
+    const createExportCanvas = (scaleOverride?: number) => {
         if (!originalImage) return null;
 
+        // Explicitly clean up old canvases if possible by letting GC run,
+        // but we can't force GC. Creating a new element is standard.
         const exportCanvas = document.createElement('canvas');
         renderCanvas({
             canvas: exportCanvas,
@@ -73,13 +75,45 @@ export function ExportBar() {
             shadowIntensity,
             borderRadius,
             frameType,
-            scale: exportScale,
+            scale: scaleOverride || exportScale,
             imageScale,
             rotation,
             targetWidth: canvasWidth,
             targetHeight: canvasHeight,
         });
         return exportCanvas;
+    };
+
+    const attemptExport = async (
+        action: 'download' | 'share' | 'copy',
+        currentScale: number
+    ): Promise<boolean> => {
+        try {
+            const exportCanvas = createExportCanvas(currentScale);
+            if (!exportCanvas) return false;
+
+            const timestamp = new Date().toISOString().slice(0, 10);
+            const filename = `snapbeautify-${timestamp}`;
+
+            if (action === 'download') {
+                await downloadCanvas(exportCanvas, filename, exportFormat);
+            } else if (action === 'share') {
+                await shareCanvas(exportCanvas, filename);
+            } else if (action === 'copy') {
+                await copyCanvasToClipboard(exportCanvas);
+            }
+
+            // Explicitly clear canvas width to free memory immediately
+            exportCanvas.width = 0;
+            exportCanvas.height = 0;
+
+            return true;
+        } catch (error) {
+            if (error instanceof Error && (error.message.includes('abort') || error.message.includes('cancel'))) {
+                throw error; // Don't retry for user cancellations
+            }
+            return false; // Failed, try next scale
+        }
     };
 
     const handleCopy = async () => {
@@ -89,11 +123,12 @@ export function ExportBar() {
         }
 
         try {
-            const exportCanvas = createExportCanvas();
-            if (!exportCanvas) return;
-
-            await copyCanvasToClipboard(exportCanvas);
-            toast.success('Copied to clipboard!');
+            const success = await attemptExport('copy', exportScale);
+            if (success) {
+                toast.success('Copied to clipboard!');
+            } else {
+                throw new Error('Failed to copy');
+            }
         } catch (error) {
             if (error instanceof Error) {
                 toast.error(error.message);
@@ -109,19 +144,26 @@ export function ExportBar() {
             return;
         }
 
-        try {
-            const exportCanvas = createExportCanvas();
-            if (!exportCanvas) return;
+        // Try current scale first, then fallback
+        const scalesToTry = [exportScale];
+        if (exportScale > 2) scalesToTry.push(2);
+        if (exportScale > 1) scalesToTry.push(1);
 
-            const timestamp = new Date().toISOString().slice(0, 10);
-            await shareCanvas(exportCanvas, `snapbeautify-${timestamp}`);
-            // Don't show success toast - share dialog handles feedback
-        } catch (error) {
-            // User cancelled share or sharing not supported - don't show error for cancel
-            if (error instanceof Error && !error.message.includes('abort') && !error.message.includes('cancel')) {
-                toast.error('Sharing failed. Try Download instead.');
+        // Remove duplicates
+        const uniqueScales = [...new Set(scalesToTry)];
+
+        for (const scale of uniqueScales) {
+            try {
+                const success = await attemptExport('share', scale);
+                if (success) return; // Success!
+            } catch (error) {
+                // User cancelled, stop trying
+                return;
             }
         }
+
+        // If we get here, all sharing failed
+        toast.error('Sharing failed. Try Download instead.');
     };
 
     const handleDownload = async () => {
@@ -130,34 +172,36 @@ export function ExportBar() {
             return;
         }
 
-        try {
-            const exportCanvas = createExportCanvas();
-            if (!exportCanvas) return;
+        // On mobile share, we already fallback inside handleShare if called directly.
+        // If not calling handleShare, we implement similar logic for download.
 
-            const timestamp = new Date().toISOString().slice(0, 10);
-
-            // On mobile, try Share API first (most reliable for "saving")
-            if (isMobile && canShare) {
-                try {
-                    await shareCanvas(exportCanvas, `snapbeautify-${timestamp}`);
-                    return;
-                } catch {
-                    // Fall through to download
-                }
-            }
-
-            await downloadCanvas(exportCanvas, `snapbeautify-${timestamp}`, exportFormat);
-
-            if (isMobile) {
-                toast.success('Image ready! Check your downloads folder.', {
-                    duration: 5000,
-                });
-            } else {
-                toast.success('Downloaded!');
-            }
-        } catch (error) {
-            toast.error('Failed to download');
+        // On mobile, try Share API first if available and not explicitly falling back
+        if (isMobile && canShare) {
+            await handleShare();
+            return;
         }
+
+        // Download fallback logic
+        const scalesToTry = [exportScale];
+        if (exportScale > 2) scalesToTry.push(2);
+        if (exportScale > 1) scalesToTry.push(1);
+        const uniqueScales = [...new Set(scalesToTry)];
+
+        for (const scale of uniqueScales) {
+            const success = await attemptExport('download', scale);
+            if (success) {
+                if (scale !== exportScale) {
+                    toast.success(`Saved at ${scale}x (lower resolution) due to memory limits`, { duration: 5000 });
+                } else if (isMobile) {
+                    toast.success('Image ready! Check downloads.', { duration: 5000 });
+                } else {
+                    toast.success('Downloaded!');
+                }
+                return;
+            }
+        }
+
+        toast.error('Failed to download. Try a lower resolution.');
     };
 
     return (
