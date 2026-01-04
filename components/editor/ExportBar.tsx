@@ -109,14 +109,14 @@ export function ExportBar() {
     };
 
     return (
-        <div className="h-16 bg-zinc-900 border-t border-zinc-800 px-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+        <div className="h-16 bg-zinc-900 border-t border-zinc-800 px-2 sm:px-4 flex items-center justify-between z-50">
+            <div className="flex items-center gap-1 sm:gap-3">
                 {/* Format Selector */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-24 justify-between">
+                        <Button variant="outline" size="sm" className="w-16 sm:w-24 justify-between text-xs sm:text-sm">
                             {exportFormat.toUpperCase()}
-                            <ChevronDown className="w-4 h-4 opacity-50" />
+                            <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
@@ -136,9 +136,9 @@ export function ExportBar() {
                 {/* Scale Selector */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-24 justify-between">
-                            {exportScale}x{exportScale === 2 ? ' Retina' : ''}
-                            <ChevronDown className="w-4 h-4 opacity-50" />
+                        <Button variant="outline" size="sm" className="w-12 sm:w-24 justify-between text-xs sm:text-sm">
+                            {exportScale}x
+                            <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50 hidden sm:block" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
@@ -155,41 +155,37 @@ export function ExportBar() {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Current dimensions display - shows actual export size */}
-                <span className="text-xs text-zinc-500">
+                {/* Current dimensions display - hide on small screens */}
+                <span className="text-[10px] sm:text-xs text-zinc-500 hidden sm:inline">
                     {canvasWidth * exportScale}×{canvasHeight * exportScale}px
                     {exportScale > 1 && (
-                        <span className="text-zinc-600 ml-1">
+                        <span className="text-zinc-600 ml-1 hidden md:inline">
                             ({canvasWidth}×{canvasHeight} @{exportScale}x)
                         </span>
                     )}
                 </span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
                 <Button
                     variant="outline"
+                    size="sm"
                     onClick={handleCopy}
                     disabled={!originalImage}
-                    className="gap-2"
+                    className="gap-1 sm:gap-2 px-2 sm:px-4"
                 >
                     <Copy className="w-4 h-4" />
                     <span className="hidden sm:inline">Copy</span>
-                    <kbd className="hidden sm:inline ml-1 px-1.5 py-0.5 text-[10px] bg-zinc-700 rounded font-mono">
-                        ⌘C
-                    </kbd>
                 </Button>
 
                 <Button
+                    size="sm"
                     onClick={handleDownload}
                     disabled={!originalImage}
-                    className="gap-2 bg-indigo-600 hover:bg-indigo-700"
+                    className="gap-1 sm:gap-2 px-2 sm:px-4 bg-indigo-600 hover:bg-indigo-700"
                 >
                     <Download className="w-4 h-4" />
-                    <span className="hidden sm:inline">Download</span>
-                    <kbd className="hidden sm:inline ml-1 px-1.5 py-0.5 text-[10px] bg-indigo-500/50 rounded font-mono">
-                        ⌘S
-                    </kbd>
+                    <span className="hidden xs:inline sm:inline">Save</span>
                 </Button>
             </div>
         </div>

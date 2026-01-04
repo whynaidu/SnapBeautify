@@ -75,7 +75,8 @@ export function DropZone() {
             {...getRootProps()}
             className={cn(
                 'flex flex-col items-center justify-center',
-                'w-full h-full min-h-[400px]',
+                'w-full h-full min-h-[200px] sm:min-h-[400px]',
+                'm-4 sm:m-6',
                 'border-2 border-dashed rounded-xl',
                 'cursor-pointer transition-all duration-200',
                 isDragActive
@@ -85,33 +86,33 @@ export function DropZone() {
         >
             <input {...getInputProps()} />
 
-            <div className="flex flex-col items-center gap-4 p-8 text-center">
+            <div className="flex flex-col items-center gap-3 sm:gap-4 p-4 sm:p-8 text-center">
                 <div
                     className={cn(
-                        'p-4 rounded-full',
+                        'p-3 sm:p-4 rounded-full',
                         isDragActive ? 'bg-indigo-500/20' : 'bg-zinc-800'
                     )}
                 >
                     {isDragActive ? (
-                        <ImageIcon className="w-8 h-8 text-indigo-500" />
+                        <ImageIcon className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-500" />
                     ) : (
-                        <Upload className="w-8 h-8 text-zinc-400" />
+                        <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-zinc-400" />
                     )}
                 </div>
 
                 <div>
-                    <p className="text-lg font-medium text-zinc-200">
-                        {isDragActive ? 'Drop your image here' : 'Drag & drop your screenshot'}
+                    <p className="text-base sm:text-lg font-medium text-zinc-200">
+                        {isDragActive ? 'Drop your image here' : 'Tap to select screenshot'}
                     </p>
-                    <p className="text-sm text-zinc-500 mt-1">or click to browse</p>
+                    <p className="text-xs sm:text-sm text-zinc-500 mt-1">or drag & drop</p>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-zinc-600">
+                <div className="hidden sm:flex items-center gap-2 text-xs text-zinc-600">
                     <Clipboard className="w-3 h-3" />
                     <span>You can also paste from clipboard (⌘V)</span>
                 </div>
 
-                <p className="text-xs text-zinc-600">Supports PNG, JPG, WebP, GIF</p>
+                <p className="text-[10px] sm:text-xs text-zinc-600">PNG, JPG, WebP, GIF</p>
             </div>
         </div>
     );
