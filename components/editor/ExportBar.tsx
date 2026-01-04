@@ -10,7 +10,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Copy, Download, ChevronDown, Check, Share2 } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
-import { copyCanvasToClipboard, downloadCanvas, shareCanvas, isClipboardSupported, isShareSupported } from '@/lib/canvas/export';
+import {
+    copyCanvasToClipboard,
+    downloadCanvas,
+    shareCanvas,
+    isClipboardSupported,
+    isShareSupported,
+    isMobileDevice
+} from '@/lib/canvas/export';
 import { renderCanvas } from '@/lib/canvas/renderer';
 import { toast } from 'sonner';
 import { ExportFormat, ExportScale } from '@/types/editor';
@@ -18,6 +25,7 @@ import { ExportFormat, ExportScale } from '@/types/editor';
 export function ExportBar() {
     const [canCopy, setCanCopy] = useState(true);
     const [canShare, setCanShare] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     const {
         exportFormat,
@@ -45,6 +53,7 @@ export function ExportBar() {
     useEffect(() => {
         setCanCopy(isClipboardSupported());
         setCanShare(isShareSupported());
+        setIsMobile(isMobileDevice());
     }, []);
 
     const createExportCanvas = () => {
@@ -104,16 +113,18 @@ export function ExportBar() {
             const exportCanvas = createExportCanvas();
             if (!exportCanvas) return;
 
-            await shareCanvas(exportCanvas);
-            toast.success('Shared successfully!');
+            const timestamp = new Date().toISOString().slice(0, 10);
+            await shareCanvas(exportCanvas, `snapbeautify-${timestamp}`);
+            // Don't show success toast - share dialog handles feedback
         } catch (error) {
-            if (error instanceof Error && error.message !== 'Sharing not supported on this device' && !error.message.includes('abort')) {
-                toast.error('Failed to share');
+            // User cancelled share or sharing not supported - don't show error for cancel
+            if (error instanceof Error && !error.message.includes('abort') && !error.message.includes('cancel')) {
+                toast.error('Sharing failed. Try Download instead.');
             }
         }
     };
 
-    const handleDownload = () => {
+    const handleDownload = async () => {
         if (!originalImage) {
             toast.error('No image to download');
             return;
@@ -124,8 +135,26 @@ export function ExportBar() {
             if (!exportCanvas) return;
 
             const timestamp = new Date().toISOString().slice(0, 10);
-            downloadCanvas(exportCanvas, `snapbeautify-${timestamp}`, exportFormat);
-            toast.success('Downloaded!');
+
+            // On mobile, try Share API first (most reliable for "saving")
+            if (isMobile && canShare) {
+                try {
+                    await shareCanvas(exportCanvas, `snapbeautify-${timestamp}`);
+                    return;
+                } catch {
+                    // Fall through to download
+                }
+            }
+
+            await downloadCanvas(exportCanvas, `snapbeautify-${timestamp}`, exportFormat);
+
+            if (isMobile) {
+                toast.success('Image ready! Check your downloads folder.', {
+                    duration: 5000,
+                });
+            } else {
+                toast.success('Downloaded!');
+            }
         } catch (error) {
             toast.error('Failed to download');
         }
@@ -190,30 +219,34 @@ export function ExportBar() {
             </div>
 
             <div className="flex items-center gap-1 sm:gap-2">
-                {/* Show Share button on mobile if supported, otherwise Copy */}
-                {canShare ? (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleShare}
-                        disabled={!originalImage}
-                        className="gap-1 sm:gap-2 px-2 sm:px-4"
-                    >
-                        <Share2 className="w-4 h-4" />
-                        <span className="hidden sm:inline">Share</span>
-                    </Button>
-                ) : canCopy ? (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleCopy}
-                        disabled={!originalImage}
-                        className="gap-1 sm:gap-2 px-2 sm:px-4"
-                    >
-                        <Copy className="w-4 h-4" />
-                        <span className="hidden sm:inline">Copy</span>
-                    </Button>
-                ) : null}
+                {/* On mobile: show Share button, on desktop: show Copy button */}
+                {isMobile ? (
+                    canShare && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleShare}
+                            disabled={!originalImage}
+                            className="gap-1 sm:gap-2 px-2 sm:px-4"
+                        >
+                            <Share2 className="w-4 h-4" />
+                            <span className="hidden sm:inline">Share</span>
+                        </Button>
+                    )
+                ) : (
+                    canCopy && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleCopy}
+                            disabled={!originalImage}
+                            className="gap-1 sm:gap-2 px-2 sm:px-4"
+                        >
+                            <Copy className="w-4 h-4" />
+                            <span className="hidden sm:inline">Copy</span>
+                        </Button>
+                    )
+                )}
 
                 <Button
                     size="sm"
@@ -222,7 +255,7 @@ export function ExportBar() {
                     className="gap-1 sm:gap-2 px-2 sm:px-4 bg-indigo-600 hover:bg-indigo-700"
                 >
                     <Download className="w-4 h-4" />
-                    <span className="hidden xs:inline sm:inline">Save</span>
+                    <span className="sm:inline">Save</span>
                 </Button>
             </div>
         </div>

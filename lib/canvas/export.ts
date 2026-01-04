@@ -21,6 +21,7 @@ export async function exportCanvas(
 // Check if clipboard API is supported for images
 export function isClipboardSupported(): boolean {
     return !!(
+        typeof navigator !== 'undefined' &&
         navigator.clipboard &&
         typeof ClipboardItem !== 'undefined' &&
         navigator.clipboard.write
@@ -32,6 +33,13 @@ export function isShareSupported(): boolean {
     return typeof navigator !== 'undefined' &&
         typeof navigator.share === 'function' &&
         typeof navigator.canShare === 'function';
+}
+
+// Check if device is mobile
+export function isMobileDevice(): boolean {
+    if (typeof window === 'undefined') return false;
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        (window.innerWidth <= 768);
 }
 
 export async function copyCanvasToClipboard(canvas: HTMLCanvasElement): Promise<void> {
@@ -47,11 +55,11 @@ export async function copyCanvasToClipboard(canvas: HTMLCanvasElement): Promise<
 }
 
 // Share image using Web Share API (works on mobile)
-export async function shareCanvas(canvas: HTMLCanvasElement): Promise<void> {
+export async function shareCanvas(canvas: HTMLCanvasElement, filename: string = 'snapbeautify'): Promise<void> {
     const blob = await exportCanvas(canvas, 'png');
-    const file = new File([blob], 'snapbeautify.png', { type: 'image/png' });
+    const file = new File([blob], `${filename}.png`, { type: 'image/png' });
 
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
         await navigator.share({
             files: [file],
             title: 'SnapBeautify',
@@ -62,18 +70,52 @@ export async function shareCanvas(canvas: HTMLCanvasElement): Promise<void> {
     }
 }
 
-export function downloadCanvas(
+// Download using blob URL - works better on mobile
+export async function downloadCanvas(
     canvas: HTMLCanvasElement,
     filename: string,
     format: ExportFormat
-): void {
-    const mimeType = format === 'jpeg' ? 'image/jpeg' : `image/${format}`;
+): Promise<void> {
+    const blob = await exportCanvas(canvas, format);
+    const url = URL.createObjectURL(blob);
+
     const link = document.createElement('a');
+    link.href = url;
     link.download = `${filename}.${format}`;
-    link.href = canvas.toDataURL(mimeType, 0.92);
+    link.style.display = 'none';
+
+    // For mobile Safari and some other browsers
     document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+
+    // Use setTimeout to ensure the link is in the DOM
+    setTimeout(() => {
+        link.click();
+
+        // Cleanup after a delay
+        setTimeout(() => {
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }, 100);
+    }, 0);
+}
+
+// Alternative download method for mobile - opens image in new tab
+export async function downloadCanvasMobile(
+    canvas: HTMLCanvasElement,
+    format: ExportFormat
+): Promise<string> {
+    const blob = await exportCanvas(canvas, format);
+    const url = URL.createObjectURL(blob);
+
+    // On mobile, open the image in a new tab for user to long-press and save
+    const newWindow = window.open(url, '_blank');
+
+    if (!newWindow) {
+        // If popup blocked, return URL for user to use
+        return url;
+    }
+
+    return url;
 }
 
 export function canvasToDataUrl(
