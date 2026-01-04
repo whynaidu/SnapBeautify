@@ -2,7 +2,6 @@
 
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { PRESET_GRADIENTS, SOLID_COLORS, MESH_GRADIENTS } from '@/lib/constants/gradients';
 import { cn } from '@/lib/utils';
@@ -89,26 +88,22 @@ export function BackgroundPicker() {
                     </div>
 
                     {/* Custom Color Picker */}
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className="w-full">
-                                <Pipette className="w-4 h-4 mr-2" />
-                                Custom Color
-                                <div
-                                    className="w-4 h-4 rounded ml-auto border border-zinc-600"
-                                    style={{ backgroundColor: backgroundColor }}
-                                />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-64 p-3" align="start">
-                            <input
-                                type="color"
-                                value={backgroundColor}
-                                onChange={(e) => setBackgroundColor(e.target.value)}
-                                className="w-full h-32 cursor-pointer rounded border-0"
+                    <div className="relative">
+                        <input
+                            type="color"
+                            value={backgroundColor}
+                            onChange={(e) => setBackgroundColor(e.target.value)}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <Button variant="outline" size="sm" className="w-full">
+                            <Pipette className="w-4 h-4 mr-2" />
+                            Custom Color
+                            <div
+                                className="w-4 h-4 rounded ml-auto border border-zinc-600"
+                                style={{ backgroundColor: backgroundColor }}
                             />
-                        </PopoverContent>
-                    </Popover>
+                        </Button>
+                    </div>
                 </div>
             )}
 
