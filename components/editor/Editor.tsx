@@ -24,13 +24,13 @@ export function Editor() {
     }, []);
 
     return (
-        <div className="h-screen flex flex-col bg-zinc-950 text-white overflow-hidden">
+        <div className="h-screen w-full flex flex-col bg-zinc-950 text-white overflow-hidden supports-[height:100cqh]:h-[100cqh] supports-[height:100dvh]:h-[100dvh]">
             <Header />
 
-            <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+            <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
                 <Canvas />
                 {/* Desktop: Show sidebar, Mobile: Hide (use bottom sheet) */}
-                <div className="hidden md:block">
+                <div className="hidden md:block h-full">
                     <ControlPanel />
                 </div>
             </div>
