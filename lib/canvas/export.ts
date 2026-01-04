@@ -18,11 +18,48 @@ export async function exportCanvas(
     });
 }
 
+// Check if clipboard API is supported for images
+export function isClipboardSupported(): boolean {
+    return !!(
+        navigator.clipboard &&
+        typeof ClipboardItem !== 'undefined' &&
+        navigator.clipboard.write
+    );
+}
+
+// Check if Web Share API is supported
+export function isShareSupported(): boolean {
+    return typeof navigator !== 'undefined' &&
+        typeof navigator.share === 'function' &&
+        typeof navigator.canShare === 'function';
+}
+
 export async function copyCanvasToClipboard(canvas: HTMLCanvasElement): Promise<void> {
+    // Check if Clipboard API with ClipboardItem is supported
+    if (!isClipboardSupported()) {
+        throw new Error('Clipboard not supported on this device. Use Share or Download instead.');
+    }
+
     const blob = await exportCanvas(canvas, 'png');
     await navigator.clipboard.write([
         new ClipboardItem({ 'image/png': blob }),
     ]);
+}
+
+// Share image using Web Share API (works on mobile)
+export async function shareCanvas(canvas: HTMLCanvasElement): Promise<void> {
+    const blob = await exportCanvas(canvas, 'png');
+    const file = new File([blob], 'snapbeautify.png', { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+            files: [file],
+            title: 'SnapBeautify',
+            text: 'Check out my beautified screenshot!',
+        });
+    } else {
+        throw new Error('Sharing not supported on this device');
+    }
 }
 
 export function downloadCanvas(

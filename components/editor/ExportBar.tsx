@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -7,14 +8,17 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Copy, Download, ChevronDown, Check } from 'lucide-react';
+import { Copy, Download, ChevronDown, Check, Share2 } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
-import { copyCanvasToClipboard, downloadCanvas } from '@/lib/canvas/export';
+import { copyCanvasToClipboard, downloadCanvas, shareCanvas, isClipboardSupported, isShareSupported } from '@/lib/canvas/export';
 import { renderCanvas } from '@/lib/canvas/renderer';
 import { toast } from 'sonner';
 import { ExportFormat, ExportScale } from '@/types/editor';
 
 export function ExportBar() {
+    const [canCopy, setCanCopy] = useState(true);
+    const [canShare, setCanShare] = useState(false);
+
     const {
         exportFormat,
         exportScale,
@@ -37,6 +41,38 @@ export function ExportBar() {
         canvasHeight,
     } = useEditorStore();
 
+    // Check capabilities on mount
+    useEffect(() => {
+        setCanCopy(isClipboardSupported());
+        setCanShare(isShareSupported());
+    }, []);
+
+    const createExportCanvas = () => {
+        if (!originalImage) return null;
+
+        const exportCanvas = document.createElement('canvas');
+        renderCanvas({
+            canvas: exportCanvas,
+            image: originalImage,
+            backgroundType,
+            backgroundColor,
+            gradientColors,
+            gradientAngle,
+            meshGradientCSS,
+            padding,
+            shadowSize,
+            shadowIntensity,
+            borderRadius,
+            frameType,
+            scale: exportScale,
+            imageScale,
+            rotation,
+            targetWidth: canvasWidth,
+            targetHeight: canvasHeight,
+        });
+        return exportCanvas;
+    };
+
     const handleCopy = async () => {
         if (!originalImage) {
             toast.error('No image to copy');
@@ -44,31 +80,36 @@ export function ExportBar() {
         }
 
         try {
-            const exportCanvas = document.createElement('canvas');
-            renderCanvas({
-                canvas: exportCanvas,
-                image: originalImage,
-                backgroundType,
-                backgroundColor,
-                gradientColors,
-                gradientAngle,
-                meshGradientCSS,
-                padding,
-                shadowSize,
-                shadowIntensity,
-                borderRadius,
-                frameType,
-                scale: exportScale,
-                imageScale,
-                rotation,
-                targetWidth: canvasWidth,
-                targetHeight: canvasHeight,
-            });
+            const exportCanvas = createExportCanvas();
+            if (!exportCanvas) return;
 
             await copyCanvasToClipboard(exportCanvas);
             toast.success('Copied to clipboard!');
         } catch (error) {
-            toast.error('Failed to copy');
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error('Failed to copy. Try Download instead.');
+            }
+        }
+    };
+
+    const handleShare = async () => {
+        if (!originalImage) {
+            toast.error('No image to share');
+            return;
+        }
+
+        try {
+            const exportCanvas = createExportCanvas();
+            if (!exportCanvas) return;
+
+            await shareCanvas(exportCanvas);
+            toast.success('Shared successfully!');
+        } catch (error) {
+            if (error instanceof Error && error.message !== 'Sharing not supported on this device' && !error.message.includes('abort')) {
+                toast.error('Failed to share');
+            }
         }
     };
 
@@ -79,26 +120,8 @@ export function ExportBar() {
         }
 
         try {
-            const exportCanvas = document.createElement('canvas');
-            renderCanvas({
-                canvas: exportCanvas,
-                image: originalImage,
-                backgroundType,
-                backgroundColor,
-                gradientColors,
-                gradientAngle,
-                meshGradientCSS,
-                padding,
-                shadowSize,
-                shadowIntensity,
-                borderRadius,
-                frameType,
-                scale: exportScale,
-                imageScale,
-                rotation,
-                targetWidth: canvasWidth,
-                targetHeight: canvasHeight,
-            });
+            const exportCanvas = createExportCanvas();
+            if (!exportCanvas) return;
 
             const timestamp = new Date().toISOString().slice(0, 10);
             downloadCanvas(exportCanvas, `snapbeautify-${timestamp}`, exportFormat);
@@ -167,16 +190,30 @@ export function ExportBar() {
             </div>
 
             <div className="flex items-center gap-1 sm:gap-2">
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCopy}
-                    disabled={!originalImage}
-                    className="gap-1 sm:gap-2 px-2 sm:px-4"
-                >
-                    <Copy className="w-4 h-4" />
-                    <span className="hidden sm:inline">Copy</span>
-                </Button>
+                {/* Show Share button on mobile if supported, otherwise Copy */}
+                {canShare ? (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleShare}
+                        disabled={!originalImage}
+                        className="gap-1 sm:gap-2 px-2 sm:px-4"
+                    >
+                        <Share2 className="w-4 h-4" />
+                        <span className="hidden sm:inline">Share</span>
+                    </Button>
+                ) : canCopy ? (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCopy}
+                        disabled={!originalImage}
+                        className="gap-1 sm:gap-2 px-2 sm:px-4"
+                    >
+                        <Copy className="w-4 h-4" />
+                        <span className="hidden sm:inline">Copy</span>
+                    </Button>
+                ) : null}
 
                 <Button
                     size="sm"
