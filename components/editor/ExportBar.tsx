@@ -8,7 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Copy, Download, ChevronDown, Check, Share2 } from 'lucide-react';
+import { Copy, Download, ChevronDown, Check, Share2, Loader2 } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
 import {
     copyCanvasToClipboard,
@@ -26,6 +26,7 @@ export function ExportBar() {
     const [canCopy, setCanCopy] = useState(true);
     const [canShare, setCanShare] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
 
     const {
         exportFormat,
@@ -92,6 +93,9 @@ export function ExportBar() {
             const exportCanvas = createExportCanvas(currentScale);
             if (!exportCanvas) return false;
 
+            // Small delay to ensure UI updates before heavy canvas operation
+            await new Promise(resolve => setTimeout(resolve, 0));
+
             const timestamp = new Date().toISOString().slice(0, 10);
             const filename = `snapbeautify-${timestamp}`;
 
@@ -116,7 +120,17 @@ export function ExportBar() {
         }
     };
 
-    const handleCopy = async () => {
+    const wrapExport = async (action: () => Promise<void>) => {
+        if (isExporting) return;
+        setIsExporting(true);
+        try {
+            await action();
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    const handleCopy = () => wrapExport(async () => {
         if (!originalImage) {
             toast.error('No image to copy');
             return;
@@ -136,9 +150,9 @@ export function ExportBar() {
                 toast.error('Failed to copy. Try Download instead.');
             }
         }
-    };
+    });
 
-    const handleShare = async () => {
+    const handleShare = () => wrapExport(async () => {
         if (!originalImage) {
             toast.error('No image to share');
             return;
@@ -164,21 +178,33 @@ export function ExportBar() {
 
         // If we get here, all sharing failed
         toast.error('Sharing failed. Try Download instead.');
-    };
+    });
 
-    const handleDownload = async () => {
+    const handleDownload = () => wrapExport(async () => {
         if (!originalImage) {
             toast.error('No image to download');
             return;
         }
 
         // On mobile share, we already fallback inside handleShare if called directly.
-        // If not calling handleShare, we implement similar logic for download.
+        // However, if we're here, we specifically want to download or try share first if appropriate.
 
-        // On mobile, try Share API first if available and not explicitly falling back
+        // On mobile, try Share API first if available
         if (isMobile && canShare) {
-            await handleShare();
-            return;
+            // We call handleShare's logic but manually to avoid double wrapExport
+            const scalesToTry = [exportScale];
+            if (exportScale > 2) scalesToTry.push(2);
+            if (exportScale > 1) scalesToTry.push(1);
+            const uniqueScales = [...new Set(scalesToTry)];
+
+            for (const scale of uniqueScales) {
+                try {
+                    const success = await attemptExport('share', scale);
+                    if (success) return;
+                } catch (error) {
+                    // User cancelled or share failed, continue to download fallback
+                }
+            }
         }
 
         // Download fallback logic
@@ -202,7 +228,7 @@ export function ExportBar() {
         }
 
         toast.error('Failed to download. Try a lower resolution.');
-    };
+    });
 
     return (
         <div className="h-16 bg-zinc-900 border-t border-zinc-800 px-2 sm:px-4 flex items-center justify-between z-50">
@@ -210,7 +236,7 @@ export function ExportBar() {
                 {/* Format Selector */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-16 sm:w-24 justify-between text-xs sm:text-sm">
+                        <Button variant="outline" size="sm" className="w-16 sm:w-24 justify-between text-xs sm:text-sm" disabled={isExporting}>
                             {exportFormat.toUpperCase()}
                             <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50" />
                         </Button>
@@ -232,7 +258,7 @@ export function ExportBar() {
                 {/* Scale Selector */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-12 sm:w-24 justify-between text-xs sm:text-sm">
+                        <Button variant="outline" size="sm" className="w-12 sm:w-24 justify-between text-xs sm:text-sm" disabled={isExporting}>
                             {exportScale}x
                             <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50 hidden sm:block" />
                         </Button>
@@ -270,10 +296,10 @@ export function ExportBar() {
                             variant="outline"
                             size="sm"
                             onClick={handleShare}
-                            disabled={!originalImage}
+                            disabled={!originalImage || isExporting}
                             className="gap-1 sm:gap-2 px-2 sm:px-4"
                         >
-                            <Share2 className="w-4 h-4" />
+                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />}
                             <span className="hidden sm:inline">Share</span>
                         </Button>
                     )
@@ -283,10 +309,10 @@ export function ExportBar() {
                             variant="outline"
                             size="sm"
                             onClick={handleCopy}
-                            disabled={!originalImage}
+                            disabled={!originalImage || isExporting}
                             className="gap-1 sm:gap-2 px-2 sm:px-4"
                         >
-                            <Copy className="w-4 h-4" />
+                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
                             <span className="hidden sm:inline">Copy</span>
                         </Button>
                     )
@@ -295,10 +321,10 @@ export function ExportBar() {
                 <Button
                     size="sm"
                     onClick={handleDownload}
-                    disabled={!originalImage}
+                    disabled={!originalImage || isExporting}
                     className="gap-1 sm:gap-2 px-2 sm:px-4 bg-indigo-600 hover:bg-indigo-700"
                 >
-                    <Download className="w-4 h-4" />
+                    {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                     <span className="sm:inline">Save</span>
                 </Button>
             </div>
