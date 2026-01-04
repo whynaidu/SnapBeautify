@@ -39,6 +39,7 @@ export function DropZone() {
             'image/*': ['.png', '.jpg', '.jpeg', '.webp', '.gif'],
         },
         maxFiles: 1,
+        multiple: false,
     });
 
     // Handle paste from clipboard
