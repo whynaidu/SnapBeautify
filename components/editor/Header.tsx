@@ -35,7 +35,7 @@ export function Header() {
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                         <Sparkles className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-lg font-semibold text-foreground">Snap</span>
+                    <span className="text-lg font-semibold text-foreground">SnapBeautify</span>
                 </div>
                 <span className="text-xs text-muted-foreground hidden sm:inline-block">
                     Beautiful screenshots instantly
