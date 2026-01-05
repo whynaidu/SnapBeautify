@@ -92,11 +92,15 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         else if (frameType === 'windows') frameOffset = 32;
 
         if (image) {
-            set({
-                padding,
-                canvasWidth: image.width + padding * 2,
-                canvasHeight: image.height + padding * 2 + frameOffset,
-            });
+            const updates: Partial<EditorState> = { padding };
+
+            // Only update canvas dimensions if no fixed aspect ratio is set
+            if (!get().aspectRatio) {
+                updates.canvasWidth = image.width + padding * 2;
+                updates.canvasHeight = image.height + padding * 2 + frameOffset;
+            }
+
+            set(updates);
         } else {
             set({ padding });
         }
@@ -118,11 +122,15 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         else if (frame === 'windows') frameOffset = 32;
 
         if (image) {
-            set({
-                frameType: frame,
-                canvasWidth: image.width + padding * 2,
-                canvasHeight: image.height + padding * 2 + frameOffset,
-            });
+            const updates: Partial<EditorState> = { frameType: frame };
+
+            // Only update canvas dimensions if no fixed aspect ratio is set
+            if (!get().aspectRatio) {
+                updates.canvasWidth = image.width + padding * 2;
+                updates.canvasHeight = image.height + padding * 2 + frameOffset;
+            }
+
+            set(updates);
         } else {
             set({ frameType: frame });
         }
