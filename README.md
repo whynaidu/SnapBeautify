@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ✨ SnapBeautify
 
-## Getting Started
+<div align="center">
 
-First, run the development server:
+![SnapBeautify Banner](https://github.com/user-attachments/assets/placeholder-banner) 
+<!-- You can add a banner image here later -->
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Create stunning, professional screenshots in seconds.**  
+Turn your boring screenshots into specific frames, add beautiful backgrounds, and export for social media instantly.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[**Live Demo**](https://snapbeautify-nhqlvmz9a-whynaidus-projects.vercel.app) · [**Report Bug**](https://github.com/whynaidu/SnapBeautify/issues) · [**Request Feature**](https://github.com/whynaidu/SnapBeautify/issues)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+</div>
 
-## Learn More
+<br />
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🎨 Backgrounds & Theming
+- **Dynamic Backgrounds:** Choose from a curated selection of solid colors, beautiful gradients, and mesh gradients.
+- **Transparency Support:** Export images with transparent backgrounds for easy compositing.
+- **Dark/Light Mode:** Fully responsive UI that adapts to your system preference or can be toggled manually.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🖼️ Device Frames
+Wrap your screenshot in professional-looking device frames:
+- **macOS & Windows:** Clean window chrome for desktop apps.
+- **Browser:** Chrome-style browser frame for web content.
+- **Mobile:** Realistic **iPhone** (with Dynamic Island) and **Android** frames.
+- **None:** Simple, clean shadows without a frame.
 
-## Deploy on Vercel
+### 🎛️ Complete Customization
+- **Adjustable Padding:** Control the spacing around your image.
+- **Border Radius:** Fine-tune corner roundness.
+- **Smart Shadows:** Customize shadow color, blur, and opacity for depth.
+- **Zoom & Scale:** Scale your image within the frame for the perfect crop.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 📐 Social Media Ready
+- **Preset Aspect Ratios:** One-click resizing for:
+  - Twitter / X Posts
+  - LinkedIn
+  - Instagram Posts (1:1 and 4:5)
+  - Stories (Instagram/Facebook/Snapchat)
+- **Standard Ratios:** 16:9, 4:3, 1:1, and more.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 📤 Export & Share
+- **High-Quality Export:** Save as **PNG**, **JPEG**, or **WEBP**.
+- **Retina Support:** Export up to **4x scale** for crisp visuals on high-res displays.
+- **Instant Copy:** One-click copy to clipboard.
+- **Mobile Friendly:** Native share integration on supported mobile devices.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework:** [Next.js 14](https://nextjs.org/) (App Router)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **State Management:** [Zustand](https://github.com/pmndrs/zustand)
+- **Icons:** [Lucide React](https://lucide.dev/)
+- **Theming:** [`next-themes`](https://github.com/pacocoursey/next-themes)
+- **Canvas Processing:** Native Canvas API with custom renderer
+
+---
+
+## 🏃‍♂️ Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/whynaidu/SnapBeautify.git
+   cd SnapBeautify
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**
+   Navigate to `http://localhost:3000` to see the app running.
+
+---
+
+## 🤝 Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📝 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+<div align="center">
+  <p>Made with ❤️ by <a href="https://github.com/whynaidu">Vedant Naidu</a></p>
+</div>
