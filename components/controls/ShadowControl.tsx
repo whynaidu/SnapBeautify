@@ -9,11 +9,17 @@ import { useEditorStore } from '@/lib/store/editor-store';
 import { SHADOW_OPTIONS } from '@/lib/constants/shadows';
 import { ShadowSize } from '@/types/editor';
 
+import { useThrottle } from '@/hooks/useThrottle';
+
 export function ShadowControl() {
     const { shadowSize, setShadowSize, shadowIntensity, setShadowIntensity } = useEditorStore();
 
     // Handle hydration - use local state that syncs with store
     const [localIntensity, setLocalIntensity] = useState(50);
+
+    const throttledSetIntensity = useThrottle((value: number) => {
+        setShadowIntensity(value);
+    }, 50);
 
     useEffect(() => {
         setLocalIntensity(shadowIntensity);
@@ -21,7 +27,7 @@ export function ShadowControl() {
 
     const handleIntensityChange = (value: number) => {
         setLocalIntensity(value);
-        setShadowIntensity(value);
+        throttledSetIntensity(value);
     };
 
     return (

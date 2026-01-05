@@ -8,11 +8,17 @@ import { Button } from '@/components/ui/button';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 
+import { useThrottle } from '@/hooks/useThrottle';
+
 export function ScaleControl() {
     const { imageScale, setImageScale } = useEditorStore();
 
     // Handle hydration
     const [localScale, setLocalScale] = useState(100);
+
+    const throttledSetScale = useThrottle((value: number) => {
+        setImageScale(value / 100);
+    }, 50);
 
     useEffect(() => {
         setLocalScale(Math.round(imageScale * 100));
@@ -21,7 +27,7 @@ export function ScaleControl() {
     const handleScaleChange = (value: number) => {
         const clampedValue = Math.max(10, Math.min(200, value));
         setLocalScale(clampedValue);
-        setImageScale(clampedValue / 100);
+        throttledSetScale(clampedValue);
     };
 
     const handleZoomIn = () => {
