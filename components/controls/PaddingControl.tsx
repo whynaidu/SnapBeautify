@@ -30,7 +30,7 @@ export function PaddingControl() {
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between">
-                <Label className="text-zinc-400 text-xs uppercase tracking-wider">
+                <Label className="text-muted-foreground text-xs uppercase tracking-wider">
                     Padding
                 </Label>
                 <div className="flex items-center gap-1">
@@ -38,11 +38,11 @@ export function PaddingControl() {
                         type="number"
                         value={localPadding}
                         onChange={(e) => handlePaddingChange(Number(e.target.value))}
-                        className="w-16 h-7 text-xs text-right bg-zinc-800 border-zinc-700"
+                        className="w-16 h-7 text-xs text-right bg-input border-border"
                         min={0}
                         max={200}
                     />
-                    <span className="text-xs text-zinc-500">px</span>
+                    <span className="text-xs text-muted-foreground">px</span>
                 </div>
             </div>
 
@@ -64,8 +64,8 @@ export function PaddingControl() {
                         className={cn(
                             'flex-1 py-1.5 text-xs rounded transition-colors',
                             padding === preset
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                         )}
                     >
                         {preset}

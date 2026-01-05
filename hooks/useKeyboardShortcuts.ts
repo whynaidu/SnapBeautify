@@ -5,7 +5,7 @@ import { useEditorStore } from '@/lib/store/editor-store';
 import { copyCanvasToClipboard, downloadCanvas } from '@/lib/canvas/export';
 import { renderCanvas } from '@/lib/canvas/renderer';
 import { toast } from 'sonner';
-import { ShadowSize } from '@/types/editor';
+// import { ShadowSize } from '@/types/editor';
 
 interface KeyboardShortcutsOptions {
     onCopy?: () => void;
@@ -21,14 +21,16 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         gradientAngle,
         meshGradientCSS,
         padding,
-        shadowSize,
+        shadowBlur,
+        shadowOpacity,
+        shadowColor,
         borderRadius,
         frameType,
         exportFormat,
         exportScale,
         rotation,
         setPadding,
-        setShadowSize,
+        // setShadowSize, // Deprecated
         clearImage,
         resetToDefaults,
     } = useEditorStore();
@@ -50,7 +52,9 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
                 gradientAngle,
                 meshGradientCSS,
                 padding,
-                shadowSize,
+                shadowBlur,
+                shadowOpacity,
+                shadowColor,
                 borderRadius,
                 frameType,
                 scale: exportScale,
@@ -70,7 +74,9 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         gradientAngle,
         meshGradientCSS,
         padding,
-        shadowSize,
+        shadowBlur,
+        shadowOpacity,
+        shadowColor,
         borderRadius,
         frameType,
         exportScale,
@@ -94,7 +100,9 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
                 gradientAngle,
                 meshGradientCSS,
                 padding,
-                shadowSize,
+                shadowBlur,
+                shadowOpacity,
+                shadowColor,
                 borderRadius,
                 frameType,
                 scale: exportScale,
@@ -115,7 +123,9 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         gradientAngle,
         meshGradientCSS,
         padding,
-        shadowSize,
+        shadowBlur,
+        shadowOpacity,
+        shadowColor,
         borderRadius,
         frameType,
         exportFormat,
@@ -156,19 +166,8 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
                 toast.info('Image cleared');
             }
 
-            // Shadow presets - 1-5
+            // Shadow presets shortcut removed in favor of granular controls
             if (!modifier && !e.shiftKey && !e.altKey) {
-                const shadowKeys: Record<string, ShadowSize> = {
-                    '1': 'none',
-                    '2': 'sm',
-                    '3': 'md',
-                    '4': 'lg',
-                    '5': 'xl',
-                };
-                if (shadowKeys[e.key] && originalImage) {
-                    setShadowSize(shadowKeys[e.key]);
-                }
-
                 // Padding - [ and ]
                 if (e.key === '[' && originalImage) {
                     setPadding(Math.max(0, padding - 8));
@@ -188,7 +187,8 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         options,
         padding,
         setPadding,
-        setShadowSize,
+        setPadding,
+        // setShadowSize,
         clearImage,
         resetToDefaults,
     ]);

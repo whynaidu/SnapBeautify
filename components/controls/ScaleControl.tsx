@@ -44,7 +44,7 @@ export function ScaleControl() {
 
     return (
         <div className="space-y-3">
-            <Label className="text-zinc-400 text-xs uppercase tracking-wider">
+            <Label className="text-muted-foreground text-xs uppercase tracking-wider">
                 Image Scale
             </Label>
 
@@ -85,18 +85,18 @@ export function ScaleControl() {
                         type="number"
                         value={localScale}
                         onChange={(e) => handleScaleChange(Number(e.target.value))}
-                        className="w-16 h-7 text-xs text-right bg-zinc-800 border-zinc-700"
+                        className="w-16 h-7 text-xs text-right bg-input border-border"
                         min={10}
                         max={200}
                     />
-                    <span className="text-xs text-zinc-500">%</span>
+                    <span className="text-xs text-muted-foreground">%</span>
                 </div>
 
                 <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleReset}
-                    className="text-xs text-zinc-400 hover:text-white"
+                    className="text-xs text-muted-foreground hover:text-foreground"
                 >
                     <RotateCcw className="w-3 h-3 mr-1" />
                     Reset

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import {
     BackgroundType,
     FrameType,
-    ShadowSize,
+    //     ShadowSize, // Deprecated
     ExportFormat,
     ExportScale,
     EditorState,
@@ -19,9 +19,9 @@ const DEFAULT_STATE: EditorState = {
     meshGradientCSS: '',
     backgroundImage: null,
     padding: 64,
-    shadowSize: 'lg',
-    shadowIntensity: 50,
-    shadowColor: 'rgba(0, 0, 0, 0.25)',
+    shadowBlur: 20, // Default blur
+    shadowOpacity: 50, // Default opacity %
+    shadowColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 12,
     imageScale: 1,
     rotation: 0,
@@ -41,18 +41,22 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         const padding = get().padding;
         const frameType = get().frameType;
 
-        // Calculate additional height for frames
-        let frameOffset = 0;
-        if (frameType === 'browser') frameOffset = 40;
-        else if (frameType === 'macos') frameOffset = 32;
-        else if (frameType === 'windows') frameOffset = 32;
+        // Calculate additional dimensions for frames
+        let frameOffsetY = 0;
+        let frameOffsetX = 0;
+        if (frameType === 'browser') frameOffsetY = 40;
+        else if (frameType === 'macos') frameOffsetY = 32;
+        else if (frameType === 'windows') frameOffsetY = 32;
+        else if (frameType === 'iphone') { frameOffsetX = 32; frameOffsetY = 32; }
+        else if (frameType === 'android') { frameOffsetX = 24; frameOffsetY = 24; }
 
-        const width = image.width + padding * 2;
-        const height = image.height + padding * 2 + frameOffset;
+        const width = image.width + padding * 2 + frameOffsetX;
+        const height = image.height + padding * 2 + frameOffsetY;
 
         set({
             originalImage: image,
             imageDataUrl: dataUrl,
+            imageScale: 1, // Reset scale for new image
             canvasWidth: width,
             canvasHeight: height,
         });
@@ -86,18 +90,22 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         const image = get().originalImage;
         const frameType = get().frameType;
 
-        let frameOffset = 0;
-        if (frameType === 'browser') frameOffset = 40;
-        else if (frameType === 'macos') frameOffset = 32;
-        else if (frameType === 'windows') frameOffset = 32;
+        let frameOffsetY = 0;
+        let frameOffsetX = 0;
+        if (frameType === 'browser') frameOffsetY = 40;
+        else if (frameType === 'macos') frameOffsetY = 32;
+        else if (frameType === 'windows') frameOffsetY = 32;
+        else if (frameType === 'iphone') { frameOffsetX = 32; frameOffsetY = 32; }
+        else if (frameType === 'android') { frameOffsetX = 24; frameOffsetY = 24; }
 
         if (image) {
             const updates: Partial<EditorState> = { padding };
 
             // Only update canvas dimensions if no fixed aspect ratio is set
             if (!get().aspectRatio) {
-                updates.canvasWidth = image.width + padding * 2;
-                updates.canvasHeight = image.height + padding * 2 + frameOffset;
+                const scale = get().imageScale;
+                updates.canvasWidth = Math.round(image.width * scale) + padding * 2 + frameOffsetX;
+                updates.canvasHeight = Math.round(image.height * scale) + padding * 2 + frameOffsetY;
             }
 
             set(updates);
@@ -106,9 +114,11 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         }
     },
 
-    setShadowSize: (size: ShadowSize) => set({ shadowSize: size }),
+    setShadowBlur: (blur: number) => set({ shadowBlur: blur }),
 
-    setShadowIntensity: (intensity: number) => set({ shadowIntensity: Math.max(0, Math.min(100, intensity)) }),
+    setShadowOpacity: (opacity: number) => set({ shadowOpacity: Math.max(0, Math.min(100, opacity)) }),
+
+    setShadowColor: (color: string) => set({ shadowColor: color }),
 
     setBorderRadius: (radius: number) => set({ borderRadius: radius }),
 
@@ -116,18 +126,22 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         const image = get().originalImage;
         const padding = get().padding;
 
-        let frameOffset = 0;
-        if (frame === 'browser') frameOffset = 40;
-        else if (frame === 'macos') frameOffset = 32;
-        else if (frame === 'windows') frameOffset = 32;
+        let frameOffsetY = 0;
+        let frameOffsetX = 0;
+        if (frame === 'browser') frameOffsetY = 40;
+        else if (frame === 'macos') frameOffsetY = 32;
+        else if (frame === 'windows') frameOffsetY = 32;
+        else if (frame === 'iphone') { frameOffsetX = 32; frameOffsetY = 32; }
+        else if (frame === 'android') { frameOffsetX = 24; frameOffsetY = 24; }
 
         if (image) {
             const updates: Partial<EditorState> = { frameType: frame };
 
             // Only update canvas dimensions if no fixed aspect ratio is set
             if (!get().aspectRatio) {
-                updates.canvasWidth = image.width + padding * 2;
-                updates.canvasHeight = image.height + padding * 2 + frameOffset;
+                const scale = get().imageScale;
+                updates.canvasWidth = Math.round(image.width * scale) + padding * 2 + frameOffsetX;
+                updates.canvasHeight = Math.round(image.height * scale) + padding * 2 + frameOffsetY;
             }
 
             set(updates);
@@ -142,7 +156,28 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
 
     setExportScale: (scale: ExportScale) => set({ exportScale: scale }),
 
-    setImageScale: (scale: number) => set({ imageScale: scale }),
+    setImageScale: (scale: number) => {
+        const image = get().originalImage;
+        const padding = get().padding;
+        const frameType = get().frameType;
+
+        let frameOffsetY = 0;
+        let frameOffsetX = 0;
+        if (frameType === 'browser') frameOffsetY = 40;
+        else if (frameType === 'macos') frameOffsetY = 32;
+        else if (frameType === 'windows') frameOffsetY = 32;
+        else if (frameType === 'iphone') { frameOffsetX = 32; frameOffsetY = 32; }
+        else if (frameType === 'android') { frameOffsetX = 24; frameOffsetY = 24; }
+
+        const updates: Partial<EditorState> = { imageScale: scale };
+
+        if (image && !get().aspectRatio) {
+            updates.canvasWidth = Math.round(image.width * scale) + padding * 2 + frameOffsetX;
+            updates.canvasHeight = Math.round(image.height * scale) + padding * 2 + frameOffsetY;
+        }
+
+        set(updates);
+    },
 
     setRotation: (rotation: number) => set({ rotation: rotation }),
 

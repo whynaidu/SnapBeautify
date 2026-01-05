@@ -2,7 +2,7 @@
 
 export type BackgroundType = 'solid' | 'gradient' | 'mesh' | 'image' | 'transparent';
 export type FrameType = 'none' | 'browser' | 'macos' | 'windows' | 'iphone' | 'android';
-export type ShadowSize = 'none' | 'sm' | 'md' | 'lg' | 'xl';
+// export type ShadowSize = 'none' | 'sm' | 'md' | 'lg' | 'xl'; // Removed in favor of custom controls
 export type ExportFormat = 'png' | 'jpeg' | 'webp';
 export type ExportScale = 1 | 2 | 3 | 4;
 
@@ -17,12 +17,12 @@ export interface MeshGradient {
     css: string;
 }
 
-export interface ShadowPreset {
-    blur: number;
-    spread: number;
-    offsetY: number;
-    opacity: number;
-}
+// export interface ShadowPreset {
+//     blur: number;
+//     spread: number;
+//     offsetY: number;
+//     opacity: number;
+// }
 
 export interface AspectRatioPreset {
     name: string;
@@ -46,9 +46,9 @@ export interface EditorState {
 
     // Styling
     padding: number;
-    shadowSize: ShadowSize;
-    shadowIntensity: number; // 0-100
-    shadowColor: string;
+    shadowBlur: number; // 0-100
+    shadowOpacity: number; // 0-100
+    shadowColor: string; // HEX or RGBA
     borderRadius: number;
     imageScale: number;
     rotation: number;
@@ -76,8 +76,9 @@ export interface EditorActions {
     setMeshGradient: (css: string) => void;
     setBackgroundImage: (url: string) => void;
     setPadding: (padding: number) => void;
-    setShadowSize: (size: ShadowSize) => void;
-    setShadowIntensity: (intensity: number) => void;
+    setShadowBlur: (blur: number) => void;
+    setShadowOpacity: (opacity: number) => void;
+    setShadowColor: (color: string) => void;
     setBorderRadius: (radius: number) => void;
     setFrameType: (frame: FrameType) => void;
     setAspectRatio: (ratio: string | null) => void;

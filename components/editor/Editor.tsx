@@ -24,7 +24,7 @@ export function Editor() {
     }, []);
 
     return (
-        <div className="h-screen w-full flex flex-col bg-zinc-950 text-white overflow-hidden supports-[height:100cqh]:h-[100cqh] supports-[height:100dvh]:h-[100dvh]">
+        <div className="h-screen w-full flex flex-col bg-background text-foreground overflow-hidden supports-[height:100cqh]:h-[100cqh] supports-[height:100dvh]:h-[100dvh]">
             <Header />
 
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">

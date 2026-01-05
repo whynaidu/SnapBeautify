@@ -28,7 +28,7 @@ export function BackgroundPicker() {
 
     return (
         <div className="space-y-4">
-            <Label className="text-zinc-400 text-xs uppercase tracking-wider">
+            <Label className="text-muted-foreground text-xs uppercase tracking-wider">
                 Background
             </Label>
 
@@ -40,7 +40,7 @@ export function BackgroundPicker() {
                     onClick={() => setBackgroundType('solid')}
                     className={cn(
                         'flex-1',
-                        backgroundType === 'solid' && 'bg-indigo-600 hover:bg-indigo-700'
+                        backgroundType === 'solid' && 'bg-primary hover:bg-primary/90 text-primary-foreground'
                     )}
                 >
                     Solid
@@ -51,7 +51,7 @@ export function BackgroundPicker() {
                     onClick={() => setBackgroundType('gradient')}
                     className={cn(
                         'flex-1',
-                        (backgroundType === 'gradient' || backgroundType === 'mesh') && 'bg-indigo-600 hover:bg-indigo-700'
+                        (backgroundType === 'gradient' || backgroundType === 'mesh') && 'bg-primary hover:bg-primary/90 text-primary-foreground'
                     )}
                 >
                     Gradient
@@ -62,7 +62,7 @@ export function BackgroundPicker() {
                     onClick={() => setBackgroundType('transparent')}
                     className={cn(
                         'flex-1',
-                        backgroundType === 'transparent' && 'bg-indigo-600 hover:bg-indigo-700'
+                        backgroundType === 'transparent' && 'bg-primary hover:bg-primary/90 text-primary-foreground'
                     )}
                 >
                     None
@@ -80,7 +80,7 @@ export function BackgroundPicker() {
                                 className={cn(
                                     'w-full aspect-square rounded-md border-2 transition-all',
                                     backgroundColor === color
-                                        ? 'border-white scale-110 z-10'
+                                        ? 'border-foreground/80 scale-110 z-10'
                                         : 'border-transparent hover:scale-105'
                                 )}
                                 style={{ backgroundColor: color }}
@@ -102,7 +102,7 @@ export function BackgroundPicker() {
                                 <Pipette className="w-4 h-4 mr-2" />
                                 Picker
                                 <div
-                                    className="w-4 h-4 rounded ml-auto border border-zinc-600"
+                                    className="w-4 h-4 rounded ml-auto border border-border"
                                     style={{ backgroundColor: backgroundColor }}
                                 />
                             </Button>
@@ -122,8 +122,8 @@ export function BackgroundPicker() {
                 <div className="space-y-4">
                     {/* Custom Gradient Controls - Only show when standard gradient is active */}
                     {isGradientActive && (
-                        <div className="space-y-2 p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
-                            <Label className="text-[10px] uppercase text-zinc-500">Custom Gradient</Label>
+                        <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
+                            <Label className="text-[10px] uppercase text-muted-foreground">Custom Gradient</Label>
 
                             <div className="flex gap-2">
                                 {/* Start Color */}
@@ -162,7 +162,7 @@ export function BackgroundPicker() {
                                         <Button variant="outline" size="sm" className="w-full h-8 px-2 justify-between">
                                             <span className="text-[10px]">End</span>
                                             <div
-                                                className="w-3 h-3 rounded border border-zinc-600"
+                                                className="w-3 h-3 rounded border border-border"
                                                 style={{ backgroundColor: gradientColors[1] }}
                                             />
                                         </Button>
@@ -178,7 +178,7 @@ export function BackgroundPicker() {
                     )}
 
                     <div>
-                        <Label className="text-zinc-500 text-xs mb-2 block">Presets</Label>
+                        <Label className="text-muted-foreground text-xs mb-2 block">Presets</Label>
                         <div className="grid grid-cols-5 gap-2">
                             {PRESET_GRADIENTS.map((gradient) => {
                                 // Only show as selected if it's a regular gradient (not mesh) AND colors match
@@ -194,7 +194,7 @@ export function BackgroundPicker() {
                                         className={cn(
                                             'relative w-full aspect-square rounded-lg transition-all',
                                             isSelected
-                                                ? 'ring-2 ring-white ring-offset-2 ring-offset-zinc-900 scale-105'
+                                                ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
                                                 : 'hover:scale-105'
                                         )}
                                         style={{
@@ -212,7 +212,7 @@ export function BackgroundPicker() {
                     </div>
 
                     <div>
-                        <Label className="text-zinc-500 text-xs mb-2 block">Mesh Gradients</Label>
+                        <Label className="text-muted-foreground text-xs mb-2 block">Mesh Gradients</Label>
                         <div className="grid grid-cols-4 gap-2">
                             {MESH_GRADIENTS.map((mesh, index) => {
                                 // Only show as selected if it's a mesh type AND the CSS matches
@@ -224,7 +224,7 @@ export function BackgroundPicker() {
                                         className={cn(
                                             'relative w-full aspect-square rounded-lg transition-all overflow-hidden',
                                             isSelected
-                                                ? 'ring-2 ring-white ring-offset-2 ring-offset-zinc-900 scale-105'
+                                                ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
                                                 : 'hover:scale-105'
                                         )}
                                         style={{ background: mesh.css, backgroundColor: '#0f172a' }}
@@ -243,7 +243,7 @@ export function BackgroundPicker() {
 
             {/* Transparent */}
             {backgroundType === 'transparent' && (
-                <div className="p-4 bg-zinc-800 rounded-lg text-center">
+                <div className="p-4 bg-muted/40 rounded-lg text-center">
                     <div
                         className="w-12 h-12 mx-auto rounded-lg mb-2"
                         style={{
@@ -257,7 +257,7 @@ export function BackgroundPicker() {
                             backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px',
                         }}
                     />
-                    <p className="text-xs text-zinc-500">Exports with transparent background (PNG)</p>
+                    <p className="text-xs text-muted-foreground">Exports with transparent background (PNG)</p>
                 </div>
             )}
         </div>

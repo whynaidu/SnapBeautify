@@ -18,15 +18,15 @@ export function MobileControlPanel() {
     return (
         <div
             className={`
-        fixed bottom-16 left-0 right-0 bg-zinc-900 border-t border-zinc-800
+        fixed bottom-16 left-0 right-0 bg-background border-t border-border
         transition-all duration-300 ease-out z-50
-        ${isExpanded ? 'h-[60vh]' : 'h-14'}
+        ${isExpanded ? 'h-[60vh] shadow-2xl' : 'h-14'}
       `}
         >
             {/* Toggle button */}
             <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full h-14 flex items-center justify-center gap-2 text-zinc-400 hover:text-white transition-colors"
+                className="w-full h-14 flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
             >
                 {isExpanded ? (
                     <>
@@ -45,31 +45,31 @@ export function MobileControlPanel() {
             {isExpanded && (
                 <div className="h-[calc(60vh-3.5rem)] overflow-y-auto">
                     <Tabs defaultValue="background" className="w-full">
-                        <TabsList className="w-full grid grid-cols-4 bg-zinc-900 border-b border-zinc-800 rounded-none h-12 p-0 sticky top-0 z-10">
+                        <TabsList className="w-full grid grid-cols-4 bg-background border-b border-border rounded-none h-12 p-0 sticky top-0 z-10">
                             <TabsTrigger
                                 value="background"
-                                className="rounded-none data-[state=active]:bg-zinc-800 data-[state=active]:shadow-none h-full flex-col gap-0.5"
+                                className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
                             >
                                 <Palette className="w-4 h-4" />
                                 <span className="text-[10px]">BG</span>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="style"
-                                className="rounded-none data-[state=active]:bg-zinc-800 data-[state=active]:shadow-none h-full flex-col gap-0.5"
+                                className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
                             >
                                 <Square className="w-4 h-4" />
                                 <span className="text-[10px]">Style</span>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="shadow"
-                                className="rounded-none data-[state=active]:bg-zinc-800 data-[state=active]:shadow-none h-full flex-col gap-0.5"
+                                className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
                             >
                                 <Sun className="w-4 h-4" />
                                 <span className="text-[10px]">Shadow</span>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="frame"
-                                className="rounded-none data-[state=active]:bg-zinc-800 data-[state=active]:shadow-none h-full flex-col gap-0.5"
+                                className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
                             >
                                 <Frame className="w-4 h-4" />
                                 <span className="text-[10px]">Frame</span>
@@ -83,13 +83,13 @@ export function MobileControlPanel() {
 
                             <TabsContent value="style" className="mt-0 space-y-6">
                                 <PaddingControl />
-                                <div className="border-t border-zinc-800 pt-6">
+                                <div className="border-t border-border pt-6">
                                     <BorderRadiusControl />
                                 </div>
-                                <div className="border-t border-zinc-800 pt-6">
+                                <div className="border-t border-border pt-6">
                                     <ScaleControl />
                                 </div>
-                                <div className="border-t border-zinc-800 pt-6">
+                                <div className="border-t border-border pt-6">
                                     <AspectRatioPicker />
                                 </div>
                             </TabsContent>

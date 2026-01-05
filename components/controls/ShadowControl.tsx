@@ -3,106 +3,149 @@
 import { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useEditorStore } from '@/lib/store/editor-store';
-import { SHADOW_OPTIONS } from '@/lib/constants/shadows';
-import { ShadowSize } from '@/types/editor';
-
 import { useThrottle } from '@/hooks/useThrottle';
+import { cn } from '@/lib/utils';
 
 export function ShadowControl() {
-    const { shadowSize, setShadowSize, shadowIntensity, setShadowIntensity } = useEditorStore();
+    const {
+        shadowBlur,
+        setShadowBlur,
+        shadowOpacity,
+        setShadowOpacity,
+        shadowColor,
+        setShadowColor
+    } = useEditorStore();
 
-    // Handle hydration - use local state that syncs with store
-    const [localIntensity, setLocalIntensity] = useState(50);
+    // Local state for throttled sliders
+    const [localBlur, setLocalBlur] = useState(shadowBlur);
+    const [localOpacity, setLocalOpacity] = useState(shadowOpacity);
+    const [isEnabled, setIsEnabled] = useState(shadowBlur > 0);
 
-    const throttledSetIntensity = useThrottle((value: number) => {
-        setShadowIntensity(value);
-    }, 50);
+    // Sync local state with store
+    useEffect(() => {
+        setLocalBlur(shadowBlur);
+        setIsEnabled(shadowBlur > 0);
+    }, [shadowBlur]);
 
     useEffect(() => {
-        setLocalIntensity(shadowIntensity);
-    }, [shadowIntensity]);
+        setLocalOpacity(shadowOpacity);
+    }, [shadowOpacity]);
 
-    const handleIntensityChange = (value: number) => {
-        setLocalIntensity(value);
-        throttledSetIntensity(value);
+    // Throttled updates
+    const throttledSetBlur = useThrottle((value: number) => {
+        setShadowBlur(value);
+    }, 50);
+
+    const throttledSetOpacity = useThrottle((value: number) => {
+        setShadowOpacity(value);
+    }, 50);
+
+    const handleBlurChange = (value: number) => {
+        setLocalBlur(value);
+        throttledSetBlur(value);
+        if (value > 0 && !isEnabled) setIsEnabled(true);
+        if (value === 0 && isEnabled) setIsEnabled(false);
+    };
+
+    const handleOpacityChange = (value: number) => {
+        setLocalOpacity(value);
+        throttledSetOpacity(value);
+    };
+
+    const toggleShadow = (checked: boolean) => {
+        setIsEnabled(checked);
+        if (checked) {
+            // Restore default or previous blur if it was 0
+            const newBlur = localBlur > 0 ? localBlur : 20;
+            setLocalBlur(newBlur);
+            setShadowBlur(newBlur);
+        } else {
+            setLocalBlur(0);
+            setShadowBlur(0);
+        }
     };
 
     return (
         <div className="space-y-4">
-            <Label className="text-zinc-400 text-xs uppercase tracking-wider">
-                Shadow Preset
-            </Label>
+            {/* Enable Toggle */}
+            <div className="flex items-center justify-between">
+                <Label className="text-muted-foreground text-xs uppercase tracking-wider">
+                    Enable Shadow
+                </Label>
+                <Switch
+                    checked={isEnabled}
+                    onCheckedChange={toggleShadow}
+                />
+            </div>
 
-            <ToggleGroup
-                type="single"
-                value={shadowSize}
-                onValueChange={(value) => value && setShadowSize(value as ShadowSize)}
-                className="justify-start w-full"
-            >
-                {SHADOW_OPTIONS.map((option) => (
-                    <ToggleGroupItem
-                        key={option.value}
-                        value={option.value}
-                        className="flex-1 data-[state=on]:bg-indigo-600 data-[state=on]:text-white"
-                    >
-                        {option.label}
-                    </ToggleGroupItem>
-                ))}
-            </ToggleGroup>
-
-            {/* Shadow Intensity Slider */}
-            {shadowSize !== 'none' && (
-                <div className="space-y-3 pt-2">
+            {isEnabled && (
+                <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                    {/* Color Picker */}
                     <div className="flex items-center justify-between">
-                        <Label className="text-zinc-400 text-xs uppercase tracking-wider">
-                            Intensity
+                        <Label className="text-muted-foreground text-xs uppercase tracking-wider">
+                            Color
                         </Label>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-2">
+                            <div className="relative group">
+                                <div
+                                    className="w-8 h-8 rounded-full border border-border cursor-pointer shadow-sm"
+                                    style={{ backgroundColor: shadowColor }}
+                                />
+                                <input
+                                    type="color"
+                                    value={shadowColor}
+                                    onChange={(e) => setShadowColor(e.target.value)}
+                                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                />
+                            </div>
                             <Input
-                                type="number"
-                                value={localIntensity}
-                                onChange={(e) => handleIntensityChange(Number(e.target.value))}
-                                className="w-16 h-7 text-xs text-right bg-zinc-800 border-zinc-700"
-                                min={0}
-                                max={100}
+                                value={shadowColor}
+                                onChange={(e) => setShadowColor(e.target.value)}
+                                className="w-20 h-7 text-xs bg-input border-border uppercase"
                             />
-                            <span className="text-xs text-zinc-500">%</span>
                         </div>
                     </div>
 
-                    <Slider
-                        value={[localIntensity]}
-                        onValueChange={([value]) => handleIntensityChange(value)}
-                        min={0}
-                        max={100}
-                        step={5}
-                        className="w-full"
-                    />
+                    {/* Blur Slider */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <Label className="text-muted-foreground text-xs uppercase tracking-wider">
+                                Blur Radius
+                            </Label>
+                            <span className="text-xs text-muted-foreground">{localBlur}px</span>
+                        </div>
+                        <Slider
+                            value={[localBlur]}
+                            onValueChange={([val]) => handleBlurChange(val)}
+                            min={0}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                        />
+                    </div>
+
+                    {/* Opacity Slider */}
+                    <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                            <Label className="text-muted-foreground text-xs uppercase tracking-wider">
+                                Opacity
+                            </Label>
+                            <span className="text-xs text-muted-foreground">{localOpacity}%</span>
+                        </div>
+                        <Slider
+                            value={[localOpacity]}
+                            onValueChange={([val]) => handleOpacityChange(val)}
+                            min={0}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                        />
+                    </div>
                 </div>
             )}
-
-            {/* Visual preview of shadow */}
-            <div className="p-4 bg-zinc-800 rounded-lg">
-                <div
-                    className="w-20 h-12 mx-auto bg-white rounded-lg transition-shadow duration-200"
-                    style={{
-                        boxShadow:
-                            shadowSize === 'none' || localIntensity === 0
-                                ? 'none'
-                                : shadowSize === 'sm'
-                                    ? `0 ${6 * (localIntensity / 50)}px ${15 * (localIntensity / 50)}px rgba(0,0,0,${0.2 * (localIntensity / 50)})`
-                                    : shadowSize === 'md'
-                                        ? `0 ${12 * (localIntensity / 50)}px ${30 * (localIntensity / 50)}px rgba(0,0,0,${0.3 * (localIntensity / 50)})`
-                                        : shadowSize === 'lg'
-                                            ? `0 ${20 * (localIntensity / 50)}px ${50 * (localIntensity / 50)}px rgba(0,0,0,${0.4 * (localIntensity / 50)})`
-                                            : `0 ${30 * (localIntensity / 50)}px ${80 * (localIntensity / 50)}px rgba(0,0,0,${0.5 * (localIntensity / 50)})`,
-                    }}
-                />
-                <p className="text-xs text-zinc-500 text-center mt-2">Preview</p>
-            </div>
         </div>
     );
 }

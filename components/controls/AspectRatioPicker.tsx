@@ -60,7 +60,7 @@ export function AspectRatioPicker() {
 
     return (
         <div className="space-y-3">
-            <Label className="text-zinc-400 text-xs uppercase tracking-wider">
+            <Label className="text-muted-foreground text-xs uppercase tracking-wider">
                 Aspect Ratio
             </Label>
 
@@ -72,8 +72,8 @@ export function AspectRatioPicker() {
                         className={cn(
                             'py-2 px-3 text-xs rounded-lg border transition-all',
                             aspectRatio === preset.value
-                                ? 'border-indigo-500 bg-indigo-500/10 text-white'
-                                : 'border-zinc-700 hover:border-zinc-600 bg-zinc-800/50 text-zinc-400'
+                                ? 'border-primary bg-primary/10 text-primary'
+                                : 'border-border hover:border-muted-foreground/50 bg-muted/30 text-muted-foreground'
                         )}
                     >
                         {preset.name}
@@ -81,7 +81,7 @@ export function AspectRatioPicker() {
                 ))}
             </div>
 
-            <Label className="text-zinc-500 text-xs block pt-2">Social Media</Label>
+            <Label className="text-muted-foreground text-xs block pt-2">Social Media</Label>
             <div className="grid grid-cols-2 gap-2">
                 {ASPECT_RATIO_PRESETS.slice(6).map((preset) => (
                     <button
@@ -90,8 +90,8 @@ export function AspectRatioPicker() {
                         className={cn(
                             'py-2 px-3 text-xs rounded-lg border transition-all',
                             aspectRatio === preset.value
-                                ? 'border-indigo-500 bg-indigo-500/10 text-white'
-                                : 'border-zinc-700 hover:border-zinc-600 bg-zinc-800/50 text-zinc-400'
+                                ? 'border-primary bg-primary/10 text-primary'
+                                : 'border-border hover:border-muted-foreground/50 bg-muted/30 text-muted-foreground'
                         )}
                     >
                         {preset.name}
@@ -101,7 +101,7 @@ export function AspectRatioPicker() {
 
             {/* Info about current aspect ratio */}
             {aspectRatio && (
-                <p className="text-xs text-zinc-500 mt-2">
+                <p className="text-xs text-muted-foreground mt-2">
                     {aspectRatio === 'twitter' && '1600×900px - Twitter/X Post'}
                     {aspectRatio === 'linkedin' && '1200×628px - LinkedIn Post'}
                     {aspectRatio === 'instagram' && '1080×1080px - Instagram Post'}

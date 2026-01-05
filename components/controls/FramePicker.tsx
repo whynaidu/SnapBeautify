@@ -38,6 +38,18 @@ const FRAME_OPTIONS: FrameOption[] = [
         icon: <Laptop className="w-5 h-5" />,
         description: 'Windows 11',
     },
+    {
+        type: 'iphone',
+        label: 'iPhone',
+        icon: <Smartphone className="w-5 h-5" />,
+        description: 'iOS Style',
+    },
+    {
+        type: 'android',
+        label: 'Android',
+        icon: <Smartphone className="w-5 h-5" />,
+        description: 'Android Style',
+    },
 ];
 
 export function FramePicker() {
@@ -45,7 +57,7 @@ export function FramePicker() {
 
     return (
         <div className="space-y-3">
-            <Label className="text-zinc-400 text-xs uppercase tracking-wider">
+            <Label className="text-muted-foreground text-xs uppercase tracking-wider">
                 Frame
             </Label>
 
@@ -55,16 +67,17 @@ export function FramePicker() {
                         key={option.type}
                         onClick={() => setFrameType(option.type)}
                         className={cn(
-                            'flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all',
+                            'flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200',
+                            'hover:bg-accent hover:border-accent-foreground/20',
                             frameType === option.type
-                                ? 'border-indigo-500 bg-indigo-500/10'
-                                : 'border-zinc-700 hover:border-zinc-600 bg-zinc-800/50'
+                                ? 'border-primary bg-primary/10 shadow-sm'
+                                : 'border-border bg-card'
                         )}
                     >
                         <div
                             className={cn(
-                                'p-2 rounded-lg',
-                                frameType === option.type ? 'text-indigo-400' : 'text-zinc-400'
+                                'p-2 rounded-lg transition-colors',
+                                frameType === option.type ? 'text-primary' : 'text-muted-foreground'
                             )}
                         >
                             {option.icon}
@@ -72,20 +85,20 @@ export function FramePicker() {
                         <div className="text-center">
                             <p
                                 className={cn(
-                                    'text-sm font-medium',
-                                    frameType === option.type ? 'text-white' : 'text-zinc-300'
+                                    'text-sm font-medium transition-colors',
+                                    frameType === option.type ? 'text-foreground' : 'text-muted-foreground'
                                 )}
                             >
                                 {option.label}
                             </p>
-                            <p className="text-xs text-zinc-500">{option.description}</p>
+                            <p className="text-xs text-muted-foreground/70">{option.description}</p>
                         </div>
                     </button>
                 ))}
             </div>
 
             {frameType !== 'none' && (
-                <p className="text-xs text-zinc-500 text-center">
+                <p className="text-xs text-muted-foreground text-center">
                     Frame adds a title bar above your screenshot
                 </p>
             )}

@@ -8,7 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Copy, Download, ChevronDown, Check, Share2, Loader2 } from 'lucide-react';
+import { Copy, Download, ChevronDown, Check, Share2, Loader2, Moon, Sun } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
 import {
     copyCanvasToClipboard,
@@ -40,8 +40,9 @@ export function ExportBar() {
         gradientAngle,
         meshGradientCSS,
         padding,
-        shadowSize,
-        shadowIntensity,
+        shadowBlur,
+        shadowOpacity,
+        shadowColor,
         borderRadius,
         frameType,
         imageScale,
@@ -72,8 +73,9 @@ export function ExportBar() {
             gradientAngle,
             meshGradientCSS,
             padding,
-            shadowSize,
-            shadowIntensity,
+            shadowBlur,
+            shadowOpacity,
+            shadowColor,
             borderRadius,
             frameType,
             scale: scaleOverride || exportScale,
@@ -231,7 +233,7 @@ export function ExportBar() {
     });
 
     return (
-        <div className="h-16 bg-zinc-900 border-t border-zinc-800 px-2 sm:px-4 flex items-center justify-between z-50">
+        <div className="h-16 bg-background border-t border-border px-2 sm:px-4 flex items-center justify-between z-50">
             <div className="flex items-center gap-1 sm:gap-3">
                 {/* Format Selector */}
                 <DropdownMenu>
@@ -258,7 +260,7 @@ export function ExportBar() {
                 {/* Scale Selector */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-12 sm:w-24 justify-between text-xs sm:text-sm" disabled={isExporting}>
+                        <Button variant="outline" size="sm" className="w-12 sm:w-24 justify-between text-xs sm:text-sm border-border hover:bg-accent hover:text-accent-foreground" disabled={isExporting}>
                             {exportScale}x
                             <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50 hidden sm:block" />
                         </Button>
@@ -278,10 +280,10 @@ export function ExportBar() {
                 </DropdownMenu>
 
                 {/* Current dimensions display - hide on small screens */}
-                <span className="text-[10px] sm:text-xs text-zinc-500 hidden sm:inline">
+                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">
                     {canvasWidth * exportScale}×{canvasHeight * exportScale}px
                     {exportScale > 1 && (
-                        <span className="text-zinc-600 ml-1 hidden md:inline">
+                        <span className="text-zinc-500 ml-1 hidden md:inline">
                             ({canvasWidth}×{canvasHeight} @{exportScale}x)
                         </span>
                     )}
@@ -297,7 +299,7 @@ export function ExportBar() {
                             size="sm"
                             onClick={handleShare}
                             disabled={!originalImage || isExporting}
-                            className="gap-1 sm:gap-2 px-2 sm:px-4"
+                            className="gap-1 sm:gap-2 px-2 sm:px-4 border-border hover:bg-accent hover:text-accent-foreground"
                         >
                             {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />}
                             <span className="hidden sm:inline">Share</span>
@@ -310,7 +312,7 @@ export function ExportBar() {
                             size="sm"
                             onClick={handleCopy}
                             disabled={!originalImage || isExporting}
-                            className="gap-1 sm:gap-2 px-2 sm:px-4"
+                            className="gap-1 sm:gap-2 px-2 sm:px-4 border-border hover:bg-accent hover:text-accent-foreground"
                         >
                             {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
                             <span className="hidden sm:inline">Copy</span>
@@ -322,11 +324,13 @@ export function ExportBar() {
                     size="sm"
                     onClick={handleDownload}
                     disabled={!originalImage || isExporting}
-                    className="gap-1 sm:gap-2 px-2 sm:px-4 bg-indigo-600 hover:bg-indigo-700"
+                    className="gap-1 sm:gap-2 px-2 sm:px-4 shadow-sm"
                 >
                     {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
                     <span className="sm:inline">Save</span>
                 </Button>
+
+                <div className="h-6 w-px bg-border mx-1" />
             </div>
         </div>
     );

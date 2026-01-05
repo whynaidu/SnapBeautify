@@ -19,8 +19,9 @@ export function Canvas() {
         gradientAngle,
         meshGradientCSS,
         padding,
-        shadowSize,
-        shadowIntensity,
+        shadowBlur,
+        shadowOpacity,
+        shadowColor,
         borderRadius,
         frameType,
         imageScale,
@@ -42,8 +43,9 @@ export function Canvas() {
             gradientAngle,
             meshGradientCSS,
             padding,
-            shadowSize,
-            shadowIntensity,
+            shadowBlur,
+            shadowOpacity,
+            shadowColor,
             borderRadius,
             frameType,
             imageScale,
@@ -59,8 +61,9 @@ export function Canvas() {
         gradientAngle,
         meshGradientCSS,
         padding,
-        shadowSize,
-        shadowIntensity,
+        shadowBlur,
+        shadowOpacity,
+        shadowColor,
         borderRadius,
         frameType,
         imageScale,
@@ -95,18 +98,12 @@ export function Canvas() {
             ref={containerRef}
             className={cn(
                 'flex-1 flex items-center justify-center',
-                'bg-zinc-950 overflow-hidden p-6',
+                'bg-muted/30 overflow-hidden p-6',
                 'relative'
             )}
             style={{
-                backgroundImage: `
-          linear-gradient(45deg, #1a1a1a 25%, transparent 25%),
-          linear-gradient(-45deg, #1a1a1a 25%, transparent 25%),
-          linear-gradient(45deg, transparent 75%, #1a1a1a 75%),
-          linear-gradient(-45deg, transparent 75%, #1a1a1a 75%)
-        `,
-                backgroundSize: '20px 20px',
-                backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
+                backgroundImage: `radial-gradient(var(--border) 1px, transparent 1px)`,
+                backgroundSize: '24px 24px',
             }}
         >
             {originalImage ? (
