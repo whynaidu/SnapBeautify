@@ -115,6 +115,19 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
+## 🔧 Troubleshooting
+
+### Linux: AppImage Release
+If you encounter a sandbox error when running the AppImage (e.g., `The SUID sandbox helper binary was found, but is not configured correctly`):
+
+Run it with the `--no-sandbox` flag:
+```bash
+./SnapBeautify-0.1.0.AppImage --no-sandbox
+```
+This is a common requirement on modern Linux distributions like Ubuntu 24.04 due to stricter kernel security defaults.
+
+---
+
 <div align="center">
   <p>Made with ❤️ by <a href="https://github.com/whynaidu">Vedant Naidu</a></p>
 </div>
