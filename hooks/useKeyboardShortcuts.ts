@@ -20,6 +20,13 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         gradientColors,
         gradientAngle,
         meshGradientCSS,
+        textPatternText,
+        textPatternColor,
+        textPatternOpacity,
+        textPatternPositions,
+        textPatternFontFamily,
+        textPatternFontSize,
+        textPatternFontWeight,
         padding,
         shadowBlur,
         shadowOpacity,
@@ -29,6 +36,9 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         exportFormat,
         exportScale,
         rotation,
+        imageScale,
+        canvasWidth,
+        canvasHeight,
         setPadding,
         // setShadowSize, // Deprecated
         clearImage,
@@ -51,6 +61,13 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
                 gradientColors,
                 gradientAngle,
                 meshGradientCSS,
+                textPatternText,
+                textPatternColor,
+                textPatternOpacity,
+                textPatternPositions,
+                textPatternFontFamily,
+                textPatternFontSize,
+                textPatternFontWeight,
                 padding,
                 shadowBlur,
                 shadowOpacity,
@@ -58,12 +75,15 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
                 borderRadius,
                 frameType,
                 scale: exportScale,
+                imageScale,
                 rotation,
+                targetWidth: canvasWidth,
+                targetHeight: canvasHeight,
             });
 
             await copyCanvasToClipboard(exportCanvas);
             toast.success('Copied to clipboard!');
-        } catch (error) {
+        } catch {
             toast.error('Failed to copy to clipboard');
         }
     }, [
@@ -73,6 +93,13 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         gradientColors,
         gradientAngle,
         meshGradientCSS,
+        textPatternText,
+        textPatternColor,
+        textPatternOpacity,
+        textPatternPositions,
+        textPatternFontFamily,
+        textPatternFontSize,
+        textPatternFontWeight,
         padding,
         shadowBlur,
         shadowOpacity,
@@ -80,7 +107,10 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         borderRadius,
         frameType,
         exportScale,
+        imageScale,
         rotation,
+        canvasWidth,
+        canvasHeight,
     ]);
 
     const handleDownload = useCallback(() => {
@@ -99,6 +129,13 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
                 gradientColors,
                 gradientAngle,
                 meshGradientCSS,
+                textPatternText,
+                textPatternColor,
+                textPatternOpacity,
+                textPatternPositions,
+                textPatternFontFamily,
+                textPatternFontSize,
+                textPatternFontWeight,
                 padding,
                 shadowBlur,
                 shadowOpacity,
@@ -106,13 +143,16 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
                 borderRadius,
                 frameType,
                 scale: exportScale,
+                imageScale,
                 rotation,
+                targetWidth: canvasWidth,
+                targetHeight: canvasHeight,
             });
 
             const timestamp = new Date().toISOString().slice(0, 10);
             downloadCanvas(exportCanvas, `snapbeautify-${timestamp}`, exportFormat);
             toast.success('Downloaded!');
-        } catch (error) {
+        } catch {
             toast.error('Failed to download');
         }
     }, [
@@ -122,6 +162,13 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         gradientColors,
         gradientAngle,
         meshGradientCSS,
+        textPatternText,
+        textPatternColor,
+        textPatternOpacity,
+        textPatternPositions,
+        textPatternFontFamily,
+        textPatternFontSize,
+        textPatternFontWeight,
         padding,
         shadowBlur,
         shadowOpacity,
@@ -130,7 +177,10 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         frameType,
         exportFormat,
         exportScale,
+        imageScale,
         rotation,
+        canvasWidth,
+        canvasHeight,
     ]);
 
     useEffect(() => {
@@ -186,7 +236,6 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         handleDownload,
         options,
         padding,
-        setPadding,
         setPadding,
         // setShadowSize,
         clearImage,

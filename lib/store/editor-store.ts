@@ -7,6 +7,7 @@ import {
     ExportScale,
     EditorState,
     EditorActions,
+    TextPosition,
 } from '@/types/editor';
 import { calculateFrameOffsets } from '@/lib/canvas/layout';
 
@@ -131,7 +132,7 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
 
     setTextPatternText: (text: string) => set({ textPatternText: text }),
 
-    toggleTextPatternPosition: (position) => {
+    toggleTextPatternPosition: (position: TextPosition) => {
         const current = get().textPatternPositions;
         const newPositions = current.includes(position)
             ? current.filter(p => p !== position) // Remove if already selected
