@@ -19,6 +19,9 @@ const DEFAULT_STATE: EditorState = {
     gradientAngle: 135,
     meshGradientCSS: '',
     backgroundImage: null,
+    textPatternText: 'WELCOME',
+    textPatternColor: '#ffffff',
+    textPatternOpacity: 0.1,
     padding: 64,
     shadowBlur: 20, // Default blur
     shadowOpacity: 50, // Default opacity %
@@ -111,6 +114,16 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
 
     setBackgroundImage: (url: string) =>
         set({ backgroundImage: url, backgroundType: 'image' }),
+
+    setTextPattern: (text: string, colors: [string, string], angle: number, textColor: string, textOpacity: number) =>
+        set({
+            textPatternText: text,
+            gradientColors: colors,
+            gradientAngle: angle,
+            textPatternColor: textColor,
+            textPatternOpacity: textOpacity,
+            backgroundType: 'textPattern',
+        }),
 
     setPadding: (padding: number) => {
         const state = get();

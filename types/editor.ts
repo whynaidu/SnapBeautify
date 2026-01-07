@@ -1,6 +1,6 @@
 // Editor TypeScript Types
 
-export type BackgroundType = 'solid' | 'gradient' | 'mesh' | 'image' | 'transparent';
+export type BackgroundType = 'solid' | 'gradient' | 'mesh' | 'image' | 'transparent' | 'textPattern';
 export type FrameType = 'none' | 'browser' | 'macos' | 'windows' | 'iphone' | 'android';
 // export type ShadowSize = 'none' | 'sm' | 'md' | 'lg' | 'xl'; // Removed in favor of custom controls
 export type ExportFormat = 'png' | 'jpeg' | 'webp';
@@ -15,6 +15,15 @@ export interface GradientPreset {
 export interface MeshGradient {
     name: string;
     css: string;
+}
+
+export interface TextPattern {
+    name: string;
+    text: string;
+    colors: [string, string];
+    angle: number;
+    textColor: string;
+    textOpacity: number;
 }
 
 // export interface ShadowPreset {
@@ -43,6 +52,9 @@ export interface EditorState {
     gradientAngle: number;
     meshGradientCSS: string;
     backgroundImage: string | null;
+    textPatternText: string;
+    textPatternColor: string;
+    textPatternOpacity: number;
 
     // Styling
     padding: number;
@@ -75,6 +87,7 @@ export interface EditorActions {
     setGradient: (colors: [string, string], angle?: number) => void;
     setMeshGradient: (css: string) => void;
     setBackgroundImage: (url: string) => void;
+    setTextPattern: (text: string, colors: [string, string], angle: number, textColor: string, textOpacity: number) => void;
     setPadding: (padding: number) => void;
     setShadowBlur: (blur: number) => void;
     setShadowOpacity: (opacity: number) => void;

@@ -1,4 +1,4 @@
-import { GradientPreset, MeshGradient } from '@/types/editor';
+import { GradientPreset, MeshGradient, TextPattern } from '@/types/editor';
 
 export const PRESET_GRADIENTS: GradientPreset[] = [
     // ===== VIBRANT & ENERGETIC =====
@@ -248,4 +248,54 @@ export const MESH_GRADIENTS: MeshGradient[] = [
         name: "Arctic Aurora",
         css: "radial-gradient(at 30% 20%, #06b6d4 0px, transparent 50%), radial-gradient(at 70% 30%, #3b82f6 0px, transparent 50%), radial-gradient(at 20% 80%, #22d3ee 0px, transparent 50%), radial-gradient(at 80% 70%, #0ea5e9 0px, transparent 50%)"
     },
+];
+
+export const TEXT_PATTERNS: TextPattern[] = [
+    // Professional & Business
+    { name: "Invoice", text: "INVOICE", colors: ["#1e40af", "#3b82f6"], angle: 135, textColor: "#ffffff", textOpacity: 0.08 },
+    { name: "Project", text: "PROJECT", colors: ["#7c3aed", "#a855f7"], angle: 135, textColor: "#ffffff", textOpacity: 0.08 },
+    { name: "Portfolio", text: "PORTFOLIO", colors: ["#6366f1", "#8b5cf6"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+    { name: "Proposal", text: "PROPOSAL", colors: ["#0891b2", "#06b6d4"], angle: 135, textColor: "#ffffff", textOpacity: 0.08 },
+    { name: "Report", text: "REPORT", colors: ["#475569", "#64748b"], angle: 180, textColor: "#ffffff", textOpacity: 0.07 },
+    { name: "Document", text: "DOCUMENT", colors: ["#334155", "#475569"], angle: 180, textColor: "#ffffff", textOpacity: 0.08 },
+
+    // Creative & Design
+    { name: "Welcome", text: "WELCOME", colors: ["#f472b6", "#c084fc"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+    { name: "Creative", text: "CREATIVE", colors: ["#ec4899", "#8b5cf6"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+    { name: "Design", text: "DESIGN", colors: ["#8b5cf6", "#6366f1"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Studio", text: "STUDIO", colors: ["#4f46e5", "#6366f1"], angle: 135, textColor: "#ffffff", textOpacity: 0.08 },
+    { name: "Modern", text: "MODERN", colors: ["#06b6d4", "#8b5cf6"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Brand", text: "BRAND", colors: ["#f97316", "#ec4899"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+
+    // Marketing & Social
+    { name: "Launch", text: "LAUNCH", colors: ["#ef4444", "#f97316"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+    { name: "Announce", text: "ANNOUNCE", colors: ["#f59e0b", "#eab308"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Event", text: "EVENT", colors: ["#22c55e", "#14b8a6"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Success", text: "SUCCESS", colors: ["#10b981", "#06b6d4"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Trending", text: "TRENDING", colors: ["#ff0080", "#ff8c00"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+    { name: "Viral", text: "VIRAL", colors: ["#ff00ff", "#00ffff"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+
+    // Tech & Innovation
+    { name: "Tech", text: "TECH", colors: ["#1e3a8a", "#3b82f6"], angle: 135, textColor: "#ffffff", textOpacity: 0.08 },
+    { name: "Digital", text: "DIGITAL", colors: ["#6366f1", "#8b5cf6"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Innovation", text: "INNOVATION", colors: ["#0ea5e9", "#8b5cf6"], angle: 135, textColor: "#ffffff", textOpacity: 0.08 },
+    { name: "Future", text: "FUTURE", colors: ["#7c3aed", "#ec4899"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "AI", text: "AI", colors: ["#4f46e5", "#ec4899"], angle: 135, textColor: "#ffffff", textOpacity: 0.12 },
+    { name: "Code", text: "CODE", colors: ["#14b8a6", "#22c55e"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+
+    // Motivational
+    { name: "Dream", text: "DREAM", colors: ["#f472b6", "#fbbf24"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+    { name: "Believe", text: "BELIEVE", colors: ["#8b5cf6", "#06b6d4"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Inspire", text: "INSPIRE", colors: ["#f97316", "#ec4899"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+    { name: "Achieve", text: "ACHIEVE", colors: ["#22c55e", "#10b981"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Grow", text: "GROW", colors: ["#84cc16", "#22c55e"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+    { name: "Focus", text: "FOCUS", colors: ["#0891b2", "#06b6d4"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+
+    // Seasonal & Events
+    { name: "Summer", text: "SUMMER", colors: ["#f59e0b", "#f97316"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+    { name: "Winter", text: "WINTER", colors: ["#0ea5e9", "#06b6d4"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Spring", text: "SPRING", colors: ["#22c55e", "#84cc16"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+    { name: "Holiday", text: "HOLIDAY", colors: ["#dc2626", "#22c55e"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Party", text: "PARTY", colors: ["#ec4899", "#f97316"], angle: 135, textColor: "#ffffff", textOpacity: 0.11 },
+    { name: "Celebrate", text: "CELEBRATE", colors: ["#eab308", "#f97316"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
 ];

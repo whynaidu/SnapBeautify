@@ -18,6 +18,9 @@ export interface RenderOptions {
     gradientColors: [string, string];
     gradientAngle: number;
     meshGradientCSS?: string;
+    textPatternText?: string;
+    textPatternColor?: string;
+    textPatternOpacity?: number;
     padding: number;
     shadowBlur?: number;
     shadowOpacity?: number;
@@ -43,6 +46,9 @@ export function renderCanvas(options: RenderOptions): void {
         gradientColors,
         gradientAngle,
         meshGradientCSS,
+        textPatternText,
+        textPatternColor,
+        textPatternOpacity,
         padding,
         shadowBlur = 20,
         shadowOpacity = 50,
@@ -81,6 +87,9 @@ export function renderCanvas(options: RenderOptions): void {
         type: backgroundType,
         color: backgroundColor,
         gradientColors,
+        textPatternText,
+        textPatternColor,
+        textPatternOpacity,
         gradientAngle,
         meshGradientCSS,
     };

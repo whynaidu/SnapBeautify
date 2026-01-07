@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useEditorStore } from '@/lib/store/editor-store';
-import { PRESET_GRADIENTS, SOLID_COLORS, MESH_GRADIENTS } from '@/lib/constants/gradients';
+import { PRESET_GRADIENTS, SOLID_COLORS, MESH_GRADIENTS, TEXT_PATTERNS } from '@/lib/constants/gradients';
 import { cn } from '@/lib/utils';
 import { Check, Pipette } from 'lucide-react';
 
@@ -15,9 +15,13 @@ export function BackgroundPicker() {
         gradientColors,
         gradientAngle,
         meshGradientCSS,
+        textPatternText,
+        textPatternColor,
+        textPatternOpacity,
         setBackgroundColor,
         setGradient,
         setMeshGradient,
+        setTextPattern,
         setBackgroundType,
     } = useEditorStore();
 
@@ -25,6 +29,8 @@ export function BackgroundPicker() {
     const isMeshActive = backgroundType === 'mesh';
     // Check if regular gradient is active (not mesh)
     const isGradientActive = backgroundType === 'gradient';
+    // Check if text pattern is active
+    const isTextPatternActive = backgroundType === 'textPattern';
 
     return (
         <div className="space-y-4">
@@ -33,7 +39,7 @@ export function BackgroundPicker() {
             </Label>
 
             {/* Type Selector */}
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-2">
                 <Button
                     variant={backgroundType === 'solid' ? 'default' : 'outline'}
                     size="sm"
@@ -57,6 +63,17 @@ export function BackgroundPicker() {
                     Gradient
                 </Button>
                 <Button
+                    variant={backgroundType === 'textPattern' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setBackgroundType('textPattern')}
+                    className={cn(
+                        'flex-1',
+                        backgroundType === 'textPattern' && 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                    )}
+                >
+                    Text
+                </Button>
+                <Button
                     variant={backgroundType === 'transparent' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setBackgroundType('transparent')}
@@ -72,7 +89,7 @@ export function BackgroundPicker() {
             {/* Solid Colors */}
             {backgroundType === 'solid' && (
                 <div className="space-y-3">
-                    <div className="max-h-[300px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+                    <div className="max-h-[240px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                         <div className="grid grid-cols-8 gap-1.5">
                             {SOLID_COLORS.map((color) => (
                                 <button
@@ -183,7 +200,7 @@ export function BackgroundPicker() {
                         <Label className="text-muted-foreground text-xs mb-2 block">
                             Gradient Presets ({PRESET_GRADIENTS.length})
                         </Label>
-                        <div className="max-h-[400px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+                        <div className="max-h-[280px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                             <div className="grid grid-cols-6 gap-2">
                                 {PRESET_GRADIENTS.map((gradient) => {
                                     // Only show as selected if it's a regular gradient (not mesh) AND colors match
@@ -224,7 +241,7 @@ export function BackgroundPicker() {
                         <Label className="text-muted-foreground text-xs mb-2 block">
                             Mesh Gradients ({MESH_GRADIENTS.length})
                         </Label>
-                        <div className="max-h-[300px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+                        <div className="max-h-[240px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                             <div className="grid grid-cols-5 gap-2">
                                 {MESH_GRADIENTS.map((mesh, index) => {
                                     // Only show as selected if it's a mesh type AND the CSS matches
@@ -252,6 +269,68 @@ export function BackgroundPicker() {
                                     );
                                 })}
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Text Patterns */}
+            {backgroundType === 'textPattern' && (
+                <div className="space-y-3">
+                    <Label className="text-muted-foreground text-xs mb-2 block">
+                        Text Patterns ({TEXT_PATTERNS.length})
+                    </Label>
+                    <div className="max-h-[280px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+                        <div className="grid grid-cols-5 gap-2">
+                            {TEXT_PATTERNS.map((pattern) => {
+                                const isSelected =
+                                    isTextPatternActive &&
+                                    textPatternText === pattern.text &&
+                                    gradientColors[0] === pattern.colors[0] &&
+                                    gradientColors[1] === pattern.colors[1];
+
+                                return (
+                                    <button
+                                        key={pattern.name}
+                                        onClick={() => setTextPattern(
+                                            pattern.text,
+                                            pattern.colors,
+                                            pattern.angle,
+                                            pattern.textColor,
+                                            pattern.textOpacity
+                                        )}
+                                        className={cn(
+                                            'relative w-full aspect-square rounded-lg transition-all overflow-hidden group',
+                                            isSelected
+                                                ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
+                                                : 'hover:scale-105'
+                                        )}
+                                        style={{
+                                            background: `linear-gradient(${pattern.angle}deg, ${pattern.colors[0]}, ${pattern.colors[1]})`,
+                                        }}
+                                        title={pattern.name}
+                                    >
+                                        {/* Preview text */}
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <span
+                                                className="text-[10px] font-black uppercase"
+                                                style={{
+                                                    color: pattern.textColor,
+                                                    opacity: pattern.textOpacity * 3,
+                                                }}
+                                            >
+                                                {pattern.text.slice(0, 3)}
+                                            </span>
+                                        </div>
+                                        {isSelected && (
+                                            <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg z-10" />
+                                        )}
+                                        <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/50 backdrop-blur-sm px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                                            {pattern.name}
+                                        </span>
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

@@ -11,6 +11,9 @@ export interface BackgroundOptions {
     gradientColors: [string, string];
     gradientAngle: number;
     meshGradientCSS?: string;
+    textPatternText?: string;
+    textPatternColor?: string;
+    textPatternOpacity?: number;
 }
 
 export interface GradientPoints {
@@ -174,6 +177,43 @@ export function drawMeshGradient(
 }
 
 /**
+ * Draw text pattern background (gradient with large text overlay)
+ */
+export function drawTextPattern(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    text: string,
+    gradientColors: [string, string],
+    gradientAngle: number,
+    textColor: string,
+    textOpacity: number
+): void {
+    // Draw gradient background first
+    drawGradientBackground(ctx, width, height, gradientColors, gradientAngle);
+
+    // Draw large text pattern overlay
+    ctx.save();
+
+    // Calculate font size based on canvas dimensions
+    const fontSize = Math.min(width, height) * 0.35;
+    ctx.font = `900 ${fontSize}px system-ui, -apple-system, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Set text style with opacity
+    const r = parseInt(textColor.slice(1, 3), 16);
+    const g = parseInt(textColor.slice(3, 5), 16);
+    const b = parseInt(textColor.slice(5, 7), 16);
+    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${textOpacity})`;
+
+    // Draw text in center
+    ctx.fillText(text, width / 2, height / 2);
+
+    ctx.restore();
+}
+
+/**
  * Draw checkerboard pattern (for transparency)
  */
 export function drawCheckerboard(
@@ -201,7 +241,16 @@ export function drawBackground(
     height: number,
     options: BackgroundOptions
 ): void {
-    const { type, color, gradientColors, gradientAngle, meshGradientCSS } = options;
+    const {
+        type,
+        color,
+        gradientColors,
+        gradientAngle,
+        meshGradientCSS,
+        textPatternText = 'WELCOME',
+        textPatternColor = '#ffffff',
+        textPatternOpacity = 0.1
+    } = options;
 
     switch (type) {
         case 'solid':
@@ -214,6 +263,19 @@ export function drawBackground(
 
         case 'mesh':
             drawMeshGradient(ctx, width, height, meshGradientCSS);
+            break;
+
+        case 'textPattern':
+            drawTextPattern(
+                ctx,
+                width,
+                height,
+                textPatternText,
+                gradientColors,
+                gradientAngle,
+                textPatternColor,
+                textPatternOpacity
+            );
             break;
 
         case 'transparent':
