@@ -6,7 +6,6 @@ import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { cn } from '@/lib/utils';
-import { useThrottle } from '@/hooks/useThrottle';
 
 const PADDING_PRESETS = [32, 48, 64, 96, 128];
 
@@ -14,17 +13,14 @@ export function PaddingControl() {
     const { padding, setPadding } = useEditorStore();
     const [localPadding, setLocalPadding] = useState(padding);
 
-    const throttledSetPadding = useThrottle((value: number) => {
-        setPadding(value);
-    }, 50);
-
     useEffect(() => {
         setLocalPadding(padding);
     }, [padding]);
 
     const handlePaddingChange = (value: number) => {
         setLocalPadding(value);
-        throttledSetPadding(value);
+        // Update immediately - store debounce + canvas throttle handles performance
+        setPadding(value);
     };
 
     return (

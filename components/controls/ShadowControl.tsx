@@ -6,7 +6,6 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { useEditorStore } from '@/lib/store/editor-store';
-import { useThrottle } from '@/hooks/useThrottle';
 import { cn } from '@/lib/utils';
 
 export function ShadowControl() {
@@ -19,7 +18,7 @@ export function ShadowControl() {
         setShadowColor
     } = useEditorStore();
 
-    // Local state for throttled sliders
+    // Local state for smooth slider interactions
     const [localBlur, setLocalBlur] = useState(shadowBlur);
     const [localOpacity, setLocalOpacity] = useState(shadowOpacity);
     const [isEnabled, setIsEnabled] = useState(shadowBlur > 0);
@@ -34,25 +33,18 @@ export function ShadowControl() {
         setLocalOpacity(shadowOpacity);
     }, [shadowOpacity]);
 
-    // Throttled updates
-    const throttledSetBlur = useThrottle((value: number) => {
-        setShadowBlur(value);
-    }, 50);
-
-    const throttledSetOpacity = useThrottle((value: number) => {
-        setShadowOpacity(value);
-    }, 50);
-
     const handleBlurChange = (value: number) => {
         setLocalBlur(value);
-        throttledSetBlur(value);
+        // Update immediately - Canvas throttle handles performance
+        setShadowBlur(value);
         if (value > 0 && !isEnabled) setIsEnabled(true);
         if (value === 0 && isEnabled) setIsEnabled(false);
     };
 
     const handleOpacityChange = (value: number) => {
         setLocalOpacity(value);
-        throttledSetOpacity(value);
+        // Update immediately - Canvas throttle handles performance
+        setShadowOpacity(value);
     };
 
     const toggleShadow = (checked: boolean) => {

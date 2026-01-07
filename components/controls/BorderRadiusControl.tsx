@@ -6,7 +6,6 @@ import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { cn } from '@/lib/utils';
-import { useThrottle } from '@/hooks/useThrottle';
 
 const RADIUS_PRESETS = [0, 8, 12, 16, 24];
 
@@ -14,17 +13,14 @@ export function BorderRadiusControl() {
     const { borderRadius, setBorderRadius } = useEditorStore();
     const [localRadius, setLocalRadius] = useState(borderRadius);
 
-    const throttledSetRadius = useThrottle((value: number) => {
-        setBorderRadius(value);
-    }, 50);
-
     useEffect(() => {
         setLocalRadius(borderRadius);
     }, [borderRadius]);
 
     const handleRadiusChange = (value: number) => {
         setLocalRadius(value);
-        throttledSetRadius(value);
+        // Update immediately - Canvas throttle handles performance
+        setBorderRadius(value);
     };
 
     return (
