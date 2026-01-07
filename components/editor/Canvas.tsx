@@ -1,10 +1,12 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { renderCanvas } from '@/lib/canvas/renderer';
 import { DropZone } from './DropZone';
 import { cn } from '@/lib/utils';
+import { measureRender } from '@/lib/utils/performance';
+import { useThrottle } from '@/lib/hooks/useThrottle';
 
 export function Canvas() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -30,29 +32,39 @@ export function Canvas() {
         canvasHeight,
     } = useEditorStore();
 
-    // Re-render canvas when any setting changes
-    useEffect(() => {
+    // Create a memoized render function
+    const performRender = useCallback(() => {
         if (!canvasRef.current || !originalImage) return;
 
-        renderCanvas({
-            canvas: canvasRef.current,
-            image: originalImage,
-            backgroundType,
-            backgroundColor,
-            gradientColors,
-            gradientAngle,
-            meshGradientCSS,
-            padding,
-            shadowBlur,
-            shadowOpacity,
-            shadowColor,
-            borderRadius,
-            frameType,
-            imageScale,
-            rotation,
-            targetWidth: canvasWidth,
-            targetHeight: canvasHeight,
-        });
+        measureRender(
+            'canvas:render',
+            () => {
+                renderCanvas({
+                    canvas: canvasRef.current!,
+                    image: originalImage,
+                    backgroundType,
+                    backgroundColor,
+                    gradientColors,
+                    gradientAngle,
+                    meshGradientCSS,
+                    padding,
+                    shadowBlur,
+                    shadowOpacity,
+                    shadowColor,
+                    borderRadius,
+                    frameType,
+                    imageScale,
+                    rotation,
+                    targetWidth: canvasWidth,
+                    targetHeight: canvasHeight,
+                });
+            },
+            {
+                canvasWidth,
+                canvasHeight,
+                frameType,
+            }
+        );
     }, [
         originalImage,
         backgroundType,
@@ -71,6 +83,14 @@ export function Canvas() {
         canvasWidth,
         canvasHeight,
     ]);
+
+    // Throttle the render function to 60fps (16ms)
+    const throttledRender = useThrottle(performRender, 16);
+
+    // Re-render canvas when any setting changes (throttled)
+    useEffect(() => {
+        throttledRender();
+    }, [throttledRender]);
 
     // Calculate display scale to fit container
     useEffect(() => {

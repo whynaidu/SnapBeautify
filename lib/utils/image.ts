@@ -1,27 +1,49 @@
+import { IMAGE_LOADING, FILE_VALIDATION } from '@/lib/constants/rendering';
+
 export function loadImageFromFile(file: File | Blob): Promise<{ image: HTMLImageElement; dataUrl: string }> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
         reader.onload = (e) => {
             const dataUrl = e.target?.result as string;
+            if (!dataUrl) {
+                reject(new Error('Failed to read file - no data'));
+                return;
+            }
+
             const img = new Image();
 
+            // Add timeout for Android content URIs
+            const timeout = setTimeout(() => {
+                reject(new Error('Image loading timeout - please try selecting the image again'));
+            }, IMAGE_LOADING.TIMEOUT_MS);
+
             img.onload = () => {
+                clearTimeout(timeout);
                 resolve({ image: img, dataUrl });
             };
 
-            img.onerror = () => {
-                reject(new Error('Failed to load image'));
+            img.onerror = (error) => {
+                clearTimeout(timeout);
+                console.error('Image load error:', error);
+                reject(new Error('Failed to load image - please try selecting it again'));
             };
 
             img.src = dataUrl;
         };
 
-        reader.onerror = () => {
+        reader.onerror = (error) => {
+            console.error('FileReader error:', error);
             reject(new Error('Failed to read file'));
         };
 
-        reader.readAsDataURL(file);
+        // Start reading the file
+        try {
+            reader.readAsDataURL(file);
+        } catch (error) {
+            console.error('FileReader readAsDataURL error:', error);
+            reject(new Error('Failed to start reading file'));
+        }
     });
 }
 
@@ -54,8 +76,8 @@ export function loadImageFromUrl(url: string): Promise<{ image: HTMLImageElement
 }
 
 export function validateImageFile(file: File): boolean {
-    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'];
-    return validTypes.includes(file.type);
+    const validTypes = FILE_VALIDATION.ALLOWED_TYPES;
+    return validTypes.includes(file.type as typeof validTypes[number]);
 }
 
 export function getImageDimensions(image: HTMLImageElement): { width: number; height: number } {

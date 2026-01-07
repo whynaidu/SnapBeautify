@@ -18,9 +18,16 @@ import {
     isShareSupported,
     isMobileDevice
 } from '@/lib/canvas/export';
+import {
+    isCapacitor,
+    saveImageCapacitor,
+    shareImageCapacitor
+} from '@/lib/canvas/export-capacitor';
 import { renderCanvas } from '@/lib/canvas/renderer';
 import { toast } from 'sonner';
 import { ExportFormat, ExportScale } from '@/types/editor';
+import { canvasPool } from '@/lib/utils/canvas-pool';
+import { measureExport } from '@/lib/utils/performance';
 
 export function ExportBar() {
     const [canCopy, setCanCopy] = useState(true);
@@ -54,72 +61,112 @@ export function ExportBar() {
     // Check capabilities on mount
     useEffect(() => {
         setCanCopy(isClipboardSupported());
-        setCanShare(isShareSupported());
+        // In Capacitor, always enable share (native plugin available)
+        // Otherwise check for Web Share API
+        setCanShare(isCapacitor() || isShareSupported());
         setIsMobile(isMobileDevice());
     }, []);
 
     const createExportCanvas = (scaleOverride?: number) => {
         if (!originalImage) return null;
 
-        // Explicitly clean up old canvases if possible by letting GC run,
-        // but we can't force GC. Creating a new element is standard.
-        const exportCanvas = document.createElement('canvas');
-        renderCanvas({
-            canvas: exportCanvas,
-            image: originalImage,
-            backgroundType,
-            backgroundColor,
-            gradientColors,
-            gradientAngle,
-            meshGradientCSS,
-            padding,
-            shadowBlur,
-            shadowOpacity,
-            shadowColor,
-            borderRadius,
-            frameType,
-            scale: scaleOverride || exportScale,
-            imageScale,
-            rotation,
-            targetWidth: canvasWidth,
-            targetHeight: canvasHeight,
-        });
-        return exportCanvas;
+        const scale = scaleOverride || exportScale;
+        const width = canvasWidth * scale;
+        const height = canvasHeight * scale;
+
+        // Use canvas pool to prevent memory leaks
+        const exportCanvas = canvasPool.acquire(width, height);
+
+        try {
+            renderCanvas({
+                canvas: exportCanvas,
+                image: originalImage,
+                backgroundType,
+                backgroundColor,
+                gradientColors,
+                gradientAngle,
+                meshGradientCSS,
+                padding,
+                shadowBlur,
+                shadowOpacity,
+                shadowColor,
+                borderRadius,
+                frameType,
+                scale,
+                imageScale,
+                rotation,
+                targetWidth: canvasWidth,
+                targetHeight: canvasHeight,
+            });
+            return exportCanvas;
+        } catch (error) {
+            // If rendering fails, release canvas back to pool
+            canvasPool.release(exportCanvas);
+            throw error;
+        }
     };
 
     const attemptExport = async (
         action: 'download' | 'share' | 'copy',
         currentScale: number
     ): Promise<boolean> => {
-        try {
-            const exportCanvas = createExportCanvas(currentScale);
-            if (!exportCanvas) return false;
+        return measureExport(
+            `export:${action}`,
+            async () => {
+                let exportCanvas: HTMLCanvasElement | null = null;
+                try {
+                    exportCanvas = createExportCanvas(currentScale);
+                    if (!exportCanvas) return false;
 
-            // Small delay to ensure UI updates before heavy canvas operation
-            await new Promise(resolve => setTimeout(resolve, 0));
+                    // Small delay to ensure UI updates before heavy canvas operation
+                    await new Promise(resolve => setTimeout(resolve, 0));
 
-            const timestamp = new Date().toISOString().slice(0, 10);
-            const filename = `snapbeautify-${timestamp}`;
+                    const timestamp = new Date().toISOString().slice(0, 10);
+                    const filename = `snapbeautify-${timestamp}`;
 
-            if (action === 'download') {
-                await downloadCanvas(exportCanvas, filename, exportFormat);
-            } else if (action === 'share') {
-                await shareCanvas(exportCanvas, filename);
-            } else if (action === 'copy') {
-                await copyCanvasToClipboard(exportCanvas);
+                    // Use Capacitor native APIs when running in native app
+                    if (isCapacitor()) {
+                        if (action === 'download') {
+                            await saveImageCapacitor(exportCanvas, filename, exportFormat);
+                        } else if (action === 'share') {
+                            await shareImageCapacitor(exportCanvas, filename, exportFormat);
+                        } else if (action === 'copy') {
+                            // Copy not supported in Capacitor, fallback to share
+                            await shareImageCapacitor(exportCanvas, filename, exportFormat);
+                        }
+                    } else {
+                        // Use web APIs for browser
+                        if (action === 'download') {
+                            await downloadCanvas(exportCanvas, filename, exportFormat);
+                        } else if (action === 'share') {
+                            await shareCanvas(exportCanvas, filename);
+                        } else if (action === 'copy') {
+                            await copyCanvasToClipboard(exportCanvas);
+                        }
+                    }
+
+                    // Release canvas back to pool for reuse
+                    canvasPool.release(exportCanvas);
+
+                    return true;
+                } catch (error) {
+                    // Release canvas on error
+                    if (exportCanvas) {
+                        canvasPool.release(exportCanvas);
+                    }
+
+                    if (error instanceof Error && (error.message.includes('abort') || error.message.includes('cancel'))) {
+                        throw error; // Don't retry for user cancellations
+                    }
+                    return false; // Failed, try next scale
+                }
+            },
+            {
+                action,
+                scale: currentScale,
+                format: exportFormat,
             }
-
-            // Explicitly clear canvas width to free memory immediately
-            exportCanvas.width = 0;
-            exportCanvas.height = 0;
-
-            return true;
-        } catch (error) {
-            if (error instanceof Error && (error.message.includes('abort') || error.message.includes('cancel'))) {
-                throw error; // Don't retry for user cancellations
-            }
-            return false; // Failed, try next scale
-        }
+        );
     };
 
     const wrapExport = async (action: () => Promise<void>) => {
@@ -220,6 +267,8 @@ export function ExportBar() {
             if (success) {
                 if (scale !== exportScale) {
                     toast.success(`Saved at ${scale}x (lower resolution) due to memory limits`, { duration: 5000 });
+                } else if (isCapacitor()) {
+                    toast.success('Saved to Pictures/SnapBeautify! Check Gallery.', { duration: 5000 });
                 } else if (isMobile) {
                     toast.success('Image ready! Check downloads.', { duration: 5000 });
                 } else {
@@ -238,7 +287,13 @@ export function ExportBar() {
                 {/* Format Selector */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-16 sm:w-24 justify-between text-xs sm:text-sm" disabled={isExporting}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-16 sm:w-24 justify-between text-xs sm:text-sm"
+                            disabled={isExporting}
+                            aria-label={`Export format: ${exportFormat.toUpperCase()}. Click to change format`}
+                        >
                             {exportFormat.toUpperCase()}
                             <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50" />
                         </Button>
@@ -260,7 +315,13 @@ export function ExportBar() {
                 {/* Scale Selector */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-12 sm:w-24 justify-between text-xs sm:text-sm border-border hover:bg-accent hover:text-accent-foreground" disabled={isExporting}>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-12 sm:w-24 justify-between text-xs sm:text-sm border-border hover:bg-accent hover:text-accent-foreground"
+                            disabled={isExporting}
+                            aria-label={`Export scale: ${exportScale}x. Click to change scale`}
+                        >
                             {exportScale}x
                             <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50 hidden sm:block" />
                         </Button>

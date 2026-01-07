@@ -8,6 +8,8 @@ import {
     EditorState,
     EditorActions,
 } from '@/types/editor';
+import { calculateFrameOffsets } from '@/lib/canvas/layout';
+import { debounce } from '@/lib/utils/debounce';
 
 const DEFAULT_STATE: EditorState = {
     originalImage: null,
@@ -34,6 +36,44 @@ const DEFAULT_STATE: EditorState = {
     exportScale: 2,
 };
 
+/**
+ * Helper function to recalculate canvas dimensions
+ * This is debounced to prevent race conditions during rapid state changes
+ */
+const recalculateCanvasDimensions = (
+    state: EditorState & EditorActions,
+    updates: Partial<EditorState>
+): Partial<EditorState> => {
+    const image = state.originalImage;
+    const aspectRatio = state.aspectRatio;
+
+    // If no image or aspect ratio is set, don't recalculate
+    if (!image || aspectRatio) {
+        return updates;
+    }
+
+    const padding = updates.padding !== undefined ? updates.padding : state.padding;
+    const frameType = updates.frameType !== undefined ? updates.frameType : state.frameType;
+    const imageScale = updates.imageScale !== undefined ? updates.imageScale : state.imageScale;
+
+    const frameOffsets = calculateFrameOffsets(frameType, imageScale);
+    const canvasWidth = Math.round(image.width * imageScale) + padding * 2 + frameOffsets.offsetX;
+    const canvasHeight = Math.round(image.height * imageScale) + padding * 2 + frameOffsets.offsetY;
+
+    return {
+        ...updates,
+        canvasWidth,
+        canvasHeight,
+    };
+};
+
+// Create debounced version of dimension recalculation (16ms = 60fps)
+const debouncedRecalc = debounce((get: () => EditorState & EditorActions, set: (updates: Partial<EditorState>) => void) => {
+    const state = get();
+    const updates = recalculateCanvasDimensions(state, {});
+    set(updates);
+}, 16);
+
 export const useEditorStore = create<EditorState & EditorActions>((set, get) => ({
     ...DEFAULT_STATE,
 
@@ -41,17 +81,11 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         const padding = get().padding;
         const frameType = get().frameType;
 
-        // Calculate additional dimensions for frames
-        let frameOffsetY = 0;
-        let frameOffsetX = 0;
-        if (frameType === 'browser') frameOffsetY = 40;
-        else if (frameType === 'macos') frameOffsetY = 32;
-        else if (frameType === 'windows') frameOffsetY = 32;
-        else if (frameType === 'iphone') { frameOffsetX = 32; frameOffsetY = 32; }
-        else if (frameType === 'android') { frameOffsetX = 24; frameOffsetY = 24; }
+        // Calculate additional dimensions for frames using centralized function
+        const frameOffsets = calculateFrameOffsets(frameType, 1);
 
-        const width = image.width + padding * 2 + frameOffsetX;
-        const height = image.height + padding * 2 + frameOffsetY;
+        const width = image.width + padding * 2 + frameOffsets.offsetX;
+        const height = image.height + padding * 2 + frameOffsets.offsetY;
 
         set({
             originalImage: image,
@@ -87,30 +121,12 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         set({ backgroundImage: url, backgroundType: 'image' }),
 
     setPadding: (padding: number) => {
-        const image = get().originalImage;
-        const frameType = get().frameType;
+        // Update padding immediately
+        set({ padding });
 
-        let frameOffsetY = 0;
-        let frameOffsetX = 0;
-        if (frameType === 'browser') frameOffsetY = 40;
-        else if (frameType === 'macos') frameOffsetY = 32;
-        else if (frameType === 'windows') frameOffsetY = 32;
-        else if (frameType === 'iphone') { frameOffsetX = 32; frameOffsetY = 32; }
-        else if (frameType === 'android') { frameOffsetX = 24; frameOffsetY = 24; }
-
-        if (image) {
-            const updates: Partial<EditorState> = { padding };
-
-            // Only update canvas dimensions if no fixed aspect ratio is set
-            if (!get().aspectRatio) {
-                const scale = get().imageScale;
-                updates.canvasWidth = Math.round(image.width * scale) + padding * 2 + frameOffsetX;
-                updates.canvasHeight = Math.round(image.height * scale) + padding * 2 + frameOffsetY;
-            }
-
-            set(updates);
-        } else {
-            set({ padding });
+        // Debounce dimension recalculation to prevent race conditions
+        if (get().originalImage && !get().aspectRatio) {
+            debouncedRecalc(get, set);
         }
     },
 
@@ -123,30 +139,12 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
     setBorderRadius: (radius: number) => set({ borderRadius: radius }),
 
     setFrameType: (frame: FrameType) => {
-        const image = get().originalImage;
-        const padding = get().padding;
+        // Update frame type immediately
+        set({ frameType: frame });
 
-        let frameOffsetY = 0;
-        let frameOffsetX = 0;
-        if (frame === 'browser') frameOffsetY = 40;
-        else if (frame === 'macos') frameOffsetY = 32;
-        else if (frame === 'windows') frameOffsetY = 32;
-        else if (frame === 'iphone') { frameOffsetX = 32; frameOffsetY = 32; }
-        else if (frame === 'android') { frameOffsetX = 24; frameOffsetY = 24; }
-
-        if (image) {
-            const updates: Partial<EditorState> = { frameType: frame };
-
-            // Only update canvas dimensions if no fixed aspect ratio is set
-            if (!get().aspectRatio) {
-                const scale = get().imageScale;
-                updates.canvasWidth = Math.round(image.width * scale) + padding * 2 + frameOffsetX;
-                updates.canvasHeight = Math.round(image.height * scale) + padding * 2 + frameOffsetY;
-            }
-
-            set(updates);
-        } else {
-            set({ frameType: frame });
+        // Debounce dimension recalculation to prevent race conditions
+        if (get().originalImage && !get().aspectRatio) {
+            debouncedRecalc(get, set);
         }
     },
 
@@ -157,26 +155,13 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
     setExportScale: (scale: ExportScale) => set({ exportScale: scale }),
 
     setImageScale: (scale: number) => {
-        const image = get().originalImage;
-        const padding = get().padding;
-        const frameType = get().frameType;
+        // Update image scale immediately
+        set({ imageScale: scale });
 
-        let frameOffsetY = 0;
-        let frameOffsetX = 0;
-        if (frameType === 'browser') frameOffsetY = 40;
-        else if (frameType === 'macos') frameOffsetY = 32;
-        else if (frameType === 'windows') frameOffsetY = 32;
-        else if (frameType === 'iphone') { frameOffsetX = 32; frameOffsetY = 32; }
-        else if (frameType === 'android') { frameOffsetX = 24; frameOffsetY = 24; }
-
-        const updates: Partial<EditorState> = { imageScale: scale };
-
-        if (image && !get().aspectRatio) {
-            updates.canvasWidth = Math.round(image.width * scale) + padding * 2 + frameOffsetX;
-            updates.canvasHeight = Math.round(image.height * scale) + padding * 2 + frameOffsetY;
+        // Debounce dimension recalculation to prevent race conditions
+        if (get().originalImage && !get().aspectRatio) {
+            debouncedRecalc(get, set);
         }
-
-        set(updates);
     },
 
     setRotation: (rotation: number) => set({ rotation: rotation }),

@@ -1,0 +1,159 @@
+/**
+ * Layout Calculations for Canvas Rendering
+ * Handles dimension calculations, frame offsets, and positioning
+ */
+
+import { FrameType } from '@/types/editor';
+import { FRAME_OFFSETS } from '@/lib/constants/rendering';
+
+export interface FrameOffsets {
+    top: number;
+    bottom: number;
+    left: number;
+    right: number;
+    offsetX: number;
+    offsetY: number;
+}
+
+export interface LayoutDimensions {
+    canvasWidth: number;
+    canvasHeight: number;
+    scaledImgWidth: number;
+    scaledImgHeight: number;
+    contentX: number;
+    contentY: number;
+    imgX: number;
+    imgY: number;
+    imgWidth: number;
+    imgHeight: number;
+}
+
+export interface BorderRadii {
+    effectiveTopRadius: number;
+    effectiveBottomRadius: number;
+}
+
+/**
+ * Calculate frame offsets for a given frame type
+ * Memoized for performance
+ */
+const frameOffsetsCache = new Map<string, FrameOffsets>();
+
+export function calculateFrameOffsets(
+    frameType: FrameType,
+    imageScale: number = 1
+): FrameOffsets {
+    const cacheKey = `${frameType}-${imageScale}`;
+
+    // Check cache first
+    if (frameOffsetsCache.has(cacheKey)) {
+        return frameOffsetsCache.get(cacheKey)!;
+    }
+
+    const baseOffsets = FRAME_OFFSETS[frameType];
+
+    const result: FrameOffsets = {
+        top: baseOffsets.top * (frameType === 'iphone' || frameType === 'android' ? imageScale : 1),
+        bottom: baseOffsets.bottom * (frameType === 'iphone' || frameType === 'android' ? imageScale : 1),
+        left: baseOffsets.left * (frameType === 'iphone' || frameType === 'android' ? imageScale : 1),
+        right: baseOffsets.right * (frameType === 'iphone' || frameType === 'android' ? imageScale : 1),
+        offsetX: 0,
+        offsetY: 0,
+    };
+
+    result.offsetX = result.left + result.right;
+    result.offsetY = result.top + result.bottom;
+
+    // Cache the result
+    frameOffsetsCache.set(cacheKey, result);
+
+    return result;
+}
+
+/**
+ * Calculate all layout dimensions
+ */
+export function calculateLayout(
+    image: HTMLImageElement,
+    frameType: FrameType,
+    padding: number,
+    imageScale: number,
+    targetWidth?: number,
+    targetHeight?: number
+): LayoutDimensions {
+    const frameOffsets = calculateFrameOffsets(frameType, imageScale);
+
+    // Calculate scaled image dimensions
+    const scaledImgWidth = Math.round(image.width * imageScale);
+    const scaledImgHeight = Math.round(image.height * imageScale);
+
+    // Calculate default canvas dimensions
+    const defaultCanvasWidth = scaledImgWidth + padding * 2 + frameOffsets.offsetX;
+    const defaultCanvasHeight = scaledImgHeight + padding * 2 + frameOffsets.offsetY;
+
+    // Use target dimensions if provided (for aspect ratio presets)
+    const canvasWidth = targetWidth && targetWidth > 0 ? targetWidth : defaultCanvasWidth;
+    const canvasHeight = targetHeight && targetHeight > 0 ? targetHeight : defaultCanvasHeight;
+
+    // Calculate content dimensions
+    const contentWidth = scaledImgWidth + frameOffsets.offsetX;
+    const contentHeight = scaledImgHeight + frameOffsets.offsetY;
+
+    // Center the content in the canvas
+    const contentX = (canvasWidth - contentWidth) / 2;
+    const contentY = (canvasHeight - contentHeight) / 2;
+
+    // Image position relative to content
+    const imgX = contentX + frameOffsets.left;
+    const imgY = contentY + frameOffsets.top;
+
+    return {
+        canvasWidth,
+        canvasHeight,
+        scaledImgWidth,
+        scaledImgHeight,
+        contentX,
+        contentY,
+        imgX,
+        imgY,
+        imgWidth: scaledImgWidth,
+        imgHeight: scaledImgHeight,
+    };
+}
+
+/**
+ * Calculate effective border radii based on frame type
+ */
+export function calculateBorderRadii(
+    frameType: FrameType,
+    borderRadius: number,
+    imageScale: number
+): BorderRadii {
+    if (frameType === 'iphone' || frameType === 'android') {
+        // Phone frames have specific screen radii
+        const screenRadius = (frameType === 'iphone' ? 24 : 18) * imageScale;
+        return {
+            effectiveTopRadius: screenRadius,
+            effectiveBottomRadius: screenRadius,
+        };
+    } else if (frameType !== 'none') {
+        // Browser/Window frames: top is flat, bottom is rounded
+        return {
+            effectiveTopRadius: 0,
+            effectiveBottomRadius: borderRadius,
+        };
+    } else {
+        // No frame: use border radius for all corners
+        return {
+            effectiveTopRadius: borderRadius,
+            effectiveBottomRadius: borderRadius,
+        };
+    }
+}
+
+/**
+ * Clear the frame offsets cache (useful for testing)
+ */
+export function clearLayoutCache(): void {
+    frameOffsetsCache.clear();
+}

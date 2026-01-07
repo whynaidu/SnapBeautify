@@ -43,3 +43,23 @@ next-env.d.ts
 # electron build output
 /dist/
 /dist-electron/
+
+# Capacitor
+# Note: android/ and ios/ folders should be committed (they contain source files)
+# Each has its own .gitignore for build artifacts
+
+# APK/AAB files (Android builds)
+*.apk
+*.aab
+
+# Keystore files (security - never commit these!)
+*.keystore
+*.jks
+keystore.properties
+
+# iOS build output (if iOS is added)
+ios/App/Pods/
+ios/App/build/
+ios/App/*.xcworkspace/xcuserdata/
+ios/App/*.xcodeproj/xcuserdata/
+ios/App/DerivedData/

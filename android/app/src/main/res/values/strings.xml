@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SnapBeautify</string>
+    <string name="title_activity_main">SnapBeautify</string>
+    <string name="package_name">com.snapbeautify.app</string>
+    <string name="custom_url_scheme">com.snapbeautify.app</string>
+</resources>
