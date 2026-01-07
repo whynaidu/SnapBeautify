@@ -22,6 +22,8 @@ export interface LayoutDimensions {
     scaledImgHeight: number;
     contentX: number;
     contentY: number;
+    contentWidth: number;
+    contentHeight: number;
     imgX: number;
     imgY: number;
     imgWidth: number;
@@ -114,6 +116,8 @@ export function calculateLayout(
         scaledImgHeight,
         contentX,
         contentY,
+        contentWidth,
+        contentHeight,
         imgX,
         imgY,
         imgWidth: scaledImgWidth,
@@ -138,9 +142,15 @@ export function calculateBorderRadii(
         };
     } else if (frameType !== 'none') {
         // Browser/Window frames: top is flat, bottom is rounded
+        // Match frame minimum radii to prevent gaps
+        let minRadius = 0;
+        if (frameType === 'browser') minRadius = 12;
+        else if (frameType === 'macos') minRadius = 10;
+        else if (frameType === 'windows') minRadius = 8;
+
         return {
             effectiveTopRadius: 0,
-            effectiveBottomRadius: borderRadius,
+            effectiveBottomRadius: Math.max(borderRadius, minRadius),
         };
     } else {
         // No frame: use border radius for all corners

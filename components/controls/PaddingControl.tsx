@@ -19,7 +19,7 @@ export function PaddingControl() {
 
     const handlePaddingChange = (value: number) => {
         setLocalPadding(value);
-        // Update immediately - store debounce + canvas throttle handles performance
+        // Update immediately - Canvas throttle handles performance
         setPadding(value);
     };
 

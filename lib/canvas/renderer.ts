@@ -95,8 +95,8 @@ export function renderCanvas(options: RenderOptions): void {
             ctx,
             layout.contentX,
             layout.contentY,
-            layout.scaledImgWidth + (layout.imgX - layout.contentX) * 2,
-            layout.scaledImgHeight + (layout.imgY - layout.contentY) * 2,
+            layout.contentWidth,
+            layout.contentHeight,
             frameType,
             borderRadius,
             imageScale
@@ -155,8 +155,8 @@ export function renderCanvas(options: RenderOptions): void {
             ctx,
             layout.contentX,
             layout.contentY,
-            layout.scaledImgWidth + (layout.imgX - layout.contentX) * 2,
-            layout.scaledImgHeight + (layout.imgY - layout.contentY) * 2,
+            layout.contentWidth,
+            layout.contentHeight,
             frameType,
             imageScale
         );

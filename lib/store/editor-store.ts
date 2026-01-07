@@ -9,7 +9,6 @@ import {
     EditorActions,
 } from '@/types/editor';
 import { calculateFrameOffsets } from '@/lib/canvas/layout';
-import { debounce } from '@/lib/utils/debounce';
 
 const DEFAULT_STATE: EditorState = {
     originalImage: null,
@@ -38,7 +37,7 @@ const DEFAULT_STATE: EditorState = {
 
 /**
  * Helper function to recalculate canvas dimensions
- * This is debounced to prevent race conditions during rapid state changes
+ * Called immediately to prevent visual stuttering from delayed dimension updates
  */
 const recalculateCanvasDimensions = (
     state: EditorState & EditorActions,
@@ -66,13 +65,6 @@ const recalculateCanvasDimensions = (
         canvasHeight,
     };
 };
-
-// Create debounced version of dimension recalculation (16ms = 60fps)
-const debouncedRecalc = debounce((get: () => EditorState & EditorActions, set: (updates: Partial<EditorState>) => void) => {
-    const state = get();
-    const updates = recalculateCanvasDimensions(state, {});
-    set(updates);
-}, 16);
 
 export const useEditorStore = create<EditorState & EditorActions>((set, get) => ({
     ...DEFAULT_STATE,
@@ -121,12 +113,14 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         set({ backgroundImage: url, backgroundType: 'image' }),
 
     setPadding: (padding: number) => {
-        // Update padding immediately
-        set({ padding });
+        const state = get();
 
-        // Debounce dimension recalculation to prevent race conditions
-        if (get().originalImage && !get().aspectRatio) {
-            debouncedRecalc(get, set);
+        // Calculate dimensions immediately to prevent visual stuttering
+        if (state.originalImage && !state.aspectRatio) {
+            const updates = recalculateCanvasDimensions(state, { padding });
+            set(updates);
+        } else {
+            set({ padding });
         }
     },
 
@@ -139,12 +133,14 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
     setBorderRadius: (radius: number) => set({ borderRadius: radius }),
 
     setFrameType: (frame: FrameType) => {
-        // Update frame type immediately
-        set({ frameType: frame });
+        const state = get();
 
-        // Debounce dimension recalculation to prevent race conditions
-        if (get().originalImage && !get().aspectRatio) {
-            debouncedRecalc(get, set);
+        // Calculate dimensions immediately to prevent visual stuttering
+        if (state.originalImage && !state.aspectRatio) {
+            const updates = recalculateCanvasDimensions(state, { frameType: frame });
+            set(updates);
+        } else {
+            set({ frameType: frame });
         }
     },
 
@@ -155,12 +151,14 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
     setExportScale: (scale: ExportScale) => set({ exportScale: scale }),
 
     setImageScale: (scale: number) => {
-        // Update image scale immediately
-        set({ imageScale: scale });
+        const state = get();
 
-        // Debounce dimension recalculation to prevent race conditions
-        if (get().originalImage && !get().aspectRatio) {
-            debouncedRecalc(get, set);
+        // Calculate dimensions immediately to prevent visual stuttering
+        if (state.originalImage && !state.aspectRatio) {
+            const updates = recalculateCanvasDimensions(state, { imageScale: scale });
+            set(updates);
+        } else {
+            set({ imageScale: scale });
         }
     },
 
