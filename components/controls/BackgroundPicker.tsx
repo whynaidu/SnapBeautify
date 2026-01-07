@@ -72,21 +72,23 @@ export function BackgroundPicker() {
             {/* Solid Colors */}
             {backgroundType === 'solid' && (
                 <div className="space-y-3">
-                    <div className="grid grid-cols-8 gap-1.5">
-                        {SOLID_COLORS.map((color) => (
-                            <button
-                                key={color}
-                                onClick={() => setBackgroundColor(color)}
-                                className={cn(
-                                    'w-full aspect-square rounded-md border-2 transition-all',
-                                    backgroundColor === color
-                                        ? 'border-foreground/80 scale-110 z-10'
-                                        : 'border-transparent hover:scale-105'
-                                )}
-                                style={{ backgroundColor: color }}
-                                title={color}
-                            />
-                        ))}
+                    <div className="max-h-[300px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+                        <div className="grid grid-cols-8 gap-1.5">
+                            {SOLID_COLORS.map((color) => (
+                                <button
+                                    key={color}
+                                    onClick={() => setBackgroundColor(color)}
+                                    className={cn(
+                                        'w-full aspect-square rounded-md border-2 transition-all',
+                                        backgroundColor === color
+                                            ? 'border-foreground/80 scale-110 z-10'
+                                            : 'border-transparent hover:scale-105'
+                                    )}
+                                    style={{ backgroundColor: color }}
+                                    title={color}
+                                />
+                            ))}
+                        </div>
                     </div>
 
                     {/* Custom Color Picker & Input */}
@@ -178,64 +180,78 @@ export function BackgroundPicker() {
                     )}
 
                     <div>
-                        <Label className="text-muted-foreground text-xs mb-2 block">Presets</Label>
-                        <div className="grid grid-cols-5 gap-2">
-                            {PRESET_GRADIENTS.map((gradient) => {
-                                // Only show as selected if it's a regular gradient (not mesh) AND colors match
-                                const isSelected =
-                                    isGradientActive &&
-                                    gradientColors[0] === gradient.colors[0] &&
-                                    gradientColors[1] === gradient.colors[1];
+                        <Label className="text-muted-foreground text-xs mb-2 block">
+                            Gradient Presets ({PRESET_GRADIENTS.length})
+                        </Label>
+                        <div className="max-h-[400px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+                            <div className="grid grid-cols-6 gap-2">
+                                {PRESET_GRADIENTS.map((gradient) => {
+                                    // Only show as selected if it's a regular gradient (not mesh) AND colors match
+                                    const isSelected =
+                                        isGradientActive &&
+                                        gradientColors[0] === gradient.colors[0] &&
+                                        gradientColors[1] === gradient.colors[1];
 
-                                return (
-                                    <button
-                                        key={gradient.name}
-                                        onClick={() => setGradient(gradient.colors, gradient.angle)}
-                                        className={cn(
-                                            'relative w-full aspect-square rounded-lg transition-all',
-                                            isSelected
-                                                ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
-                                                : 'hover:scale-105'
-                                        )}
-                                        style={{
-                                            background: `linear-gradient(${gradient.angle}deg, ${gradient.colors[0]}, ${gradient.colors[1]})`,
-                                        }}
-                                        title={gradient.name}
-                                    >
-                                        {isSelected && (
-                                            <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
-                                        )}
-                                    </button>
-                                );
-                            })}
+                                    return (
+                                        <button
+                                            key={gradient.name}
+                                            onClick={() => setGradient(gradient.colors, gradient.angle)}
+                                            className={cn(
+                                                'relative w-full aspect-square rounded-lg transition-all group',
+                                                isSelected
+                                                    ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
+                                                    : 'hover:scale-105'
+                                            )}
+                                            style={{
+                                                background: `linear-gradient(${gradient.angle}deg, ${gradient.colors[0]}, ${gradient.colors[1]})`,
+                                            }}
+                                            title={gradient.name}
+                                        >
+                                            {isSelected && (
+                                                <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
+                                            )}
+                                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/50 backdrop-blur-sm px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                                                {gradient.name}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
 
                     <div>
-                        <Label className="text-muted-foreground text-xs mb-2 block">Mesh Gradients</Label>
-                        <div className="grid grid-cols-4 gap-2">
-                            {MESH_GRADIENTS.map((mesh, index) => {
-                                // Only show as selected if it's a mesh type AND the CSS matches
-                                const isSelected = isMeshActive && meshGradientCSS === mesh.css;
-                                return (
-                                    <button
-                                        key={mesh.name}
-                                        onClick={() => setMeshGradient(mesh.css)}
-                                        className={cn(
-                                            'relative w-full aspect-square rounded-lg transition-all overflow-hidden',
-                                            isSelected
-                                                ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
-                                                : 'hover:scale-105'
-                                        )}
-                                        style={{ background: mesh.css, backgroundColor: '#0f172a' }}
-                                        title={mesh.name}
-                                    >
-                                        {isSelected && (
-                                            <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
-                                        )}
-                                    </button>
-                                );
-                            })}
+                        <Label className="text-muted-foreground text-xs mb-2 block">
+                            Mesh Gradients ({MESH_GRADIENTS.length})
+                        </Label>
+                        <div className="max-h-[300px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+                            <div className="grid grid-cols-5 gap-2">
+                                {MESH_GRADIENTS.map((mesh, index) => {
+                                    // Only show as selected if it's a mesh type AND the CSS matches
+                                    const isSelected = isMeshActive && meshGradientCSS === mesh.css;
+                                    return (
+                                        <button
+                                            key={mesh.name}
+                                            onClick={() => setMeshGradient(mesh.css)}
+                                            className={cn(
+                                                'relative w-full aspect-square rounded-lg transition-all overflow-hidden group',
+                                                isSelected
+                                                    ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
+                                                    : 'hover:scale-105'
+                                            )}
+                                            style={{ background: mesh.css, backgroundColor: '#0f172a' }}
+                                            title={mesh.name}
+                                        >
+                                            {isSelected && (
+                                                <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
+                                            )}
+                                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/50 backdrop-blur-sm px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                                                {mesh.name}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 </div>
