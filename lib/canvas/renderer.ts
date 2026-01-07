@@ -3,7 +3,7 @@
  * Coordinates all rendering modules to produce final output
  */
 
-import { FrameType } from '@/types/editor';
+import { FrameType, TextPosition } from '@/types/editor';
 import { calculateLayout, calculateBorderRadii } from './layout';
 import { drawBackground, BackgroundOptions } from './background';
 import { drawShadow, ShadowOptions } from './shadow';
@@ -21,6 +21,7 @@ export interface RenderOptions {
     textPatternText?: string;
     textPatternColor?: string;
     textPatternOpacity?: number;
+    textPatternPosition?: TextPosition;
     padding: number;
     shadowBlur?: number;
     shadowOpacity?: number;
@@ -49,6 +50,7 @@ export function renderCanvas(options: RenderOptions): void {
         textPatternText,
         textPatternColor,
         textPatternOpacity,
+        textPatternPosition,
         padding,
         shadowBlur = 20,
         shadowOpacity = 50,
@@ -90,6 +92,7 @@ export function renderCanvas(options: RenderOptions): void {
         textPatternText,
         textPatternColor,
         textPatternOpacity,
+        textPatternPosition,
         gradientAngle,
         meshGradientCSS,
     };

@@ -22,6 +22,7 @@ const DEFAULT_STATE: EditorState = {
     textPatternText: 'WELCOME',
     textPatternColor: '#ffffff',
     textPatternOpacity: 0.1,
+    textPatternPosition: 'center',
     padding: 64,
     shadowBlur: 20, // Default blur
     shadowOpacity: 50, // Default opacity %
@@ -124,6 +125,10 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
             textPatternOpacity: textOpacity,
             backgroundType: 'textPattern',
         }),
+
+    setTextPatternText: (text: string) => set({ textPatternText: text }),
+
+    setTextPatternPosition: (position) => set({ textPatternPosition: position }),
 
     setPadding: (padding: number) => {
         const state = get();

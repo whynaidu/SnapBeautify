@@ -5,6 +5,8 @@
 
 import { MESH_GRADIENT, CHECKERBOARD } from '@/lib/constants/rendering';
 
+import type { TextPosition } from '@/types/editor';
+
 export interface BackgroundOptions {
     type: string;
     color: string;
@@ -14,6 +16,7 @@ export interface BackgroundOptions {
     textPatternText?: string;
     textPatternColor?: string;
     textPatternOpacity?: number;
+    textPatternPosition?: TextPosition;
 }
 
 export interface GradientPoints {
@@ -177,6 +180,29 @@ export function drawMeshGradient(
 }
 
 /**
+ * Calculate text position based on position type
+ */
+function calculateTextPosition(
+    width: number,
+    height: number,
+    position: TextPosition
+): { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline } {
+    const positions: Record<TextPosition, { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline }> = {
+        'top-left': { x: width * 0.1, y: height * 0.15, align: 'left', baseline: 'top' },
+        'top-center': { x: width / 2, y: height * 0.15, align: 'center', baseline: 'top' },
+        'top-right': { x: width * 0.9, y: height * 0.15, align: 'right', baseline: 'top' },
+        'center-left': { x: width * 0.1, y: height / 2, align: 'left', baseline: 'middle' },
+        'center': { x: width / 2, y: height / 2, align: 'center', baseline: 'middle' },
+        'center-right': { x: width * 0.9, y: height / 2, align: 'right', baseline: 'middle' },
+        'bottom-left': { x: width * 0.1, y: height * 0.85, align: 'left', baseline: 'bottom' },
+        'bottom-center': { x: width / 2, y: height * 0.85, align: 'center', baseline: 'bottom' },
+        'bottom-right': { x: width * 0.9, y: height * 0.85, align: 'right', baseline: 'bottom' },
+    };
+
+    return positions[position];
+}
+
+/**
  * Draw text pattern background (gradient with large text overlay)
  */
 export function drawTextPattern(
@@ -187,7 +213,8 @@ export function drawTextPattern(
     gradientColors: [string, string],
     gradientAngle: number,
     textColor: string,
-    textOpacity: number
+    textOpacity: number,
+    position: TextPosition = 'center'
 ): void {
     // Draw gradient background first
     drawGradientBackground(ctx, width, height, gradientColors, gradientAngle);
@@ -198,8 +225,11 @@ export function drawTextPattern(
     // Calculate font size based on canvas dimensions
     const fontSize = Math.min(width, height) * 0.35;
     ctx.font = `900 ${fontSize}px system-ui, -apple-system, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+
+    // Calculate position
+    const pos = calculateTextPosition(width, height, position);
+    ctx.textAlign = pos.align;
+    ctx.textBaseline = pos.baseline;
 
     // Set text style with opacity
     const r = parseInt(textColor.slice(1, 3), 16);
@@ -207,8 +237,8 @@ export function drawTextPattern(
     const b = parseInt(textColor.slice(5, 7), 16);
     ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${textOpacity})`;
 
-    // Draw text in center
-    ctx.fillText(text, width / 2, height / 2);
+    // Draw text at calculated position
+    ctx.fillText(text, pos.x, pos.y);
 
     ctx.restore();
 }
@@ -249,7 +279,8 @@ export function drawBackground(
         meshGradientCSS,
         textPatternText = 'WELCOME',
         textPatternColor = '#ffffff',
-        textPatternOpacity = 0.1
+        textPatternOpacity = 0.1,
+        textPatternPosition = 'center'
     } = options;
 
     switch (type) {
@@ -274,7 +305,8 @@ export function drawBackground(
                 gradientColors,
                 gradientAngle,
                 textPatternColor,
-                textPatternOpacity
+                textPatternOpacity,
+                textPatternPosition
             );
             break;
 

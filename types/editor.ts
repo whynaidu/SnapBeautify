@@ -26,6 +26,8 @@ export interface TextPattern {
     textOpacity: number;
 }
 
+export type TextPosition = 'top-left' | 'top-center' | 'top-right' | 'center-left' | 'center' | 'center-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
+
 // export interface ShadowPreset {
 //     blur: number;
 //     spread: number;
@@ -55,6 +57,7 @@ export interface EditorState {
     textPatternText: string;
     textPatternColor: string;
     textPatternOpacity: number;
+    textPatternPosition: TextPosition;
 
     // Styling
     padding: number;
@@ -88,6 +91,8 @@ export interface EditorActions {
     setMeshGradient: (css: string) => void;
     setBackgroundImage: (url: string) => void;
     setTextPattern: (text: string, colors: [string, string], angle: number, textColor: string, textOpacity: number) => void;
+    setTextPatternText: (text: string) => void;
+    setTextPatternPosition: (position: TextPosition) => void;
     setPadding: (padding: number) => void;
     setShadowBlur: (blur: number) => void;
     setShadowOpacity: (opacity: number) => void;

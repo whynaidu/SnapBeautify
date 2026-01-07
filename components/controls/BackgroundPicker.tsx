@@ -18,10 +18,13 @@ export function BackgroundPicker() {
         textPatternText,
         textPatternColor,
         textPatternOpacity,
+        textPatternPosition,
         setBackgroundColor,
         setGradient,
         setMeshGradient,
         setTextPattern,
+        setTextPatternText,
+        setTextPatternPosition,
         setBackgroundType,
     } = useEditorStore();
 
@@ -329,6 +332,55 @@ export function BackgroundPicker() {
                                             {pattern.name}
                                         </span>
                                     </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Custom Text Input */}
+                    <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
+                        <Label className="text-[10px] uppercase text-muted-foreground">Custom Text</Label>
+                        <Input
+                            value={textPatternText}
+                            onChange={(e) => setTextPatternText(e.target.value.toUpperCase())}
+                            placeholder="ENTER YOUR TEXT"
+                            className="font-mono text-sm font-bold uppercase"
+                            maxLength={20}
+                        />
+                    </div>
+
+                    {/* Text Position Selector */}
+                    <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
+                        <Label className="text-[10px] uppercase text-muted-foreground">Text Position</Label>
+                        <div className="grid grid-cols-3 gap-1.5">
+                            {(['top-left', 'top-center', 'top-right', 'center-left', 'center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right'] as const).map((position) => {
+                                const isSelected = textPatternPosition === position;
+                                const labels: Record<typeof position, string> = {
+                                    'top-left': '↖',
+                                    'top-center': '↑',
+                                    'top-right': '↗',
+                                    'center-left': '←',
+                                    'center': '●',
+                                    'center-right': '→',
+                                    'bottom-left': '↙',
+                                    'bottom-center': '↓',
+                                    'bottom-right': '↘',
+                                };
+
+                                return (
+                                    <Button
+                                        key={position}
+                                        variant={isSelected ? 'default' : 'outline'}
+                                        size="sm"
+                                        onClick={() => setTextPatternPosition(position)}
+                                        className={cn(
+                                            'h-10 text-lg',
+                                            isSelected && 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                                        )}
+                                        title={position.replace('-', ' ')}
+                                    >
+                                        {labels[position]}
+                                    </Button>
                                 );
                             })}
                         </div>
