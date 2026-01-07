@@ -16,7 +16,10 @@ export interface BackgroundOptions {
     textPatternText?: string;
     textPatternColor?: string;
     textPatternOpacity?: number;
-    textPatternPosition?: TextPosition;
+    textPatternPositions?: TextPosition[];
+    textPatternFontFamily?: string;
+    textPatternFontSize?: number;
+    textPatternFontWeight?: number;
 }
 
 export interface GradientPoints {
@@ -180,7 +183,8 @@ export function drawMeshGradient(
 }
 
 /**
- * Calculate text position based on position type
+ * Calculate text position based on position type (simplified to top/center/bottom)
+ * Positions are spaced to prevent overlap when multiple are selected
  */
 function calculateTextPosition(
     width: number,
@@ -188,22 +192,16 @@ function calculateTextPosition(
     position: TextPosition
 ): { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline } {
     const positions: Record<TextPosition, { x: number; y: number; align: CanvasTextAlign; baseline: CanvasTextBaseline }> = {
-        'top-left': { x: width * 0.1, y: height * 0.15, align: 'left', baseline: 'top' },
-        'top-center': { x: width / 2, y: height * 0.15, align: 'center', baseline: 'top' },
-        'top-right': { x: width * 0.9, y: height * 0.15, align: 'right', baseline: 'top' },
-        'center-left': { x: width * 0.1, y: height / 2, align: 'left', baseline: 'middle' },
+        'top': { x: width / 2, y: height * 0.08, align: 'center', baseline: 'top' },
         'center': { x: width / 2, y: height / 2, align: 'center', baseline: 'middle' },
-        'center-right': { x: width * 0.9, y: height / 2, align: 'right', baseline: 'middle' },
-        'bottom-left': { x: width * 0.1, y: height * 0.85, align: 'left', baseline: 'bottom' },
-        'bottom-center': { x: width / 2, y: height * 0.85, align: 'center', baseline: 'bottom' },
-        'bottom-right': { x: width * 0.9, y: height * 0.85, align: 'right', baseline: 'bottom' },
+        'bottom': { x: width / 2, y: height * 0.92, align: 'center', baseline: 'bottom' },
     };
 
     return positions[position];
 }
 
 /**
- * Draw text pattern background (gradient with large text overlay)
+ * Draw text pattern background (gradient with large text overlay at multiple positions)
  */
 export function drawTextPattern(
     ctx: CanvasRenderingContext2D,
@@ -214,22 +212,24 @@ export function drawTextPattern(
     gradientAngle: number,
     textColor: string,
     textOpacity: number,
-    position: TextPosition = 'center'
+    positions: TextPosition[] = ['center'],
+    fontFamily: string = 'system-ui, -apple-system, sans-serif',
+    fontSizeMultiplier: number = 0.35,
+    fontWeight: number = 900
 ): void {
     // Draw gradient background first
     drawGradientBackground(ctx, width, height, gradientColors, gradientAngle);
 
-    // Draw large text pattern overlay
+    // Draw large text pattern overlay at each position
     ctx.save();
 
-    // Calculate font size based on canvas dimensions
-    const fontSize = Math.min(width, height) * 0.35;
-    ctx.font = `900 ${fontSize}px system-ui, -apple-system, sans-serif`;
+    // Dynamically reduce font size when multiple positions are selected to prevent overlap
+    const positionScaleFactor = positions.length === 3 ? 0.7 : positions.length === 2 ? 0.85 : 1;
+    const adjustedFontSizeMultiplier = fontSizeMultiplier * positionScaleFactor;
 
-    // Calculate position
-    const pos = calculateTextPosition(width, height, position);
-    ctx.textAlign = pos.align;
-    ctx.textBaseline = pos.baseline;
+    // Calculate font size based on canvas dimensions
+    const fontSize = Math.min(width, height) * adjustedFontSizeMultiplier;
+    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
 
     // Set text style with opacity
     const r = parseInt(textColor.slice(1, 3), 16);
@@ -237,8 +237,18 @@ export function drawTextPattern(
     const b = parseInt(textColor.slice(5, 7), 16);
     ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${textOpacity})`;
 
-    // Draw text at calculated position
-    ctx.fillText(text, pos.x, pos.y);
+    // Calculate max width to prevent text clipping (96% of canvas width for less side padding)
+    const maxWidth = width * 0.96;
+
+    // Draw text at each selected position
+    positions.forEach(position => {
+        const pos = calculateTextPosition(width, height, position);
+        ctx.textAlign = pos.align;
+        ctx.textBaseline = pos.baseline;
+
+        // Draw text with max width to prevent clipping
+        ctx.fillText(text, pos.x, pos.y, maxWidth);
+    });
 
     ctx.restore();
 }
@@ -280,7 +290,10 @@ export function drawBackground(
         textPatternText = 'WELCOME',
         textPatternColor = '#ffffff',
         textPatternOpacity = 0.1,
-        textPatternPosition = 'center'
+        textPatternPositions = ['center'],
+        textPatternFontFamily = 'system-ui, -apple-system, sans-serif',
+        textPatternFontSize = 0.35,
+        textPatternFontWeight = 900
     } = options;
 
     switch (type) {
@@ -306,7 +319,10 @@ export function drawBackground(
                 gradientAngle,
                 textPatternColor,
                 textPatternOpacity,
-                textPatternPosition
+                textPatternPositions,
+                textPatternFontFamily,
+                textPatternFontSize,
+                textPatternFontWeight
             );
             break;
 

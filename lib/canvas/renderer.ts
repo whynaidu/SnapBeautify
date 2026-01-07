@@ -21,7 +21,10 @@ export interface RenderOptions {
     textPatternText?: string;
     textPatternColor?: string;
     textPatternOpacity?: number;
-    textPatternPosition?: TextPosition;
+    textPatternPositions?: TextPosition[];
+    textPatternFontFamily?: string;
+    textPatternFontSize?: number;
+    textPatternFontWeight?: number;
     padding: number;
     shadowBlur?: number;
     shadowOpacity?: number;
@@ -50,7 +53,10 @@ export function renderCanvas(options: RenderOptions): void {
         textPatternText,
         textPatternColor,
         textPatternOpacity,
-        textPatternPosition,
+        textPatternPositions,
+        textPatternFontFamily,
+        textPatternFontSize,
+        textPatternFontWeight,
         padding,
         shadowBlur = 20,
         shadowOpacity = 50,
@@ -92,7 +98,10 @@ export function renderCanvas(options: RenderOptions): void {
         textPatternText,
         textPatternColor,
         textPatternOpacity,
-        textPatternPosition,
+        textPatternPositions,
+        textPatternFontFamily,
+        textPatternFontSize,
+        textPatternFontWeight,
         gradientAngle,
         meshGradientCSS,
     };

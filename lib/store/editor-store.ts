@@ -22,7 +22,10 @@ const DEFAULT_STATE: EditorState = {
     textPatternText: 'WELCOME',
     textPatternColor: '#ffffff',
     textPatternOpacity: 0.1,
-    textPatternPosition: 'center',
+    textPatternPositions: ['center'], // Default to center only
+    textPatternFontFamily: 'system-ui, -apple-system, sans-serif',
+    textPatternFontSize: 0.35, // 35% of canvas dimension
+    textPatternFontWeight: 900,
     padding: 64,
     shadowBlur: 20, // Default blur
     shadowOpacity: 50, // Default opacity %
@@ -128,7 +131,25 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
 
     setTextPatternText: (text: string) => set({ textPatternText: text }),
 
-    setTextPatternPosition: (position) => set({ textPatternPosition: position }),
+    toggleTextPatternPosition: (position) => {
+        const current = get().textPatternPositions;
+        const newPositions = current.includes(position)
+            ? current.filter(p => p !== position) // Remove if already selected
+            : [...current, position]; // Add if not selected
+
+        // Ensure at least one position is always selected
+        if (newPositions.length === 0) {
+            return;
+        }
+
+        set({ textPatternPositions: newPositions });
+    },
+
+    setTextPatternFontFamily: (fontFamily: string) => set({ textPatternFontFamily: fontFamily }),
+
+    setTextPatternFontSize: (size: number) => set({ textPatternFontSize: Math.max(0.1, Math.min(1.0, size)) }),
+
+    setTextPatternFontWeight: (weight: number) => set({ textPatternFontWeight: Math.max(100, Math.min(900, weight)) }),
 
     setPadding: (padding: number) => {
         const state = get();

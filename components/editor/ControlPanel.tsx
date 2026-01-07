@@ -28,9 +28,9 @@ export function ControlPanel() {
     }
 
     return (
-        <div className="w-80 bg-background border-l border-border overflow-y-auto">
-            <Tabs defaultValue="background" className="w-full">
-                <TabsList className="w-full grid grid-cols-4 bg-background border-b border-border rounded-none h-12 p-0">
+        <div className="w-80 bg-background border-l border-border flex flex-col h-full">
+            <Tabs defaultValue="background" className="w-full flex flex-col flex-1 overflow-hidden">
+                <TabsList className="w-full grid grid-cols-4 bg-background border-b border-border rounded-none h-12 p-0 flex-shrink-0">
                     <TabsTrigger
                         value="background"
                         className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full"
@@ -57,7 +57,7 @@ export function ControlPanel() {
                     </TabsTrigger>
                 </TabsList>
 
-                <div className="p-4">
+                <div className="flex-1 overflow-y-auto p-4">
                     <TabsContent value="background" className="mt-0 space-y-6">
                         <BackgroundPicker />
                     </TabsContent>

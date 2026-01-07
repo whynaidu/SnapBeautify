@@ -3,6 +3,7 @@
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { PRESET_GRADIENTS, SOLID_COLORS, MESH_GRADIENTS, TEXT_PATTERNS } from '@/lib/constants/gradients';
 import { cn } from '@/lib/utils';
@@ -18,13 +19,19 @@ export function BackgroundPicker() {
         textPatternText,
         textPatternColor,
         textPatternOpacity,
-        textPatternPosition,
+        textPatternPositions,
+        textPatternFontFamily,
+        textPatternFontSize,
+        textPatternFontWeight,
         setBackgroundColor,
         setGradient,
         setMeshGradient,
         setTextPattern,
         setTextPatternText,
-        setTextPatternPosition,
+        toggleTextPatternPosition,
+        setTextPatternFontFamily,
+        setTextPatternFontSize,
+        setTextPatternFontWeight,
         setBackgroundType,
     } = useEditorStore();
 
@@ -349,22 +356,16 @@ export function BackgroundPicker() {
                         />
                     </div>
 
-                    {/* Text Position Selector */}
+                    {/* Text Position Selector - Multi-select */}
                     <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
-                        <Label className="text-[10px] uppercase text-muted-foreground">Text Position</Label>
-                        <div className="grid grid-cols-3 gap-1.5">
-                            {(['top-left', 'top-center', 'top-right', 'center-left', 'center', 'center-right', 'bottom-left', 'bottom-center', 'bottom-right'] as const).map((position) => {
-                                const isSelected = textPatternPosition === position;
-                                const labels: Record<typeof position, string> = {
-                                    'top-left': '↖',
-                                    'top-center': '↑',
-                                    'top-right': '↗',
-                                    'center-left': '←',
-                                    'center': '●',
-                                    'center-right': '→',
-                                    'bottom-left': '↙',
-                                    'bottom-center': '↓',
-                                    'bottom-right': '↘',
+                        <Label className="text-[10px] uppercase text-muted-foreground">Text Position (Multi-select)</Label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {(['top', 'center', 'bottom'] as const).map((position) => {
+                                const isSelected = textPatternPositions.includes(position);
+                                const labels = {
+                                    'top': 'Top',
+                                    'center': 'Center',
+                                    'bottom': 'Bottom',
                                 };
 
                                 return (
@@ -372,14 +373,87 @@ export function BackgroundPicker() {
                                         key={position}
                                         variant={isSelected ? 'default' : 'outline'}
                                         size="sm"
-                                        onClick={() => setTextPatternPosition(position)}
+                                        onClick={() => toggleTextPatternPosition(position)}
                                         className={cn(
-                                            'h-10 text-lg',
+                                            'h-10',
                                             isSelected && 'bg-primary hover:bg-primary/90 text-primary-foreground'
                                         )}
-                                        title={position.replace('-', ' ')}
                                     >
                                         {labels[position]}
+                                    </Button>
+                                );
+                            })}
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-1">
+                            Select multiple positions to show text {textPatternPositions.length} time{textPatternPositions.length !== 1 ? 's' : ''}
+                        </p>
+                    </div>
+
+                    {/* Font Family Selector */}
+                    <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
+                        <Label className="text-[10px] uppercase text-muted-foreground">Font Family</Label>
+                        <select
+                            value={textPatternFontFamily}
+                            onChange={(e) => setTextPatternFontFamily(e.target.value)}
+                            className="w-full h-9 px-3 rounded-md border border-border bg-background text-sm"
+                        >
+                            <option value="system-ui, -apple-system, sans-serif">System UI (Default)</option>
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="Helvetica, sans-serif">Helvetica</option>
+                            <option value="'Times New Roman', serif">'Times New Roman'</option>
+                            <option value="Georgia, serif">Georgia</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                            <option value="Verdana, sans-serif">Verdana</option>
+                            <option value="Impact, sans-serif">Impact</option>
+                            <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+                            <option value="'Brush Script MT', cursive">Brush Script MT</option>
+                        </select>
+                    </div>
+
+                    {/* Font Size Slider */}
+                    <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
+                        <div className="flex justify-between items-center">
+                            <Label className="text-[10px] uppercase text-muted-foreground">Font Size</Label>
+                            <span className="text-xs text-muted-foreground">{Math.round(textPatternFontSize * 100)}%</span>
+                        </div>
+                        <Slider
+                            value={[textPatternFontSize * 100]}
+                            onValueChange={([value]) => setTextPatternFontSize(value / 100)}
+                            min={10}
+                            max={100}
+                            step={1}
+                            className="w-full"
+                        />
+                    </div>
+
+                    {/* Font Weight Selector */}
+                    <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
+                        <Label className="text-[10px] uppercase text-muted-foreground">Font Weight</Label>
+                        <div className="grid grid-cols-5 gap-1.5">
+                            {[100, 300, 400, 700, 900].map((weight) => {
+                                const isSelected = textPatternFontWeight === weight;
+                                const labels: Record<number, string> = {
+                                    100: 'Thin',
+                                    300: 'Light',
+                                    400: 'Normal',
+                                    700: 'Bold',
+                                    900: 'Black',
+                                };
+
+                                return (
+                                    <Button
+                                        key={weight}
+                                        variant={isSelected ? 'default' : 'outline'}
+                                        size="sm"
+                                        onClick={() => setTextPatternFontWeight(weight)}
+                                        className={cn(
+                                            'h-9 text-[10px]',
+                                            isSelected && 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                                        )}
+                                        title={labels[weight]}
+                                    >
+                                        {labels[weight]}
                                     </Button>
                                 );
                             })}

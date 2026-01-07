@@ -26,7 +26,7 @@ export interface TextPattern {
     textOpacity: number;
 }
 
-export type TextPosition = 'top-left' | 'top-center' | 'top-right' | 'center-left' | 'center' | 'center-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
+export type TextPosition = 'top' | 'center' | 'bottom';
 
 // export interface ShadowPreset {
 //     blur: number;
@@ -57,7 +57,10 @@ export interface EditorState {
     textPatternText: string;
     textPatternColor: string;
     textPatternOpacity: number;
-    textPatternPosition: TextPosition;
+    textPatternPositions: TextPosition[]; // Array for multiple positions
+    textPatternFontFamily: string;
+    textPatternFontSize: number; // percentage 0.1 - 1.0
+    textPatternFontWeight: number; // 100-900
 
     // Styling
     padding: number;
@@ -92,7 +95,10 @@ export interface EditorActions {
     setBackgroundImage: (url: string) => void;
     setTextPattern: (text: string, colors: [string, string], angle: number, textColor: string, textOpacity: number) => void;
     setTextPatternText: (text: string) => void;
-    setTextPatternPosition: (position: TextPosition) => void;
+    toggleTextPatternPosition: (position: TextPosition) => void; // Toggle position in/out of array
+    setTextPatternFontFamily: (fontFamily: string) => void;
+    setTextPatternFontSize: (size: number) => void;
+    setTextPatternFontWeight: (weight: number) => void;
     setPadding: (padding: number) => void;
     setShadowBlur: (blur: number) => void;
     setShadowOpacity: (opacity: number) => void;
