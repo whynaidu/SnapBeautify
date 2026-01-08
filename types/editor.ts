@@ -1,6 +1,6 @@
 // Editor TypeScript Types
 
-export type BackgroundType = 'solid' | 'gradient' | 'mesh' | 'image' | 'transparent' | 'textPattern';
+export type BackgroundType = 'solid' | 'gradient' | 'mesh' | 'image' | 'transparent' | 'textPattern' | 'waveSplit' | 'logoPattern';
 export type FrameType = 'none' | 'browser' | 'macos' | 'windows' | 'iphone' | 'android';
 // export type ShadowSize = 'none' | 'sm' | 'md' | 'lg' | 'xl'; // Removed in favor of custom controls
 export type ExportFormat = 'png' | 'jpeg' | 'webp';
@@ -81,6 +81,11 @@ export interface EditorState {
     textPatternFontFamily: string;
     textPatternFontSize: number; // percentage 0.1 - 1.0
     textPatternFontWeight: number; // 100-900
+    waveSplitFlipped: boolean; // If true, gradient on bottom, solid on top
+    logoPatternImage: HTMLImageElement | null;
+    logoPatternOpacity: number; // 0-1
+    logoPatternSize: number; // percentage 0.1 - 1.0
+    logoPatternSpacing: number; // spacing multiplier 1.0 - 3.0
 
     // Styling
     padding: number;
@@ -118,6 +123,7 @@ export interface EditorActions {
     clearImage: () => void;
     setBackgroundType: (type: BackgroundType) => void;
     setBackgroundColor: (color: string) => void;
+    updateBackgroundColor: (color: string) => void; // Updates color without changing background type
     setGradient: (colors: [string, string], angle?: number) => void;
     updateGradientColors: (colors: [string, string], angle?: number) => void; // Updates gradient without changing background type
     setMeshGradient: (css: string) => void;
@@ -128,6 +134,12 @@ export interface EditorActions {
     setTextPatternFontFamily: (fontFamily: string) => void;
     setTextPatternFontSize: (size: number) => void;
     setTextPatternFontWeight: (weight: number) => void;
+    toggleWaveSplitFlip: () => void; // Toggle wave split orientation
+    setLogoPattern: (image: HTMLImageElement) => void;
+    clearLogoPattern: () => void;
+    setLogoPatternOpacity: (opacity: number) => void;
+    setLogoPatternSize: (size: number) => void;
+    setLogoPatternSpacing: (spacing: number) => void;
     setPadding: (padding: number) => void;
     setShadowBlur: (blur: number) => void;
     setShadowOpacity: (opacity: number) => void;
@@ -140,6 +152,7 @@ export interface EditorActions {
     setImageScale: (scale: number) => void;
     setRotation: (rotation: number) => void;
     addTextOverlay: () => void;
+    duplicateTextOverlay: (id: string) => void;
     removeTextOverlay: (id: string) => void;
     selectTextOverlay: (id: string | null) => void;
     updateTextOverlay: (id: string, updates: Partial<Omit<TextOverlay, 'id'>>) => void;

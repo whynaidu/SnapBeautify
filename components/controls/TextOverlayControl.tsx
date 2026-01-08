@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { useEditorStore } from '@/lib/store/editor-store';
-import { Plus, Trash2, Type } from 'lucide-react';
+import { Plus, Trash2, Type, Copy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function TextOverlayControl() {
@@ -13,6 +13,7 @@ export function TextOverlayControl() {
         textOverlays,
         selectedTextOverlayId,
         addTextOverlay,
+        duplicateTextOverlay,
         removeTextOverlay,
         selectTextOverlay,
         updateTextOverlay,
@@ -61,11 +62,24 @@ export function TextOverlayControl() {
                                 <Button
                                     onClick={(e) => {
                                         e.stopPropagation();
+                                        duplicateTextOverlay(overlay.id);
+                                    }}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-7 w-7 p-0 flex-shrink-0 hover:bg-primary/10"
+                                    title="Duplicate"
+                                >
+                                    <Copy className="w-3 h-3" />
+                                </Button>
+                                <Button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         removeTextOverlay(overlay.id);
                                     }}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-7 w-7 p-0 flex-shrink-0"
+                                    className="h-7 w-7 p-0 flex-shrink-0 hover:bg-destructive/10 hover:text-destructive"
+                                    title="Delete"
                                 >
                                     <Trash2 className="w-3 h-3" />
                                 </Button>

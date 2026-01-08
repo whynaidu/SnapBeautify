@@ -31,6 +31,11 @@ const DEFAULT_STATE: EditorState = {
     textPatternFontFamily: 'system-ui, -apple-system, sans-serif',
     textPatternFontSize: 0.35, // 35% of canvas dimension
     textPatternFontWeight: 900,
+    waveSplitFlipped: false, // Default: gradient on top, solid on bottom
+    logoPatternImage: null,
+    logoPatternOpacity: 0.3,
+    logoPatternSize: 0.3, // 30% of canvas dimension
+    logoPatternSpacing: 1.5, // 1.5x spacing between logos
     padding: 64,
     shadowBlur: 20, // Default blur
     shadowOpacity: 50, // Default opacity %
@@ -117,6 +122,10 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
     setBackgroundColor: (color: string) =>
         set({ backgroundColor: color, backgroundType: 'solid' }),
 
+    updateBackgroundColor: (color: string) =>
+        set({ backgroundColor: color }),
+        // Does NOT change backgroundType - for updating color in waveSplit
+
     setGradient: (colors: [string, string], angle = 135) =>
         set({
             gradientColors: colors,
@@ -128,7 +137,7 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         set({
             gradientColors: colors,
             gradientAngle: angle,
-            // Does NOT change backgroundType - for updating gradients in text patterns
+            // Does NOT change backgroundType - for updating gradients in text patterns and waveSplit
         }),
 
     setMeshGradient: (css: string) =>
@@ -168,6 +177,18 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
     setTextPatternFontSize: (size: number) => set({ textPatternFontSize: Math.max(0.1, Math.min(1.0, size)) }),
 
     setTextPatternFontWeight: (weight: number) => set({ textPatternFontWeight: Math.max(100, Math.min(900, weight)) }),
+
+    toggleWaveSplitFlip: () => set((state) => ({ waveSplitFlipped: !state.waveSplitFlipped })),
+
+    setLogoPattern: (image: HTMLImageElement) => set({ logoPatternImage: image, backgroundType: 'logoPattern' }),
+
+    clearLogoPattern: () => set({ logoPatternImage: null }),
+
+    setLogoPatternOpacity: (opacity: number) => set({ logoPatternOpacity: Math.max(0, Math.min(1, opacity)) }),
+
+    setLogoPatternSize: (size: number) => set({ logoPatternSize: Math.max(0.1, Math.min(1.0, size)) }),
+
+    setLogoPatternSpacing: (spacing: number) => set({ logoPatternSpacing: Math.max(1.0, Math.min(3.0, spacing)) }),
 
     setPadding: (padding: number) => {
         const state = get();
@@ -236,6 +257,26 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         set({
             textOverlays: [...get().textOverlays, newOverlay],
             selectedTextOverlayId: id,
+        });
+    },
+
+    duplicateTextOverlay: (id: string) => {
+        const state = get();
+        const originalOverlay = state.textOverlays.find(t => t.id === id);
+        if (!originalOverlay) return;
+
+        const newId = `text-${Date.now()}`;
+        const duplicatedOverlay = {
+            ...originalOverlay,
+            id: newId,
+            // Offset position slightly (5% down and right) so it's visible
+            x: Math.min(originalOverlay.x + 5, 95),
+            y: Math.min(originalOverlay.y + 5, 95),
+        };
+
+        set({
+            textOverlays: [...state.textOverlays, duplicatedOverlay],
+            selectedTextOverlayId: newId,
         });
     },
 

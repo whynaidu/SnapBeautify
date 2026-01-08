@@ -131,14 +131,30 @@ export function calculateLayout(
 export function calculateBorderRadii(
     frameType: FrameType,
     borderRadius: number,
-    imageScale: number
+    imageScale: number,
+    contentWidth?: number,
+    contentHeight?: number
 ): BorderRadii {
     if (frameType === 'iphone' || frameType === 'android') {
         // Phone frames have specific screen radii
-        const screenRadius = (frameType === 'iphone' ? 24 : 18) * imageScale;
+        // MagicUI iPhone uses 55.75px screen radius in 433x882 space
+        // Android uses 33px/25px elliptical radius in 378x830 space
+        const PHONE_WIDTH = frameType === 'iphone' ? 433 : 378;
+        const PHONE_HEIGHT = frameType === 'iphone' ? 882 : 830;
+        const baseRadius = frameType === 'iphone' ? 55.75 : 33; // Use radiusX for Android
+
+        // Calculate actual frame scale if dimensions provided
+        let effectiveRadius = baseRadius * imageScale;
+        if (contentWidth && contentHeight) {
+            const frameScaleX = contentWidth / PHONE_WIDTH;
+            const frameScaleY = contentHeight / PHONE_HEIGHT;
+            const frameScale = Math.min(frameScaleX, frameScaleY);
+            effectiveRadius = baseRadius * frameScale;
+        }
+
         return {
-            effectiveTopRadius: screenRadius,
-            effectiveBottomRadius: screenRadius,
+            effectiveTopRadius: effectiveRadius,
+            effectiveBottomRadius: effectiveRadius,
         };
     } else if (frameType !== 'none') {
         // Browser/Window frames: top is flat, bottom is rounded

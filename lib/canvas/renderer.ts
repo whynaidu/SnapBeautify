@@ -8,7 +8,7 @@ import { calculateLayout, calculateBorderRadii } from './layout';
 import { drawBackground, BackgroundOptions } from './background';
 import { drawShadow, ShadowOptions } from './shadow';
 import { initializeCanvas, applyRotation, drawClippedImage } from './helpers';
-import { drawFrame, drawFrameOverlay } from './frames';
+import { drawFrame, drawFrameOverlay, getiPhoneScreenBounds, getAndroidScreenBounds } from './frames';
 
 export interface RenderOptions {
     canvas: HTMLCanvasElement;
@@ -25,6 +25,11 @@ export interface RenderOptions {
     textPatternFontFamily?: string;
     textPatternFontSize?: number;
     textPatternFontWeight?: number;
+    waveSplitFlipped?: boolean;
+    logoPatternImage?: HTMLImageElement | null;
+    logoPatternOpacity?: number;
+    logoPatternSize?: number;
+    logoPatternSpacing?: number;
     padding: number;
     shadowBlur?: number;
     shadowOpacity?: number;
@@ -58,6 +63,11 @@ export function renderCanvas(options: RenderOptions): void {
         textPatternFontFamily,
         textPatternFontSize,
         textPatternFontWeight,
+        waveSplitFlipped = false,
+        logoPatternImage = null,
+        logoPatternOpacity = 0.3,
+        logoPatternSize = 0.3,
+        logoPatternSpacing = 1.5,
         padding,
         shadowBlur = 20,
         shadowOpacity = 50,
@@ -104,13 +114,24 @@ export function renderCanvas(options: RenderOptions): void {
         textPatternFontFamily,
         textPatternFontSize,
         textPatternFontWeight,
+        waveSplitFlipped,
+        logoPatternImage,
+        logoPatternOpacity,
+        logoPatternSize,
+        logoPatternSpacing,
         gradientAngle,
         meshGradientCSS,
     };
     drawBackground(ctx, layout.canvasWidth, layout.canvasHeight, backgroundOptions);
 
-    // Calculate effective border radii
-    const radii = calculateBorderRadii(frameType, borderRadius, imageScale);
+    // Calculate effective border radii (pass content dimensions for iPhone/Android)
+    const radii = calculateBorderRadii(
+        frameType,
+        borderRadius,
+        imageScale,
+        layout.contentWidth,
+        layout.contentHeight
+    );
 
     // Draw frame if needed
     if (frameType !== 'none') {
@@ -128,6 +149,108 @@ export function renderCanvas(options: RenderOptions): void {
 
     // Save context for rotation
     ctx.save();
+
+    // For iPhone/Android frames, apply additional clipping to screen bounds
+    // Safari frame wraps around the image without clipping
+    if (frameType === 'iphone') {
+        const screenBounds = getiPhoneScreenBounds(
+            layout.contentX,
+            layout.contentY,
+            layout.contentWidth,
+            layout.contentHeight
+        );
+
+        // Create clipping path for screen area
+        ctx.beginPath();
+        ctx.moveTo(screenBounds.x + screenBounds.radius, screenBounds.y);
+        ctx.lineTo(screenBounds.x + screenBounds.width - screenBounds.radius, screenBounds.y);
+        ctx.quadraticCurveTo(
+            screenBounds.x + screenBounds.width,
+            screenBounds.y,
+            screenBounds.x + screenBounds.width,
+            screenBounds.y + screenBounds.radius
+        );
+        ctx.lineTo(
+            screenBounds.x + screenBounds.width,
+            screenBounds.y + screenBounds.height - screenBounds.radius
+        );
+        ctx.quadraticCurveTo(
+            screenBounds.x + screenBounds.width,
+            screenBounds.y + screenBounds.height,
+            screenBounds.x + screenBounds.width - screenBounds.radius,
+            screenBounds.y + screenBounds.height
+        );
+        ctx.lineTo(
+            screenBounds.x + screenBounds.radius,
+            screenBounds.y + screenBounds.height
+        );
+        ctx.quadraticCurveTo(
+            screenBounds.x,
+            screenBounds.y + screenBounds.height,
+            screenBounds.x,
+            screenBounds.y + screenBounds.height - screenBounds.radius
+        );
+        ctx.lineTo(screenBounds.x, screenBounds.y + screenBounds.radius);
+        ctx.quadraticCurveTo(
+            screenBounds.x,
+            screenBounds.y,
+            screenBounds.x + screenBounds.radius,
+            screenBounds.y
+        );
+        ctx.closePath();
+        ctx.clip();
+    } else if (frameType === 'android') {
+        const screenBounds = getAndroidScreenBounds(
+            layout.contentX,
+            layout.contentY,
+            layout.contentWidth,
+            layout.contentHeight
+        );
+
+        // Create clipping path for Android screen area (with elliptical corners)
+        ctx.beginPath();
+        ctx.ellipse(
+            screenBounds.x + screenBounds.radiusX,
+            screenBounds.y + screenBounds.radiusY,
+            screenBounds.radiusX,
+            screenBounds.radiusY,
+            0,
+            Math.PI,
+            1.5 * Math.PI
+        );
+        ctx.lineTo(screenBounds.x + screenBounds.width - screenBounds.radiusX, screenBounds.y);
+        ctx.ellipse(
+            screenBounds.x + screenBounds.width - screenBounds.radiusX,
+            screenBounds.y + screenBounds.radiusY,
+            screenBounds.radiusX,
+            screenBounds.radiusY,
+            0,
+            1.5 * Math.PI,
+            0
+        );
+        ctx.lineTo(screenBounds.x + screenBounds.width, screenBounds.y + screenBounds.height - screenBounds.radiusY);
+        ctx.ellipse(
+            screenBounds.x + screenBounds.width - screenBounds.radiusX,
+            screenBounds.y + screenBounds.height - screenBounds.radiusY,
+            screenBounds.radiusX,
+            screenBounds.radiusY,
+            0,
+            0,
+            0.5 * Math.PI
+        );
+        ctx.lineTo(screenBounds.x + screenBounds.radiusX, screenBounds.y + screenBounds.height);
+        ctx.ellipse(
+            screenBounds.x + screenBounds.radiusX,
+            screenBounds.y + screenBounds.height - screenBounds.radiusY,
+            screenBounds.radiusX,
+            screenBounds.radiusY,
+            0,
+            0.5 * Math.PI,
+            Math.PI
+        );
+        ctx.closePath();
+        ctx.clip();
+    }
 
     // Apply rotation if needed
     applyRotation(

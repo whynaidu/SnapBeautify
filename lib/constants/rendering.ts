@@ -40,26 +40,26 @@ export const SHADOW = {
  */
 export const FRAME_OFFSETS: Record<FrameType, { x: number; y: number; top: number; bottom: number; left: number; right: number }> = {
     none: { x: 0, y: 0, top: 0, bottom: 0, left: 0, right: 0 },
-    browser: { x: 0, y: 40, top: 40, bottom: 0, left: 0, right: 0 },
+    browser: { x: 2, y: 32, top: 32, bottom: 0, left: 1, right: 1 },
     macos: { x: 0, y: 32, top: 32, bottom: 0, left: 0, right: 0 },
     windows: { x: 0, y: 32, top: 32, bottom: 0, left: 0, right: 0 },
-    iphone: { x: 32, y: 32, top: 16, bottom: 16, left: 16, right: 16 },
-    android: { x: 24, y: 24, top: 12, bottom: 12, left: 12, right: 12 },
+    iphone: { x: 24, y: 24, top: 12, bottom: 12, left: 12, right: 12 }, // Thinner 12px bezel
+    android: { x: 18, y: 28, top: 14, bottom: 14, left: 9, right: 9 }, // MagicUI Android dimensions
 } as const;
 
 /**
  * Browser Frame Constants
  */
 export const BROWSER_FRAME = {
-    TITLE_BAR_HEIGHT: 40,
+    TITLE_BAR_HEIGHT: 32,
     MIN_BORDER_RADIUS: 12,
-    DOT_RADIUS: 6,
-    DOT_SPACING: 20,
-    DOT_START_X: 16,
+    DOT_RADIUS: 5,
+    DOT_SPACING: 16,
+    DOT_START_X: 12,
     URL_BAR: {
-        X_OFFSET: 80,
-        Y_OFFSET: 10,
-        WIDTH_OFFSET: 160, // Subtracted from total width
+        X_OFFSET: 60,
+        Y_OFFSET: 6,
+        WIDTH_OFFSET: 120, // Subtracted from total width
         HEIGHT: 20,
         BORDER_RADIUS: 6,
     },

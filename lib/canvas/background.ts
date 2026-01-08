@@ -20,6 +20,11 @@ export interface BackgroundOptions {
     textPatternFontFamily?: string;
     textPatternFontSize?: number;
     textPatternFontWeight?: number;
+    waveSplitFlipped?: boolean;
+    logoPatternImage?: HTMLImageElement | null;
+    logoPatternOpacity?: number;
+    logoPatternSize?: number;
+    logoPatternSpacing?: number;
 }
 
 export interface GradientPoints {
@@ -254,6 +259,144 @@ export function drawTextPattern(
 }
 
 /**
+ * Draw wave split background (half solid, half gradient with wave divider)
+ */
+export function drawWaveSplitBackground(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    solidColor: string,
+    gradientColors: [string, string],
+    gradientAngle: number,
+    flipped: boolean = false
+): void {
+    const midY = height / 2;
+
+    // Draw solid color on entire canvas first
+    ctx.fillStyle = solidColor;
+    ctx.fillRect(0, 0, width, height);
+
+    // Create smooth wave path using sine-like bezier curves
+    ctx.save();
+    ctx.beginPath();
+
+    // Start from left edge at middle
+    ctx.moveTo(0, midY);
+
+    // Create smooth wave using bezier curves
+    const waveCount = 2; // Number of complete wave cycles (reduced from 3 to 2)
+    const waveWidth = width / waveCount;
+    const waveHeight = 60; // Amplitude of the wave
+
+    // Invert wave direction when flipped so it looks visually different
+    const heightMultiplier = flipped ? -1 : 1;
+
+    for (let i = 0; i < waveCount; i++) {
+        const x0 = i * waveWidth;
+        const x1 = x0 + waveWidth * 0.25;
+        const x2 = x0 + waveWidth * 0.5;
+        const x3 = x0 + waveWidth * 0.75;
+        const x4 = (i + 1) * waveWidth;
+
+        // First half of wave (going up when not flipped, down when flipped)
+        ctx.bezierCurveTo(
+            x1, midY - (waveHeight * heightMultiplier),
+            x2, midY - (waveHeight * heightMultiplier),
+            x2, midY
+        );
+
+        // Second half of wave (going down when not flipped, up when flipped)
+        ctx.bezierCurveTo(
+            x2, midY + (waveHeight * heightMultiplier),
+            x3, midY + (waveHeight * heightMultiplier),
+            x4, midY
+        );
+    }
+
+    // Complete the path based on flip direction
+    if (flipped) {
+        // Gradient on bottom, solid on top
+        ctx.lineTo(width, height);
+        ctx.lineTo(0, height);
+    } else {
+        // Gradient on top, solid on bottom
+        ctx.lineTo(width, 0);
+        ctx.lineTo(0, 0);
+    }
+    ctx.closePath();
+
+    // Fill with gradient
+    const points = calculateGradientPoints(width, height, gradientAngle);
+    const gradient = ctx.createLinearGradient(points.x1, points.y1, points.x2, points.y2);
+    gradient.addColorStop(0, gradientColors[0]);
+    gradient.addColorStop(1, gradientColors[1]);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    ctx.restore();
+}
+
+/**
+ * Draw logo pattern background (gradient with repeating logo grid)
+ */
+export function drawLogoPattern(
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    logo: HTMLImageElement,
+    gradientColors: [string, string],
+    gradientAngle: number,
+    logoOpacity: number,
+    logoSize: number,
+    spacing: number = 1.5 // Spacing multiplier between logos
+): void {
+    // Draw gradient background first
+    drawGradientBackground(ctx, width, height, gradientColors, gradientAngle);
+
+    ctx.save();
+
+    // Calculate logo dimensions based on canvas size
+    const maxDimension = Math.min(width, height) * logoSize;
+    const logoAspect = logo.width / logo.height;
+    let logoWidth: number;
+    let logoHeight: number;
+
+    if (logoAspect > 1) {
+        // Landscape logo
+        logoWidth = maxDimension;
+        logoHeight = maxDimension / logoAspect;
+    } else {
+        // Portrait or square logo
+        logoHeight = maxDimension;
+        logoWidth = maxDimension * logoAspect;
+    }
+
+    // Set opacity
+    ctx.globalAlpha = logoOpacity;
+
+    // Calculate spacing between logos
+    const spacingX = logoWidth * spacing;
+    const spacingY = logoHeight * spacing;
+
+    // Calculate how many logos we need to cover the canvas (with some extra for edges)
+    const cols = Math.ceil(width / spacingX) + 1;
+    const rows = Math.ceil(height / spacingY) + 1;
+
+    // Draw logo grid
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const x = col * spacingX - logoWidth / 2;
+            const y = row * spacingY - logoHeight / 2;
+
+            // Draw the logo
+            ctx.drawImage(logo, x, y, logoWidth, logoHeight);
+        }
+    }
+
+    ctx.restore();
+}
+
+/**
  * Draw checkerboard pattern (for transparency)
  */
 export function drawCheckerboard(
@@ -293,7 +436,12 @@ export function drawBackground(
         textPatternPositions = ['center'],
         textPatternFontFamily = 'system-ui, -apple-system, sans-serif',
         textPatternFontSize = 0.35,
-        textPatternFontWeight = 900
+        textPatternFontWeight = 900,
+        waveSplitFlipped = false,
+        logoPatternImage = null,
+        logoPatternOpacity = 0.3,
+        logoPatternSize = 0.3,
+        logoPatternSpacing = 1.5
     } = options;
 
     switch (type) {
@@ -324,6 +472,34 @@ export function drawBackground(
                 textPatternFontSize,
                 textPatternFontWeight
             );
+            break;
+
+        case 'waveSplit':
+            drawWaveSplitBackground(
+                ctx,
+                width,
+                height,
+                color,
+                gradientColors,
+                gradientAngle,
+                waveSplitFlipped
+            );
+            break;
+
+        case 'logoPattern':
+            if (logoPatternImage) {
+                drawLogoPattern(
+                    ctx,
+                    width,
+                    height,
+                    logoPatternImage,
+                    gradientColors,
+                    gradientAngle,
+                    logoPatternOpacity,
+                    logoPatternSize,
+                    logoPatternSpacing
+                );
+            }
             break;
 
         case 'transparent':

@@ -19,9 +19,9 @@ export const FRAME_CONFIGS: Record<FrameType, FrameConfig> = {
     browser: {
         name: 'Browser',
         type: 'browser',
-        titleBarHeight: 40,
+        titleBarHeight: 32,
         borderRadius: 12,
-        padding: 0,
+        padding: 1,
     },
     macos: {
         name: 'macOS',
@@ -40,16 +40,16 @@ export const FRAME_CONFIGS: Record<FrameType, FrameConfig> = {
     iphone: {
         name: 'iPhone',
         type: 'iphone',
-        titleBarHeight: 0,
-        borderRadius: 44,
-        padding: 12,
+        titleBarHeight: 0, // No title bar, notch included in frame
+        borderRadius: 73, // Outer device body radius
+        padding: 12, // Thinner bezel thickness
     },
     android: {
         name: 'Android',
         type: 'android',
-        titleBarHeight: 0,
-        borderRadius: 20,
-        padding: 8,
+        titleBarHeight: 0, // No title bar, camera included in frame
+        borderRadius: 42, // Outer device body radius (MagicUI)
+        padding: 9, // Bezel thickness (MagicUI: SCREEN_X)
     },
 };
 

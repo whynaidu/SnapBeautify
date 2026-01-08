@@ -15,17 +15,12 @@ import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 
 export function Header() {
-    const { resetToDefaults, originalImage, clearImage, enterCropMode, isCropping, uncroppedImage, revertCrop } = useEditorStore();
+    const { resetToDefaults, originalImage, enterCropMode, isCropping, uncroppedImage, revertCrop } = useEditorStore();
     const { setTheme, theme } = useTheme();
 
     const handleReset = () => {
         resetToDefaults();
-        toast.info('Settings reset to defaults');
-    };
-
-    const handleClear = () => {
-        clearImage();
-        toast.info('Image cleared');
+        toast.info('All settings reset to defaults');
     };
 
     const handleCrop = () => {
@@ -79,19 +74,11 @@ export function Header() {
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={handleClear}
-                            className="text-muted-foreground hover:text-foreground"
-                        >
-                            Clear
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
                             onClick={handleReset}
                             className="text-muted-foreground hover:text-foreground"
                         >
                             <RotateCcw className="w-4 h-4 mr-1" />
-                            Reset
+                            Reset All
                         </Button>
                     </>
                 )}
