@@ -6,12 +6,13 @@ import { Canvas } from './Canvas';
 import { ControlPanel } from './ControlPanel';
 import { ExportBar } from './ExportBar';
 import { MobileControlPanel } from './MobileControlPanel';
+import { CropActionButtons } from './CropActionButtons';
 import { KeyboardShortcuts } from '@/components/shared/KeyboardShortcuts';
 import { useEditorStore } from '@/lib/store/editor-store';
 
 export function Editor() {
     const [isMobile, setIsMobile] = useState(false);
-    const { originalImage } = useEditorStore();
+    const { originalImage, isCropping } = useEditorStore();
 
     useEffect(() => {
         const checkMobile = () => {
@@ -29,16 +30,22 @@ export function Editor() {
 
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
                 <Canvas />
-                {/* Desktop: Show sidebar, Mobile: Hide (use bottom sheet) */}
-                <div className="hidden md:block h-full">
-                    <ControlPanel />
-                </div>
+                {/* Desktop: Show sidebar (hide when cropping), Mobile: Hide (use bottom sheet) */}
+                {!isCropping && (
+                    <div className="hidden md:block h-full">
+                        <ControlPanel />
+                    </div>
+                )}
             </div>
 
-            <ExportBar />
+            {/* Hide export bar when cropping */}
+            {!isCropping && <ExportBar />}
 
-            {/* Mobile: Show bottom control panel */}
-            {isMobile && originalImage && <MobileControlPanel />}
+            {/* Mobile: Show bottom control panel (hide when cropping) */}
+            {isMobile && originalImage && !isCropping && <MobileControlPanel />}
+
+            {/* Show crop action buttons when in crop mode */}
+            {isCropping && <CropActionButtons />}
 
             {/* Global keyboard shortcuts handler */}
             <KeyboardShortcuts />

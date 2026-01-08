@@ -3,8 +3,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { CropArea } from '@/types/editor';
-import { Button } from '@/components/ui/button';
-import { Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type DragHandle = 'move' | 'nw' | 'ne' | 'sw' | 'se' | 'n' | 's' | 'e' | 'w' | null;
@@ -16,7 +14,7 @@ interface CropOverlayProps {
 }
 
 export function CropOverlay({ canvasWidth, canvasHeight, displayScale }: CropOverlayProps) {
-    const { cropArea, setCropArea, applyCrop, exitCropMode } = useEditorStore();
+    const { cropArea, setCropArea } = useEditorStore();
     const [isDragging, setIsDragging] = useState(false);
     const [dragHandle, setDragHandle] = useState<DragHandle>(null);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -111,37 +109,33 @@ export function CropOverlay({ canvasWidth, canvasHeight, displayScale }: CropOve
         }
     }, [isDragging, handleMouseMove, handleMouseUp]);
 
-    const handleApply = async () => {
-        await applyCrop();
-    };
-
     return (
-        <div
-            ref={overlayRef}
-            className="absolute top-0 left-0 z-10"
-            style={{
-                width: `${canvasWidth}px`,
-                height: `${canvasHeight}px`,
-                transform: `scale(${displayScale})`,
-                transformOrigin: 'center center',
-                touchAction: 'none',
-            }}
-        >
-            {/* Darkened overlay */}
-            <div className="absolute inset-0 bg-black/50" />
-
-            {/* Crop area */}
+        <>
             <div
-                className="absolute border-2 border-white shadow-lg"
+                ref={overlayRef}
+                className="absolute top-0 left-0 z-10 pointer-events-none"
                 style={{
-                    left: `${cropArea.x}%`,
-                    top: `${cropArea.y}%`,
-                    width: `${cropArea.width}%`,
-                    height: `${cropArea.height}%`,
+                    width: `${canvasWidth}px`,
+                    height: `${canvasHeight}px`,
+                    transform: `scale(${displayScale})`,
+                    transformOrigin: 'center center',
                 }}
             >
-                {/* Semi-transparent overlay to show crop area */}
-                <div className="absolute inset-0 bg-white/10" />
+                {/* Darkened overlay */}
+                <div className="absolute inset-0 bg-black/50 pointer-events-auto" style={{ touchAction: 'none' }} />
+
+                {/* Crop area */}
+                <div
+                    className="absolute border-2 border-white shadow-lg pointer-events-none"
+                    style={{
+                        left: `${cropArea.x}%`,
+                        top: `${cropArea.y}%`,
+                        width: `${cropArea.width}%`,
+                        height: `${cropArea.height}%`,
+                    }}
+                >
+                    {/* Semi-transparent overlay to show crop area */}
+                    <div className="absolute inset-0 bg-white/10" />
 
                 {/* Grid lines */}
                 <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
@@ -150,118 +144,127 @@ export function CropOverlay({ canvasWidth, canvasHeight, displayScale }: CropOve
                     ))}
                 </div>
 
-                {/* Move handle (center) */}
-                <div
-                    className="absolute inset-0 cursor-move"
-                    onMouseDown={(e) => handleMouseDown(e, 'move')}
-                    onTouchStart={(e) => handleMouseDown(e, 'move')}
-                />
+                    {/* Move handle (center) */}
+                    <div
+                        className="absolute inset-0 cursor-move pointer-events-auto"
+                        onMouseDown={(e) => handleMouseDown(e, 'move')}
+                        onTouchStart={(e) => handleMouseDown(e, 'move')}
+                        style={{ touchAction: 'none' }}
+                    />
 
-                {/* Corner handles - extra large for mobile accessibility */}
-                <div
-                    className={cn(
-                        "absolute -top-6 -left-6 w-16 h-16 bg-white border-4 border-indigo-500 rounded-full shadow-2xl",
-                        "active:scale-95 transition-all duration-150",
-                        "flex items-center justify-center z-10"
-                    )}
-                    onMouseDown={(e) => handleMouseDown(e, 'nw')}
-                    onTouchStart={(e) => handleMouseDown(e, 'nw')}
-                    style={{ touchAction: 'none' }}
-                >
-                    <div className="w-3 h-3 bg-indigo-500 rounded-full" />
-                </div>
-                <div
-                    className={cn(
-                        "absolute -top-6 -right-6 w-16 h-16 bg-white border-4 border-indigo-500 rounded-full shadow-2xl",
-                        "active:scale-95 transition-all duration-150",
-                        "flex items-center justify-center z-10"
-                    )}
-                    onMouseDown={(e) => handleMouseDown(e, 'ne')}
-                    onTouchStart={(e) => handleMouseDown(e, 'ne')}
-                    style={{ touchAction: 'none' }}
-                >
-                    <div className="w-3 h-3 bg-indigo-500 rounded-full" />
-                </div>
-                <div
-                    className={cn(
-                        "absolute -bottom-6 -left-6 w-16 h-16 bg-white border-4 border-indigo-500 rounded-full shadow-2xl",
-                        "active:scale-95 transition-all duration-150",
-                        "flex items-center justify-center z-10"
-                    )}
-                    onMouseDown={(e) => handleMouseDown(e, 'sw')}
-                    onTouchStart={(e) => handleMouseDown(e, 'sw')}
-                    style={{ touchAction: 'none' }}
-                >
-                    <div className="w-3 h-3 bg-indigo-500 rounded-full" />
-                </div>
-                <div
-                    className={cn(
-                        "absolute -bottom-6 -right-6 w-16 h-16 bg-white border-4 border-indigo-500 rounded-full shadow-2xl",
-                        "active:scale-95 transition-all duration-150",
-                        "flex items-center justify-center z-10"
-                    )}
-                    onMouseDown={(e) => handleMouseDown(e, 'se')}
-                    onTouchStart={(e) => handleMouseDown(e, 'se')}
-                    style={{ touchAction: 'none' }}
-                >
-                    <div className="w-3 h-3 bg-indigo-500 rounded-full" />
-                </div>
+                    {/* Corner handles - responsive sizing */}
+                    <div
+                        className={cn(
+                            "absolute -top-3 -left-3 w-10 h-10 md:w-6 md:h-6 md:-top-2 md:-left-2",
+                            "bg-white border-2 md:border-2 border-indigo-500 rounded-full shadow-lg pointer-events-auto",
+                            "active:scale-95 hover:scale-110 transition-all duration-150",
+                            "flex items-center justify-center z-10"
+                        )}
+                        onMouseDown={(e) => handleMouseDown(e, 'nw')}
+                        onTouchStart={(e) => handleMouseDown(e, 'nw')}
+                        style={{ touchAction: 'none' }}
+                    >
+                        <div className="w-2 h-2 md:w-1 md:h-1 bg-indigo-500 rounded-full" />
+                    </div>
+                    <div
+                        className={cn(
+                            "absolute -top-3 -right-3 w-10 h-10 md:w-6 md:h-6 md:-top-2 md:-right-2",
+                            "bg-white border-2 md:border-2 border-indigo-500 rounded-full shadow-lg pointer-events-auto",
+                            "active:scale-95 hover:scale-110 transition-all duration-150",
+                            "flex items-center justify-center z-10"
+                        )}
+                        onMouseDown={(e) => handleMouseDown(e, 'ne')}
+                        onTouchStart={(e) => handleMouseDown(e, 'ne')}
+                        style={{ touchAction: 'none' }}
+                    >
+                        <div className="w-2 h-2 md:w-1 md:h-1 bg-indigo-500 rounded-full" />
+                    </div>
+                    <div
+                        className={cn(
+                            "absolute -bottom-3 -left-3 w-10 h-10 md:w-6 md:h-6 md:-bottom-2 md:-left-2",
+                            "bg-white border-2 md:border-2 border-indigo-500 rounded-full shadow-lg pointer-events-auto",
+                            "active:scale-95 hover:scale-110 transition-all duration-150",
+                            "flex items-center justify-center z-10"
+                        )}
+                        onMouseDown={(e) => handleMouseDown(e, 'sw')}
+                        onTouchStart={(e) => handleMouseDown(e, 'sw')}
+                        style={{ touchAction: 'none' }}
+                    >
+                        <div className="w-2 h-2 md:w-1 md:h-1 bg-indigo-500 rounded-full" />
+                    </div>
+                    <div
+                        className={cn(
+                            "absolute -bottom-3 -right-3 w-10 h-10 md:w-6 md:h-6 md:-bottom-2 md:-right-2",
+                            "bg-white border-2 md:border-2 border-indigo-500 rounded-full shadow-lg pointer-events-auto",
+                            "active:scale-95 hover:scale-110 transition-all duration-150",
+                            "flex items-center justify-center z-10"
+                        )}
+                        onMouseDown={(e) => handleMouseDown(e, 'se')}
+                        onTouchStart={(e) => handleMouseDown(e, 'se')}
+                        style={{ touchAction: 'none' }}
+                    >
+                        <div className="w-2 h-2 md:w-1 md:h-1 bg-indigo-500 rounded-full" />
+                    </div>
 
-                {/* Edge handles - extra large for mobile accessibility */}
-                <div
-                    className="absolute -top-5 left-1/2 -translate-x-1/2 w-20 h-14 bg-white border-4 border-indigo-500 rounded-xl shadow-2xl active:scale-95 transition-all duration-150 flex items-center justify-center z-10"
-                    onMouseDown={(e) => handleMouseDown(e, 'n')}
-                    onTouchStart={(e) => handleMouseDown(e, 'n')}
-                    style={{ touchAction: 'none' }}
-                >
-                    <div className="w-8 h-1.5 bg-indigo-500 rounded-full" />
-                </div>
-                <div
-                    className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-20 h-14 bg-white border-4 border-indigo-500 rounded-xl shadow-2xl active:scale-95 transition-all duration-150 flex items-center justify-center z-10"
-                    onMouseDown={(e) => handleMouseDown(e, 's')}
-                    onTouchStart={(e) => handleMouseDown(e, 's')}
-                    style={{ touchAction: 'none' }}
-                >
-                    <div className="w-8 h-1.5 bg-indigo-500 rounded-full" />
-                </div>
-                <div
-                    className="absolute -left-5 top-1/2 -translate-y-1/2 w-14 h-20 bg-white border-4 border-indigo-500 rounded-xl shadow-2xl active:scale-95 transition-all duration-150 flex items-center justify-center z-10"
-                    onMouseDown={(e) => handleMouseDown(e, 'w')}
-                    onTouchStart={(e) => handleMouseDown(e, 'w')}
-                    style={{ touchAction: 'none' }}
-                >
-                    <div className="w-1.5 h-8 bg-indigo-500 rounded-full" />
-                </div>
-                <div
-                    className="absolute -right-5 top-1/2 -translate-y-1/2 w-14 h-20 bg-white border-4 border-indigo-500 rounded-xl shadow-2xl active:scale-95 transition-all duration-150 flex items-center justify-center z-10"
-                    onMouseDown={(e) => handleMouseDown(e, 'e')}
-                    onTouchStart={(e) => handleMouseDown(e, 'e')}
-                    style={{ touchAction: 'none' }}
-                >
-                    <div className="w-1.5 h-8 bg-indigo-500 rounded-full" />
+                    {/* Edge handles - responsive sizing */}
+                    <div
+                        className={cn(
+                            "absolute -top-2 md:-top-1 left-1/2 -translate-x-1/2",
+                            "w-12 h-8 md:w-8 md:h-4",
+                            "bg-white border-2 border-indigo-500 rounded-lg shadow-lg pointer-events-auto",
+                            "active:scale-95 hover:scale-110 transition-all duration-150",
+                            "flex items-center justify-center z-10"
+                        )}
+                        onMouseDown={(e) => handleMouseDown(e, 'n')}
+                        onTouchStart={(e) => handleMouseDown(e, 'n')}
+                        style={{ touchAction: 'none' }}
+                    >
+                        <div className="w-4 h-0.5 md:w-3 md:h-0.5 bg-indigo-500 rounded-full" />
+                    </div>
+                    <div
+                        className={cn(
+                            "absolute -bottom-2 md:-bottom-1 left-1/2 -translate-x-1/2",
+                            "w-12 h-8 md:w-8 md:h-4",
+                            "bg-white border-2 border-indigo-500 rounded-lg shadow-lg pointer-events-auto",
+                            "active:scale-95 hover:scale-110 transition-all duration-150",
+                            "flex items-center justify-center z-10"
+                        )}
+                        onMouseDown={(e) => handleMouseDown(e, 's')}
+                        onTouchStart={(e) => handleMouseDown(e, 's')}
+                        style={{ touchAction: 'none' }}
+                    >
+                        <div className="w-4 h-0.5 md:w-3 md:h-0.5 bg-indigo-500 rounded-full" />
+                    </div>
+                    <div
+                        className={cn(
+                            "absolute -left-2 md:-left-1 top-1/2 -translate-y-1/2",
+                            "w-8 h-12 md:w-4 md:h-8",
+                            "bg-white border-2 border-indigo-500 rounded-lg shadow-lg pointer-events-auto",
+                            "active:scale-95 hover:scale-110 transition-all duration-150",
+                            "flex items-center justify-center z-10"
+                        )}
+                        onMouseDown={(e) => handleMouseDown(e, 'w')}
+                        onTouchStart={(e) => handleMouseDown(e, 'w')}
+                        style={{ touchAction: 'none' }}
+                    >
+                        <div className="w-0.5 h-4 md:w-0.5 md:h-3 bg-indigo-500 rounded-full" />
+                    </div>
+                    <div
+                        className={cn(
+                            "absolute -right-2 md:-right-1 top-1/2 -translate-y-1/2",
+                            "w-8 h-12 md:w-4 md:h-8",
+                            "bg-white border-2 border-indigo-500 rounded-lg shadow-lg pointer-events-auto",
+                            "active:scale-95 hover:scale-110 transition-all duration-150",
+                            "flex items-center justify-center z-10"
+                        )}
+                        onMouseDown={(e) => handleMouseDown(e, 'e')}
+                        onTouchStart={(e) => handleMouseDown(e, 'e')}
+                        style={{ touchAction: 'none' }}
+                    >
+                        <div className="w-0.5 h-4 md:w-0.5 md:h-3 bg-indigo-500 rounded-full" />
+                    </div>
                 </div>
             </div>
-
-            {/* Action buttons - larger for mobile */}
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-3 z-20">
-                <Button
-                    onClick={handleApply}
-                    size="lg"
-                    className="bg-indigo-500 hover:bg-indigo-600 text-white shadow-2xl h-12 px-6 text-base font-semibold"
-                >
-                    <Check className="w-5 h-5 mr-2" />
-                    Apply Crop
-                </Button>
-                <Button
-                    onClick={exitCropMode}
-                    size="lg"
-                    variant="outline"
-                    className="bg-background shadow-2xl h-12 px-6 text-base font-semibold"
-                >
-                    <X className="w-5 h-5 mr-2" />
-                    Cancel
-                </Button>
-            </div>
-        </div>
+        </>
     );
 }
