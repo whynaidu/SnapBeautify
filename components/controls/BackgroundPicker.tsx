@@ -17,16 +17,14 @@ export function BackgroundPicker() {
         gradientAngle,
         meshGradientCSS,
         textPatternText,
-        textPatternColor,
-        textPatternOpacity,
         textPatternPositions,
         textPatternFontFamily,
         textPatternFontSize,
         textPatternFontWeight,
         setBackgroundColor,
         setGradient,
+        updateGradientColors,
         setMeshGradient,
-        setTextPattern,
         setTextPatternText,
         toggleTextPatternPosition,
         setTextPatternFontFamily,
@@ -99,8 +97,7 @@ export function BackgroundPicker() {
             {/* Solid Colors */}
             {backgroundType === 'solid' && (
                 <div className="space-y-3">
-                    <div className="max-h-[240px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-                        <div className="grid grid-cols-8 gap-1.5">
+                    <div className="grid grid-cols-8 gap-1.5">
                             {SOLID_COLORS.map((color) => (
                                 <button
                                     key={color}
@@ -115,7 +112,6 @@ export function BackgroundPicker() {
                                     title={color}
                                 />
                             ))}
-                        </div>
                     </div>
 
                     {/* Custom Color Picker & Input */}
@@ -210,8 +206,7 @@ export function BackgroundPicker() {
                         <Label className="text-muted-foreground text-xs mb-2 block">
                             Gradient Presets ({PRESET_GRADIENTS.length})
                         </Label>
-                        <div className="max-h-[280px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-                            <div className="grid grid-cols-6 gap-2">
+                        <div className="grid grid-cols-6 gap-2">
                                 {PRESET_GRADIENTS.map((gradient) => {
                                     // Only show as selected if it's a regular gradient (not mesh) AND colors match
                                     const isSelected =
@@ -243,7 +238,6 @@ export function BackgroundPicker() {
                                         </button>
                                     );
                                 })}
-                            </div>
                         </div>
                     </div>
 
@@ -251,8 +245,7 @@ export function BackgroundPicker() {
                         <Label className="text-muted-foreground text-xs mb-2 block">
                             Mesh Gradients ({MESH_GRADIENTS.length})
                         </Label>
-                        <div className="max-h-[240px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-                            <div className="grid grid-cols-5 gap-2">
+                        <div className="grid grid-cols-5 gap-2">
                                 {MESH_GRADIENTS.map((mesh, index) => {
                                     // Only show as selected if it's a mesh type AND the CSS matches
                                     const isSelected = isMeshActive && meshGradientCSS === mesh.css;
@@ -278,7 +271,6 @@ export function BackgroundPicker() {
                                         </button>
                                     );
                                 })}
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -288,27 +280,19 @@ export function BackgroundPicker() {
             {backgroundType === 'textPattern' && (
                 <div className="space-y-3">
                     <Label className="text-muted-foreground text-xs mb-2 block">
-                        Text Patterns ({TEXT_PATTERNS.length})
+                        Gradients ({TEXT_PATTERNS.length}) - Keeps your text
                     </Label>
-                    <div className="max-h-[280px] overflow-y-auto pr-2 -mr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
-                        <div className="grid grid-cols-5 gap-2">
+                    <div className="grid grid-cols-5 gap-2">
                             {TEXT_PATTERNS.map((pattern) => {
                                 const isSelected =
                                     isTextPatternActive &&
-                                    textPatternText === pattern.text &&
                                     gradientColors[0] === pattern.colors[0] &&
                                     gradientColors[1] === pattern.colors[1];
 
                                 return (
                                     <button
                                         key={pattern.name}
-                                        onClick={() => setTextPattern(
-                                            pattern.text,
-                                            pattern.colors,
-                                            pattern.angle,
-                                            pattern.textColor,
-                                            pattern.textOpacity
-                                        )}
+                                        onClick={() => updateGradientColors(pattern.colors, pattern.angle)}
                                         className={cn(
                                             'relative w-full aspect-square rounded-lg transition-all overflow-hidden group',
                                             isSelected
@@ -341,7 +325,6 @@ export function BackgroundPicker() {
                                     </button>
                                 );
                             })}
-                        </div>
                     </div>
 
                     {/* Custom Text Input */}

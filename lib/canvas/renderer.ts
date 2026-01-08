@@ -3,7 +3,7 @@
  * Coordinates all rendering modules to produce final output
  */
 
-import { FrameType, TextPosition } from '@/types/editor';
+import { FrameType, TextPosition, TextOverlay } from '@/types/editor';
 import { calculateLayout, calculateBorderRadii } from './layout';
 import { drawBackground, BackgroundOptions } from './background';
 import { drawShadow, ShadowOptions } from './shadow';
@@ -36,6 +36,7 @@ export interface RenderOptions {
     rotation?: number;
     targetWidth?: number; // for aspect ratio presets
     targetHeight?: number; // for aspect ratio presets
+    textOverlays?: TextOverlay[];
 }
 
 /**
@@ -68,6 +69,7 @@ export function renderCanvas(options: RenderOptions): void {
         rotation = 0,
         targetWidth,
         targetHeight,
+        textOverlays = [],
     } = options;
 
     // Initialize canvas and get context
@@ -181,5 +183,34 @@ export function renderCanvas(options: RenderOptions): void {
             frameType,
             imageScale
         );
+    }
+
+    // Draw text overlays on top of everything
+    if (textOverlays && textOverlays.length > 0) {
+        ctx.save();
+        textOverlays.forEach((overlay) => {
+            const x = (layout.canvasWidth * overlay.x) / 100;
+            const y = (layout.canvasHeight * overlay.y) / 100;
+
+            ctx.font = `${overlay.fontWeight} ${overlay.fontSize}px ${overlay.fontFamily}`;
+            ctx.fillStyle = overlay.color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Add text shadow for better readability
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 2;
+
+            ctx.fillText(overlay.text, x, y);
+
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+        });
+        ctx.restore();
     }
 }

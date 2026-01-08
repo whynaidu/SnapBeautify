@@ -39,6 +39,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         imageScale,
         canvasWidth,
         canvasHeight,
+        textOverlays,
         setPadding,
         // setShadowSize, // Deprecated
         clearImage,
@@ -79,6 +80,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
                 rotation,
                 targetWidth: canvasWidth,
                 targetHeight: canvasHeight,
+                textOverlays,
             });
 
             await copyCanvasToClipboard(exportCanvas);
@@ -111,6 +113,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         rotation,
         canvasWidth,
         canvasHeight,
+        textOverlays,
     ]);
 
     const handleDownload = useCallback(() => {
@@ -147,6 +150,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
                 rotation,
                 targetWidth: canvasWidth,
                 targetHeight: canvasHeight,
+                textOverlays,
             });
 
             const timestamp = new Date().toISOString().slice(0, 10);
@@ -181,6 +185,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         rotation,
         canvasWidth,
         canvasHeight,
+        textOverlays,
     ]);
 
     useEffect(() => {

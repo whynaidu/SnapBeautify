@@ -277,7 +277,7 @@ export const TEXT_PATTERNS: TextPattern[] = [
 
     // Tech & Innovation
     { name: "Tech", text: "TECH", colors: ["#1e3a8a", "#3b82f6"], angle: 135, textColor: "#ffffff", textOpacity: 0.08 },
-    { name: "Digital", text: "DIGITAL", colors: ["#6366f1", "#8b5cf6"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Digital", text: "DIGITAL", colors: ["#3b82f6", "#14b8a6"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
     { name: "Innovation", text: "INNOVATION", colors: ["#0ea5e9", "#8b5cf6"], angle: 135, textColor: "#ffffff", textOpacity: 0.08 },
     { name: "Future", text: "FUTURE", colors: ["#7c3aed", "#ec4899"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
     { name: "AI", text: "AI", colors: ["#4f46e5", "#ec4899"], angle: 135, textColor: "#ffffff", textOpacity: 0.12 },
@@ -286,14 +286,14 @@ export const TEXT_PATTERNS: TextPattern[] = [
     // Motivational
     { name: "Dream", text: "DREAM", colors: ["#f472b6", "#fbbf24"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
     { name: "Believe", text: "BELIEVE", colors: ["#8b5cf6", "#06b6d4"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
-    { name: "Inspire", text: "INSPIRE", colors: ["#f97316", "#ec4899"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
+    { name: "Inspire", text: "INSPIRE", colors: ["#eab308", "#ec4899"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
     { name: "Achieve", text: "ACHIEVE", colors: ["#22c55e", "#10b981"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
     { name: "Grow", text: "GROW", colors: ["#84cc16", "#22c55e"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
     { name: "Focus", text: "FOCUS", colors: ["#0891b2", "#06b6d4"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
 
     // Seasonal & Events
     { name: "Summer", text: "SUMMER", colors: ["#f59e0b", "#f97316"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
-    { name: "Winter", text: "WINTER", colors: ["#0ea5e9", "#06b6d4"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
+    { name: "Winter", text: "WINTER", colors: ["#3b82f6", "#06b6d4"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
     { name: "Spring", text: "SPRING", colors: ["#22c55e", "#84cc16"], angle: 135, textColor: "#ffffff", textOpacity: 0.1 },
     { name: "Holiday", text: "HOLIDAY", colors: ["#dc2626", "#22c55e"], angle: 135, textColor: "#ffffff", textOpacity: 0.09 },
     { name: "Party", text: "PARTY", colors: ["#ec4899", "#f97316"], angle: 135, textColor: "#ffffff", textOpacity: 0.11 },

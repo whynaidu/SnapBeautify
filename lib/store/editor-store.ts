@@ -8,6 +8,7 @@ import {
     EditorState,
     EditorActions,
     TextPosition,
+    TextOverlay,
 } from '@/types/editor';
 import { calculateFrameOffsets } from '@/lib/canvas/layout';
 
@@ -39,6 +40,8 @@ const DEFAULT_STATE: EditorState = {
     aspectRatio: null,
     canvasWidth: 1600,
     canvasHeight: 900,
+    textOverlays: [],
+    selectedTextOverlayId: null,
     exportFormat: 'png',
     exportScale: 2,
 };
@@ -112,6 +115,13 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
             gradientColors: colors,
             gradientAngle: angle,
             backgroundType: 'gradient',
+        }),
+
+    updateGradientColors: (colors: [string, string], angle = 135) =>
+        set({
+            gradientColors: colors,
+            gradientAngle: angle,
+            // Does NOT change backgroundType - for updating gradients in text patterns
         }),
 
     setMeshGradient: (css: string) =>
@@ -203,6 +213,42 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
     },
 
     setRotation: (rotation: number) => set({ rotation: rotation }),
+
+    addTextOverlay: () => {
+        const id = `text-${Date.now()}`;
+        const newOverlay = {
+            id,
+            text: 'Your Text',
+            x: 50, // center
+            y: 50, // center
+            color: '#ffffff',
+            fontSize: 48,
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            fontWeight: 700,
+        };
+        set({
+            textOverlays: [...get().textOverlays, newOverlay],
+            selectedTextOverlayId: id,
+        });
+    },
+
+    removeTextOverlay: (id: string) => {
+        const state = get();
+        set({
+            textOverlays: state.textOverlays.filter(t => t.id !== id),
+            selectedTextOverlayId: state.selectedTextOverlayId === id ? null : state.selectedTextOverlayId,
+        });
+    },
+
+    selectTextOverlay: (id: string | null) => set({ selectedTextOverlayId: id }),
+
+    updateTextOverlay: (id: string, updates: Partial<Omit<TextOverlay, 'id'>>) => {
+        set({
+            textOverlays: get().textOverlays.map(overlay =>
+                overlay.id === id ? { ...overlay, ...updates } : overlay
+            ),
+        });
+    },
 
     resetToDefaults: () => set(DEFAULT_STATE),
 }));

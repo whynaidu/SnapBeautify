@@ -28,6 +28,17 @@ export interface TextPattern {
 
 export type TextPosition = 'top' | 'center' | 'bottom';
 
+export interface TextOverlay {
+    id: string;
+    text: string;
+    x: number; // percentage 0-100
+    y: number; // percentage 0-100
+    color: string;
+    fontSize: number; // pixels
+    fontFamily: string;
+    fontWeight: number; // 100-900
+}
+
 // export interface ShadowPreset {
 //     blur: number;
 //     spread: number;
@@ -80,6 +91,10 @@ export interface EditorState {
     canvasWidth: number;
     canvasHeight: number;
 
+    // Text Overlays
+    textOverlays: TextOverlay[];
+    selectedTextOverlayId: string | null;
+
     // Export
     exportFormat: ExportFormat;
     exportScale: ExportScale;
@@ -91,6 +106,7 @@ export interface EditorActions {
     setBackgroundType: (type: BackgroundType) => void;
     setBackgroundColor: (color: string) => void;
     setGradient: (colors: [string, string], angle?: number) => void;
+    updateGradientColors: (colors: [string, string], angle?: number) => void; // Updates gradient without changing background type
     setMeshGradient: (css: string) => void;
     setBackgroundImage: (url: string) => void;
     setTextPattern: (text: string, colors: [string, string], angle: number, textColor: string, textOpacity: number) => void;
@@ -110,5 +126,9 @@ export interface EditorActions {
     setExportScale: (scale: ExportScale) => void;
     setImageScale: (scale: number) => void;
     setRotation: (rotation: number) => void;
+    addTextOverlay: () => void;
+    removeTextOverlay: (id: string) => void;
+    selectTextOverlay: (id: string | null) => void;
+    updateTextOverlay: (id: string, updates: Partial<Omit<TextOverlay, 'id'>>) => void;
     resetToDefaults: () => void;
 }

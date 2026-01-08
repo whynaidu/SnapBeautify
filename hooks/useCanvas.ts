@@ -32,6 +32,7 @@ export function useCanvas() {
         exportScale,
         canvasWidth,
         canvasHeight,
+        textOverlays,
     } = useEditorStore();
 
     const render = useCallback(() => {
@@ -63,6 +64,7 @@ export function useCanvas() {
             rotation,
             targetWidth: canvasWidth,
             targetHeight: canvasHeight,
+            textOverlays,
         });
     }, [
         originalImage,
@@ -88,6 +90,7 @@ export function useCanvas() {
         rotation,
         canvasWidth,
         canvasHeight,
+        textOverlays,
     ]);
 
     const renderExport = useCallback((): HTMLCanvasElement => {
@@ -123,6 +126,7 @@ export function useCanvas() {
             rotation,
             targetWidth: canvasWidth,
             targetHeight: canvasHeight,
+            textOverlays,
         });
 
         return exportCanvas;
@@ -151,6 +155,7 @@ export function useCanvas() {
         rotation,
         canvasWidth,
         canvasHeight,
+        textOverlays,
     ]);
 
     return {

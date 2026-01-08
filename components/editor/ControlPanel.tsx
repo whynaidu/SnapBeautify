@@ -1,7 +1,7 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Palette, Square, Sun, Frame } from 'lucide-react';
+import { Palette, Square, Sun, Frame, Type } from 'lucide-react';
 import { BackgroundPicker } from '@/components/controls/BackgroundPicker';
 import { PaddingControl } from '@/components/controls/PaddingControl';
 import { ShadowControl } from '@/components/controls/ShadowControl';
@@ -9,6 +9,7 @@ import { BorderRadiusControl } from '@/components/controls/BorderRadiusControl';
 import { FramePicker } from '@/components/controls/FramePicker';
 import { AspectRatioPicker } from '@/components/controls/AspectRatioPicker';
 import { ScaleControl } from '@/components/controls/ScaleControl';
+import { TextOverlayControl } from '@/components/controls/TextOverlayControl';
 import { useEditorStore } from '@/lib/store/editor-store';
 
 export function ControlPanel() {
@@ -30,7 +31,7 @@ export function ControlPanel() {
     return (
         <div className="w-80 bg-background border-l border-border flex flex-col h-full">
             <Tabs defaultValue="background" className="w-full flex flex-col flex-1 overflow-hidden">
-                <TabsList className="w-full grid grid-cols-4 bg-background border-b border-border rounded-none h-12 p-0 flex-shrink-0">
+                <TabsList className="w-full grid grid-cols-5 bg-background border-b border-border rounded-none h-12 p-0 flex-shrink-0">
                     <TabsTrigger
                         value="background"
                         className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full"
@@ -55,9 +56,15 @@ export function ControlPanel() {
                     >
                         <Frame className="w-4 h-4" />
                     </TabsTrigger>
+                    <TabsTrigger
+                        value="text"
+                        className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full"
+                    >
+                        <Type className="w-4 h-4" />
+                    </TabsTrigger>
                 </TabsList>
 
-                <div className="flex-1 overflow-y-auto p-4">
+                <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                     <TabsContent value="background" className="mt-0 space-y-6">
                         <BackgroundPicker />
                     </TabsContent>
@@ -81,6 +88,10 @@ export function ControlPanel() {
 
                     <TabsContent value="frame" className="mt-0 space-y-6">
                         <FramePicker />
+                    </TabsContent>
+
+                    <TabsContent value="text" className="mt-0 space-y-6">
+                        <TextOverlayControl />
                     </TabsContent>
                 </div>
             </Tabs>

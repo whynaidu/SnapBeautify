@@ -63,6 +63,7 @@ export function ExportBar() {
         rotation,
         canvasWidth,
         canvasHeight,
+        textOverlays,
     } = useEditorStore();
 
     // Check capabilities on mount
@@ -111,6 +112,7 @@ export function ExportBar() {
                 rotation,
                 targetWidth: canvasWidth,
                 targetHeight: canvasHeight,
+                textOverlays,
             });
             return exportCanvas;
         } catch (error) {
