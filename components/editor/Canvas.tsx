@@ -342,7 +342,9 @@ export function Canvas() {
             className={cn(
                 'flex-1 flex items-center justify-center',
                 'bg-muted/30 overflow-hidden p-6',
-                'relative'
+                'relative',
+                // Add extra bottom padding on mobile to prevent overlap with Show Controls button
+                originalImage && 'pb-24 md:pb-6'
             )}
             style={{
                 backgroundImage: `radial-gradient(var(--border) 1px, transparent 1px)`,
