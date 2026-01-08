@@ -157,100 +157,108 @@ export function CropOverlay({ canvasWidth, canvasHeight, displayScale }: CropOve
                     onTouchStart={(e) => handleMouseDown(e, 'move')}
                 />
 
-                {/* Corner handles - larger for mobile */}
+                {/* Corner handles - extra large for mobile accessibility */}
                 <div
                     className={cn(
-                        "absolute -top-3 -left-3 w-10 h-10 bg-white border-3 border-indigo-500 rounded-full cursor-nwse-resize shadow-lg",
-                        "hover:scale-110 transition-transform",
-                        "flex items-center justify-center"
+                        "absolute -top-6 -left-6 w-16 h-16 bg-white border-4 border-indigo-500 rounded-full shadow-2xl",
+                        "active:scale-95 transition-all duration-150",
+                        "flex items-center justify-center z-10"
                     )}
                     onMouseDown={(e) => handleMouseDown(e, 'nw')}
                     onTouchStart={(e) => handleMouseDown(e, 'nw')}
+                    style={{ touchAction: 'none' }}
                 >
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                    <div className="w-3 h-3 bg-indigo-500 rounded-full" />
                 </div>
                 <div
                     className={cn(
-                        "absolute -top-3 -right-3 w-10 h-10 bg-white border-3 border-indigo-500 rounded-full cursor-nesw-resize shadow-lg",
-                        "hover:scale-110 transition-transform",
-                        "flex items-center justify-center"
+                        "absolute -top-6 -right-6 w-16 h-16 bg-white border-4 border-indigo-500 rounded-full shadow-2xl",
+                        "active:scale-95 transition-all duration-150",
+                        "flex items-center justify-center z-10"
                     )}
                     onMouseDown={(e) => handleMouseDown(e, 'ne')}
                     onTouchStart={(e) => handleMouseDown(e, 'ne')}
+                    style={{ touchAction: 'none' }}
                 >
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                    <div className="w-3 h-3 bg-indigo-500 rounded-full" />
                 </div>
                 <div
                     className={cn(
-                        "absolute -bottom-3 -left-3 w-10 h-10 bg-white border-3 border-indigo-500 rounded-full cursor-nesw-resize shadow-lg",
-                        "hover:scale-110 transition-transform",
-                        "flex items-center justify-center"
+                        "absolute -bottom-6 -left-6 w-16 h-16 bg-white border-4 border-indigo-500 rounded-full shadow-2xl",
+                        "active:scale-95 transition-all duration-150",
+                        "flex items-center justify-center z-10"
                     )}
                     onMouseDown={(e) => handleMouseDown(e, 'sw')}
                     onTouchStart={(e) => handleMouseDown(e, 'sw')}
+                    style={{ touchAction: 'none' }}
                 >
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                    <div className="w-3 h-3 bg-indigo-500 rounded-full" />
                 </div>
                 <div
                     className={cn(
-                        "absolute -bottom-3 -right-3 w-10 h-10 bg-white border-3 border-indigo-500 rounded-full cursor-nwse-resize shadow-lg",
-                        "hover:scale-110 transition-transform",
-                        "flex items-center justify-center"
+                        "absolute -bottom-6 -right-6 w-16 h-16 bg-white border-4 border-indigo-500 rounded-full shadow-2xl",
+                        "active:scale-95 transition-all duration-150",
+                        "flex items-center justify-center z-10"
                     )}
                     onMouseDown={(e) => handleMouseDown(e, 'se')}
                     onTouchStart={(e) => handleMouseDown(e, 'se')}
+                    style={{ touchAction: 'none' }}
                 >
-                    <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                    <div className="w-3 h-3 bg-indigo-500 rounded-full" />
                 </div>
 
-                {/* Edge handles - larger for mobile */}
+                {/* Edge handles - extra large for mobile accessibility */}
                 <div
-                    className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-10 bg-white border-3 border-indigo-500 rounded-lg cursor-ns-resize shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
+                    className="absolute -top-5 left-1/2 -translate-x-1/2 w-20 h-14 bg-white border-4 border-indigo-500 rounded-xl shadow-2xl active:scale-95 transition-all duration-150 flex items-center justify-center z-10"
                     onMouseDown={(e) => handleMouseDown(e, 'n')}
                     onTouchStart={(e) => handleMouseDown(e, 'n')}
+                    style={{ touchAction: 'none' }}
                 >
-                    <div className="w-6 h-1 bg-indigo-500 rounded-full" />
+                    <div className="w-8 h-1.5 bg-indigo-500 rounded-full" />
                 </div>
                 <div
-                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-12 h-10 bg-white border-3 border-indigo-500 rounded-lg cursor-ns-resize shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
+                    className="absolute -bottom-5 left-1/2 -translate-x-1/2 w-20 h-14 bg-white border-4 border-indigo-500 rounded-xl shadow-2xl active:scale-95 transition-all duration-150 flex items-center justify-center z-10"
                     onMouseDown={(e) => handleMouseDown(e, 's')}
                     onTouchStart={(e) => handleMouseDown(e, 's')}
+                    style={{ touchAction: 'none' }}
                 >
-                    <div className="w-6 h-1 bg-indigo-500 rounded-full" />
+                    <div className="w-8 h-1.5 bg-indigo-500 rounded-full" />
                 </div>
                 <div
-                    className="absolute -left-3 top-1/2 -translate-y-1/2 w-10 h-12 bg-white border-3 border-indigo-500 rounded-lg cursor-ew-resize shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
+                    className="absolute -left-5 top-1/2 -translate-y-1/2 w-14 h-20 bg-white border-4 border-indigo-500 rounded-xl shadow-2xl active:scale-95 transition-all duration-150 flex items-center justify-center z-10"
                     onMouseDown={(e) => handleMouseDown(e, 'w')}
                     onTouchStart={(e) => handleMouseDown(e, 'w')}
+                    style={{ touchAction: 'none' }}
                 >
-                    <div className="w-1 h-6 bg-indigo-500 rounded-full" />
+                    <div className="w-1.5 h-8 bg-indigo-500 rounded-full" />
                 </div>
                 <div
-                    className="absolute -right-3 top-1/2 -translate-y-1/2 w-10 h-12 bg-white border-3 border-indigo-500 rounded-lg cursor-ew-resize shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
+                    className="absolute -right-5 top-1/2 -translate-y-1/2 w-14 h-20 bg-white border-4 border-indigo-500 rounded-xl shadow-2xl active:scale-95 transition-all duration-150 flex items-center justify-center z-10"
                     onMouseDown={(e) => handleMouseDown(e, 'e')}
                     onTouchStart={(e) => handleMouseDown(e, 'e')}
+                    style={{ touchAction: 'none' }}
                 >
-                    <div className="w-1 h-6 bg-indigo-500 rounded-full" />
+                    <div className="w-1.5 h-8 bg-indigo-500 rounded-full" />
                 </div>
             </div>
 
-            {/* Action buttons */}
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            {/* Action buttons - larger for mobile */}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-3 z-20">
                 <Button
                     onClick={handleApply}
-                    size="sm"
-                    className="bg-indigo-500 hover:bg-indigo-600 text-white"
+                    size="lg"
+                    className="bg-indigo-500 hover:bg-indigo-600 text-white shadow-2xl h-12 px-6 text-base font-semibold"
                 >
-                    <Check className="w-4 h-4 mr-1" />
+                    <Check className="w-5 h-5 mr-2" />
                     Apply Crop
                 </Button>
                 <Button
                     onClick={exitCropMode}
-                    size="sm"
+                    size="lg"
                     variant="outline"
-                    className="bg-background"
+                    className="bg-background shadow-2xl h-12 px-6 text-base font-semibold"
                 >
-                    <X className="w-4 h-4 mr-1" />
+                    <X className="w-5 h-5 mr-2" />
                     Cancel
                 </Button>
             </div>
