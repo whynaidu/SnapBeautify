@@ -341,10 +341,10 @@ export function Canvas() {
             ref={containerRef}
             className={cn(
                 'flex-1 flex items-center justify-center',
-                'bg-muted/30 overflow-hidden p-6',
+                'bg-muted/30 overflow-hidden',
                 'relative',
-                // Add extra bottom padding on mobile to prevent overlap with Show Controls button
-                originalImage && 'pb-24 md:pb-6'
+                // Add balanced vertical padding on mobile to prevent overlap with header and controls
+                originalImage ? 'p-4 py-20 md:p-6' : 'p-6'
             )}
             style={{
                 backgroundImage: `radial-gradient(var(--border) 1px, transparent 1px)`,
