@@ -383,7 +383,7 @@ export function BackgroundPicker() {
                             <option value="system-ui, -apple-system, sans-serif">System UI (Default)</option>
                             <option value="Arial, sans-serif">Arial</option>
                             <option value="Helvetica, sans-serif">Helvetica</option>
-                            <option value="'Times New Roman', serif">'Times New Roman'</option>
+                            <option value="'Times New Roman', serif">Times New Roman</option>
                             <option value="Georgia, serif">Georgia</option>
                             <option value="'Courier New', monospace">Courier New</option>
                             <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
