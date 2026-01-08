@@ -1,6 +1,6 @@
 'use client';
 
-import { Sparkles, RotateCcw, Settings, Moon, Sun, Laptop } from 'lucide-react';
+import { Sparkles, RotateCcw, Settings, Moon, Sun, Laptop, Crop, Undo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -15,7 +15,7 @@ import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 
 export function Header() {
-    const { resetToDefaults, originalImage, clearImage } = useEditorStore();
+    const { resetToDefaults, originalImage, clearImage, enterCropMode, isCropping, uncroppedImage, revertCrop } = useEditorStore();
     const { setTheme, theme } = useTheme();
 
     const handleReset = () => {
@@ -26,6 +26,16 @@ export function Header() {
     const handleClear = () => {
         clearImage();
         toast.info('Image cleared');
+    };
+
+    const handleCrop = () => {
+        enterCropMode();
+        toast.info('Drag and resize the crop area, then click Apply');
+    };
+
+    const handleRevertCrop = () => {
+        revertCrop();
+        toast.success('Crop reverted to original image');
     };
 
     return (
@@ -45,6 +55,27 @@ export function Header() {
             <div className="flex items-center gap-2">
                 {originalImage && (
                     <>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleCrop}
+                            disabled={isCropping}
+                            className="text-muted-foreground hover:text-foreground"
+                        >
+                            <Crop className="w-4 h-4 mr-1" />
+                            Crop
+                        </Button>
+                        {uncroppedImage && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleRevertCrop}
+                                className="text-muted-foreground hover:text-foreground"
+                            >
+                                <Undo className="w-4 h-4 mr-1" />
+                                Revert Crop
+                            </Button>
+                        )}
                         <Button
                             variant="ghost"
                             size="sm"

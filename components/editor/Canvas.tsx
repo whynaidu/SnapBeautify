@@ -4,6 +4,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { renderCanvas } from '@/lib/canvas/renderer';
 import { DropZone } from './DropZone';
+import { CropOverlay } from './CropOverlay';
 import { cn } from '@/lib/utils';
 import { measureRender } from '@/lib/utils/performance';
 import { useThrottle } from '@/lib/hooks/useThrottle';
@@ -42,6 +43,7 @@ export function Canvas() {
         textOverlays,
         updateTextOverlay,
         selectTextOverlay,
+        isCropping,
     } = useEditorStore();
 
     // Create a memoized render function
@@ -116,9 +118,29 @@ export function Canvas() {
     const throttledRender = useThrottle(performRender, 16);
 
     // Re-render canvas when any setting changes (throttled)
+    // Skip rendering when in crop mode - we'll show the raw image instead
     useEffect(() => {
-        throttledRender();
-    }, [throttledRender]);
+        if (!isCropping) {
+            throttledRender();
+        }
+    }, [throttledRender, isCropping]);
+
+    // Render raw image when in crop mode
+    useEffect(() => {
+        if (!canvasRef.current || !originalImage || !isCropping) return;
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Set canvas to original image size
+        canvas.width = originalImage.width;
+        canvas.height = originalImage.height;
+
+        // Draw the original image without any effects
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(originalImage, 0, 0);
+    }, [originalImage, isCropping]);
 
     // Calculate display scale to fit container
     useEffect(() => {
@@ -129,8 +151,12 @@ export function Canvas() {
             const containerWidth = container.clientWidth - 48;
             const containerHeight = container.clientHeight - 48;
 
-            const scaleX = containerWidth / canvasWidth;
-            const scaleY = containerHeight / canvasHeight;
+            // Use original image dimensions when cropping, canvas dimensions otherwise
+            const width = isCropping ? originalImage.width : canvasWidth;
+            const height = isCropping ? originalImage.height : canvasHeight;
+
+            const scaleX = containerWidth / width;
+            const scaleY = containerHeight / height;
             const scale = Math.min(scaleX, scaleY, 1);
 
             setDisplayScale(scale);
@@ -139,7 +165,7 @@ export function Canvas() {
         updateScale();
         window.addEventListener('resize', updateScale);
         return () => window.removeEventListener('resize', updateScale);
-    }, [canvasWidth, canvasHeight, originalImage]);
+    }, [canvasWidth, canvasHeight, originalImage, isCropping]);
 
     // Handle text overlay dragging
     const handleCanvasMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -324,22 +350,31 @@ export function Canvas() {
             }}
         >
             {originalImage ? (
-                <canvas
-                    ref={canvasRef}
-                    onMouseDown={handleCanvasMouseDown}
-                    onMouseMove={handleCanvasMouseMove}
-                    onMouseUp={handleCanvasMouseUp}
-                    onMouseLeave={handleCanvasMouseLeave}
-                    onTouchStart={handleCanvasTouchStart}
-                    onTouchMove={handleCanvasTouchMove}
-                    onTouchEnd={handleCanvasTouchEnd}
-                    style={{
-                        transform: `scale(${displayScale})`,
-                        transformOrigin: 'center center',
-                        touchAction: 'none', // Prevent default touch behaviors
-                    }}
-                    className="rounded-lg shadow-2xl"
-                />
+                <div className="relative">
+                    <canvas
+                        ref={canvasRef}
+                        onMouseDown={handleCanvasMouseDown}
+                        onMouseMove={handleCanvasMouseMove}
+                        onMouseUp={handleCanvasMouseUp}
+                        onMouseLeave={handleCanvasMouseLeave}
+                        onTouchStart={handleCanvasTouchStart}
+                        onTouchMove={handleCanvasTouchMove}
+                        onTouchEnd={handleCanvasTouchEnd}
+                        style={{
+                            transform: `scale(${displayScale})`,
+                            transformOrigin: 'center center',
+                            touchAction: isCropping ? 'none' : 'auto', // Prevent default touch behaviors during crop
+                        }}
+                        className="rounded-lg shadow-2xl"
+                    />
+                    {isCropping && originalImage && (
+                        <CropOverlay
+                            canvasWidth={originalImage.width}
+                            canvasHeight={originalImage.height}
+                            displayScale={displayScale}
+                        />
+                    )}
+                </div>
             ) : (
                 <DropZone />
             )}

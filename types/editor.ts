@@ -39,6 +39,13 @@ export interface TextOverlay {
     fontWeight: number; // 100-900
 }
 
+export interface CropArea {
+    x: number; // percentage 0-100
+    y: number; // percentage 0-100
+    width: number; // percentage 0-100
+    height: number; // percentage 0-100
+}
+
 // export interface ShadowPreset {
 //     blur: number;
 //     spread: number;
@@ -57,6 +64,8 @@ export interface EditorState {
     // Image
     originalImage: HTMLImageElement | null;
     imageDataUrl: string | null;
+    uncroppedImage: HTMLImageElement | null;
+    uncroppedImageDataUrl: string | null;
 
     // Background
     backgroundType: BackgroundType;
@@ -95,6 +104,10 @@ export interface EditorState {
     textOverlays: TextOverlay[];
     selectedTextOverlayId: string | null;
 
+    // Crop
+    isCropping: boolean;
+    cropArea: CropArea | null;
+
     // Export
     exportFormat: ExportFormat;
     exportScale: ExportScale;
@@ -130,5 +143,10 @@ export interface EditorActions {
     removeTextOverlay: (id: string) => void;
     selectTextOverlay: (id: string | null) => void;
     updateTextOverlay: (id: string, updates: Partial<Omit<TextOverlay, 'id'>>) => void;
+    enterCropMode: () => void;
+    exitCropMode: () => void;
+    setCropArea: (area: CropArea) => void;
+    applyCrop: () => Promise<void>;
+    revertCrop: () => void;
     resetToDefaults: () => void;
 }

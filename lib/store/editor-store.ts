@@ -9,12 +9,15 @@ import {
     EditorActions,
     TextPosition,
     TextOverlay,
+    CropArea,
 } from '@/types/editor';
 import { calculateFrameOffsets } from '@/lib/canvas/layout';
 
 const DEFAULT_STATE: EditorState = {
     originalImage: null,
     imageDataUrl: null,
+    uncroppedImage: null,
+    uncroppedImageDataUrl: null,
     backgroundType: 'gradient',
     backgroundColor: '#6366f1',
     gradientColors: ['#6366f1', '#8b5cf6'],
@@ -42,6 +45,8 @@ const DEFAULT_STATE: EditorState = {
     canvasHeight: 900,
     textOverlays: [],
     selectedTextOverlayId: null,
+    isCropping: false,
+    cropArea: null,
     exportFormat: 'png',
     exportScale: 2,
 };
@@ -103,6 +108,8 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         set({
             originalImage: null,
             imageDataUrl: null,
+            uncroppedImage: null,
+            uncroppedImageDataUrl: null,
         }),
 
     setBackgroundType: (type: BackgroundType) => set({ backgroundType: type }),
@@ -247,6 +254,119 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
             textOverlays: get().textOverlays.map(overlay =>
                 overlay.id === id ? { ...overlay, ...updates } : overlay
             ),
+        });
+    },
+
+    enterCropMode: () => {
+        const state = get();
+        if (!state.originalImage) return;
+
+        // Initialize crop area to cover the entire image (with 10% padding)
+        set({
+            isCropping: true,
+            cropArea: {
+                x: 10,
+                y: 10,
+                width: 80,
+                height: 80,
+            },
+        });
+    },
+
+    exitCropMode: () => {
+        set({
+            isCropping: false,
+            cropArea: null,
+        });
+    },
+
+    setCropArea: (area: CropArea) => {
+        set({ cropArea: area });
+    },
+
+    applyCrop: async () => {
+        const state = get();
+        if (!state.originalImage || !state.cropArea) return;
+
+        // Store the original uncropped image before cropping (if not already stored)
+        const uncroppedImage = state.uncroppedImage || state.originalImage;
+        const uncroppedImageDataUrl = state.uncroppedImageDataUrl || state.imageDataUrl;
+
+        // Create a temporary canvas to crop the image
+        const tempCanvas = document.createElement('canvas');
+        const ctx = tempCanvas.getContext('2d');
+        if (!ctx) return;
+
+        const img = state.originalImage;
+        const crop = state.cropArea;
+
+        // Calculate pixel coordinates from percentages
+        const cropX = (crop.x / 100) * img.width;
+        const cropY = (crop.y / 100) * img.height;
+        const cropWidth = (crop.width / 100) * img.width;
+        const cropHeight = (crop.height / 100) * img.height;
+
+        // Set canvas size to cropped dimensions
+        tempCanvas.width = cropWidth;
+        tempCanvas.height = cropHeight;
+
+        // Draw the cropped portion
+        ctx.drawImage(
+            img,
+            cropX, cropY, cropWidth, cropHeight,
+            0, 0, cropWidth, cropHeight
+        );
+
+        // Convert to data URL
+        const croppedDataUrl = tempCanvas.toDataURL('image/png');
+
+        // Create new image from cropped data
+        const croppedImage = new Image();
+        await new Promise<void>((resolve, reject) => {
+            croppedImage.onload = () => resolve();
+            croppedImage.onerror = () => reject(new Error('Failed to load cropped image'));
+            croppedImage.src = croppedDataUrl;
+        });
+
+        // Update the store with the cropped image
+        const padding = state.padding;
+        const frameType = state.frameType;
+        const frameOffsets = calculateFrameOffsets(frameType, 1);
+        const width = croppedImage.width + padding * 2 + frameOffsets.offsetX;
+        const height = croppedImage.height + padding * 2 + frameOffsets.offsetY;
+
+        set({
+            originalImage: croppedImage,
+            imageDataUrl: croppedDataUrl,
+            uncroppedImage: uncroppedImage,
+            uncroppedImageDataUrl: uncroppedImageDataUrl,
+            imageScale: 1,
+            canvasWidth: width,
+            canvasHeight: height,
+            isCropping: false,
+            cropArea: null,
+        });
+    },
+
+    revertCrop: () => {
+        const state = get();
+        if (!state.uncroppedImage || !state.uncroppedImageDataUrl) return;
+
+        // Restore the original uncropped image
+        const padding = state.padding;
+        const frameType = state.frameType;
+        const frameOffsets = calculateFrameOffsets(frameType, 1);
+        const width = state.uncroppedImage.width + padding * 2 + frameOffsets.offsetX;
+        const height = state.uncroppedImage.height + padding * 2 + frameOffsets.offsetY;
+
+        set({
+            originalImage: state.uncroppedImage,
+            imageDataUrl: state.uncroppedImageDataUrl,
+            uncroppedImage: null,
+            uncroppedImageDataUrl: null,
+            imageScale: 1,
+            canvasWidth: width,
+            canvasHeight: height,
         });
     },
 
