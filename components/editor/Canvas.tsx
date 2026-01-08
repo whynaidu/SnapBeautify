@@ -150,17 +150,33 @@ export function Canvas() {
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
 
+        // Get canvas context for text measurement
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
         // Check if click is on any text overlay (in reverse order, top to bottom)
         for (let i = textOverlays.length - 1; i >= 0; i--) {
             const overlay = textOverlays[i];
-            const textWidth = 20; // Approximate hitbox width in %
-            const textHeight = 10; // Approximate hitbox height in %
+
+            // Measure actual text dimensions
+            ctx.font = `${overlay.fontWeight} ${overlay.fontSize}px ${overlay.fontFamily}`;
+            const metrics = ctx.measureText(overlay.text);
+
+            // Calculate text width and height in percentage of canvas
+            const textWidthPx = metrics.width;
+            const textHeightPx = overlay.fontSize * 1.2; // Approximate height with some padding
+            const textWidthPercent = (textWidthPx / canvas.width) * 100;
+            const textHeightPercent = (textHeightPx / canvas.height) * 100;
+
+            // Add some padding to make it easier to click
+            const hitboxWidth = textWidthPercent + 5;
+            const hitboxHeight = textHeightPercent + 5;
 
             if (
-                x >= overlay.x - textWidth / 2 &&
-                x <= overlay.x + textWidth / 2 &&
-                y >= overlay.y - textHeight / 2 &&
-                y <= overlay.y + textHeight / 2
+                x >= overlay.x - hitboxWidth / 2 &&
+                x <= overlay.x + hitboxWidth / 2 &&
+                y >= overlay.y - hitboxHeight / 2 &&
+                y <= overlay.y + hitboxHeight / 2
             ) {
                 setIsDragging(true);
                 setDraggedTextId(overlay.id);
@@ -172,29 +188,58 @@ export function Canvas() {
     }, [textOverlays, selectTextOverlay]);
 
     const handleCanvasMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-        if (!isDragging || !draggedTextId || !canvasRef.current) return;
+        if (!canvasRef.current) return;
 
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
         const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
         const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
 
-        updateTextOverlay(draggedTextId, { x, y });
-    }, [isDragging, draggedTextId, updateTextOverlay]);
+        // If dragging, update position
+        if (isDragging && draggedTextId) {
+            updateTextOverlay(draggedTextId, { x, y });
+            return;
+        }
+
+        // If not dragging, check if hovering over any text to show grab cursor
+        if (textOverlays.length > 0) {
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            let isOverText = false;
+            for (let i = textOverlays.length - 1; i >= 0; i--) {
+                const overlay = textOverlays[i];
+
+                ctx.font = `${overlay.fontWeight} ${overlay.fontSize}px ${overlay.fontFamily}`;
+                const metrics = ctx.measureText(overlay.text);
+
+                const textWidthPx = metrics.width;
+                const textHeightPx = overlay.fontSize * 1.2;
+                const textWidthPercent = (textWidthPx / canvas.width) * 100;
+                const textHeightPercent = (textHeightPx / canvas.height) * 100;
+
+                const hitboxWidth = textWidthPercent + 5;
+                const hitboxHeight = textHeightPercent + 5;
+
+                if (
+                    x >= overlay.x - hitboxWidth / 2 &&
+                    x <= overlay.x + hitboxWidth / 2 &&
+                    y >= overlay.y - hitboxHeight / 2 &&
+                    y <= overlay.y + hitboxHeight / 2
+                ) {
+                    isOverText = true;
+                    break;
+                }
+            }
+
+            canvas.style.cursor = isOverText ? 'grab' : 'default';
+        }
+    }, [isDragging, draggedTextId, updateTextOverlay, textOverlays]);
 
     const handleCanvasMouseUp = useCallback(() => {
-        if (canvasRef.current) {
-            canvasRef.current.style.cursor = textOverlays.length > 0 ? 'grab' : 'default';
-        }
         setIsDragging(false);
         setDraggedTextId(null);
-    }, [textOverlays.length]);
-
-    const handleCanvasMouseEnter = useCallback(() => {
-        if (canvasRef.current && textOverlays.length > 0 && !isDragging) {
-            canvasRef.current.style.cursor = 'grab';
-        }
-    }, [textOverlays.length, isDragging]);
+    }, []);
 
     const handleCanvasMouseLeave = useCallback(() => {
         if (canvasRef.current) {
@@ -223,12 +268,10 @@ export function Canvas() {
                     onMouseDown={handleCanvasMouseDown}
                     onMouseMove={handleCanvasMouseMove}
                     onMouseUp={handleCanvasMouseUp}
-                    onMouseEnter={handleCanvasMouseEnter}
                     onMouseLeave={handleCanvasMouseLeave}
                     style={{
                         transform: `scale(${displayScale})`,
                         transformOrigin: 'center center',
-                        cursor: textOverlays.length > 0 ? 'grab' : 'default',
                     }}
                     className="rounded-lg shadow-2xl"
                 />
