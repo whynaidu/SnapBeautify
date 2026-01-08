@@ -148,8 +148,13 @@ export function Canvas() {
 
         const updateScale = () => {
             const container = containerRef.current!;
-            const containerWidth = container.clientWidth - 48;
-            const containerHeight = container.clientHeight - 48;
+            // Account for actual padding values - mobile has more vertical padding
+            const isMobile = window.innerWidth < 768;
+            const horizontalPadding = isMobile ? 32 : 48; // p-4 (16px * 2) on mobile, p-6 (24px * 2) on desktop
+            const verticalPadding = isMobile ? 208 : 48; // pt-20 + pb-32 (80px + 128px) on mobile, p-6 on desktop
+
+            const containerWidth = container.clientWidth - horizontalPadding;
+            const containerHeight = container.clientHeight - verticalPadding;
 
             // Use original image dimensions when cropping, canvas dimensions otherwise
             const width = isCropping ? originalImage.width : canvasWidth;
@@ -343,8 +348,9 @@ export function Canvas() {
                 'flex-1 flex items-center justify-center',
                 'bg-muted/30 overflow-hidden',
                 'relative',
-                // Add balanced vertical padding on mobile to prevent overlap with header and controls
-                originalImage ? 'p-4 py-20 md:p-6' : 'p-6'
+                // Increase bottom padding on mobile to prevent overlap with controls
+                // pt-20 for top spacing, pb-32 for bottom controls, on mobile
+                originalImage ? 'p-4 pt-20 pb-32 md:p-6' : 'p-6'
             )}
             style={{
                 backgroundImage: `radial-gradient(var(--border) 1px, transparent 1px)`,
