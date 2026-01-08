@@ -249,6 +249,67 @@ export function Canvas() {
         setDraggedTextId(null);
     }, []);
 
+    // Touch event handlers for mobile
+    const handleCanvasTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
+        if (!canvasRef.current || textOverlays.length === 0) return;
+
+        e.preventDefault(); // Prevent scrolling while dragging
+        const canvas = canvasRef.current;
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const x = ((touch.clientX - rect.left) / rect.width) * 100;
+        const y = ((touch.clientY - rect.top) / rect.height) * 100;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Check if touch is on any text overlay
+        for (let i = textOverlays.length - 1; i >= 0; i--) {
+            const overlay = textOverlays[i];
+
+            ctx.font = `${overlay.fontWeight} ${overlay.fontSize}px ${overlay.fontFamily}`;
+            const metrics = ctx.measureText(overlay.text);
+
+            const textWidthPx = metrics.width;
+            const textHeightPx = overlay.fontSize * 1.2;
+            const textWidthPercent = (textWidthPx / canvas.width) * 100;
+            const textHeightPercent = (textHeightPx / canvas.height) * 100;
+
+            const hitboxWidth = textWidthPercent + 5;
+            const hitboxHeight = textHeightPercent + 5;
+
+            if (
+                x >= overlay.x - hitboxWidth / 2 &&
+                x <= overlay.x + hitboxWidth / 2 &&
+                y >= overlay.y - hitboxHeight / 2 &&
+                y <= overlay.y + hitboxHeight / 2
+            ) {
+                setIsDragging(true);
+                setDraggedTextId(overlay.id);
+                selectTextOverlay(overlay.id);
+                break;
+            }
+        }
+    }, [textOverlays, selectTextOverlay]);
+
+    const handleCanvasTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
+        if (!isDragging || !draggedTextId || !canvasRef.current) return;
+
+        e.preventDefault(); // Prevent scrolling while dragging
+        const canvas = canvasRef.current;
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const x = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
+        const y = Math.max(0, Math.min(100, ((touch.clientY - rect.top) / rect.height) * 100));
+
+        updateTextOverlay(draggedTextId, { x, y });
+    }, [isDragging, draggedTextId, updateTextOverlay]);
+
+    const handleCanvasTouchEnd = useCallback(() => {
+        setIsDragging(false);
+        setDraggedTextId(null);
+    }, []);
+
     return (
         <div
             ref={containerRef}
@@ -269,9 +330,13 @@ export function Canvas() {
                     onMouseMove={handleCanvasMouseMove}
                     onMouseUp={handleCanvasMouseUp}
                     onMouseLeave={handleCanvasMouseLeave}
+                    onTouchStart={handleCanvasTouchStart}
+                    onTouchMove={handleCanvasTouchMove}
+                    onTouchEnd={handleCanvasTouchEnd}
                     style={{
                         transform: `scale(${displayScale})`,
                         transformOrigin: 'center center',
+                        touchAction: 'none', // Prevent default touch behaviors
                     }}
                     className="rounded-lg shadow-2xl"
                 />
