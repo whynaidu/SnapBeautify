@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Palette, Square, Sun, Frame, ChevronUp, ChevronDown } from 'lucide-react';
+import { Palette, Square, Sun, Frame, Type, ChevronUp, ChevronDown } from 'lucide-react';
 import { BackgroundPicker } from '@/components/controls/BackgroundPicker';
 import { PaddingControl } from '@/components/controls/PaddingControl';
 import { ShadowControl } from '@/components/controls/ShadowControl';
@@ -10,6 +10,7 @@ import { BorderRadiusControl } from '@/components/controls/BorderRadiusControl';
 import { FramePicker } from '@/components/controls/FramePicker';
 import { AspectRatioPicker } from '@/components/controls/AspectRatioPicker';
 import { ScaleControl } from '@/components/controls/ScaleControl';
+import { TextOverlayControl } from '@/components/controls/TextOverlayControl';
 import { Button } from '@/components/ui/button';
 
 export function MobileControlPanel() {
@@ -45,7 +46,7 @@ export function MobileControlPanel() {
             {isExpanded && (
                 <div className="h-[calc(60vh-3.5rem)] overflow-y-auto">
                     <Tabs defaultValue="background" className="w-full">
-                        <TabsList className="w-full grid grid-cols-4 bg-background border-b border-border rounded-none h-12 p-0 sticky top-0 z-10">
+                        <TabsList className="w-full grid grid-cols-5 bg-background border-b border-border rounded-none h-12 p-0 sticky top-0 z-10">
                             <TabsTrigger
                                 value="background"
                                 className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
@@ -74,6 +75,13 @@ export function MobileControlPanel() {
                                 <Frame className="w-4 h-4" />
                                 <span className="text-[10px]">Frame</span>
                             </TabsTrigger>
+                            <TabsTrigger
+                                value="text"
+                                className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
+                            >
+                                <Type className="w-4 h-4" />
+                                <span className="text-[10px]">Text</span>
+                            </TabsTrigger>
                         </TabsList>
 
                         <div className="p-4">
@@ -100,6 +108,10 @@ export function MobileControlPanel() {
 
                             <TabsContent value="frame" className="mt-0 space-y-6">
                                 <FramePicker />
+                            </TabsContent>
+
+                            <TabsContent value="text" className="mt-0 space-y-6">
+                                <TextOverlayControl />
                             </TabsContent>
                         </div>
                     </Tabs>
