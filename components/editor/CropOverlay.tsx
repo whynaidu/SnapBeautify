@@ -157,61 +157,81 @@ export function CropOverlay({ canvasWidth, canvasHeight, displayScale }: CropOve
                     onTouchStart={(e) => handleMouseDown(e, 'move')}
                 />
 
-                {/* Corner handles */}
+                {/* Corner handles - larger for mobile */}
                 <div
                     className={cn(
-                        "absolute -top-2 -left-2 w-4 h-4 bg-white border-2 border-indigo-500 rounded-full cursor-nwse-resize",
-                        "hover:scale-125 transition-transform"
+                        "absolute -top-3 -left-3 w-10 h-10 bg-white border-3 border-indigo-500 rounded-full cursor-nwse-resize shadow-lg",
+                        "hover:scale-110 transition-transform",
+                        "flex items-center justify-center"
                     )}
                     onMouseDown={(e) => handleMouseDown(e, 'nw')}
                     onTouchStart={(e) => handleMouseDown(e, 'nw')}
-                />
+                >
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                </div>
                 <div
                     className={cn(
-                        "absolute -top-2 -right-2 w-4 h-4 bg-white border-2 border-indigo-500 rounded-full cursor-nesw-resize",
-                        "hover:scale-125 transition-transform"
+                        "absolute -top-3 -right-3 w-10 h-10 bg-white border-3 border-indigo-500 rounded-full cursor-nesw-resize shadow-lg",
+                        "hover:scale-110 transition-transform",
+                        "flex items-center justify-center"
                     )}
                     onMouseDown={(e) => handleMouseDown(e, 'ne')}
                     onTouchStart={(e) => handleMouseDown(e, 'ne')}
-                />
+                >
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                </div>
                 <div
                     className={cn(
-                        "absolute -bottom-2 -left-2 w-4 h-4 bg-white border-2 border-indigo-500 rounded-full cursor-nesw-resize",
-                        "hover:scale-125 transition-transform"
+                        "absolute -bottom-3 -left-3 w-10 h-10 bg-white border-3 border-indigo-500 rounded-full cursor-nesw-resize shadow-lg",
+                        "hover:scale-110 transition-transform",
+                        "flex items-center justify-center"
                     )}
                     onMouseDown={(e) => handleMouseDown(e, 'sw')}
                     onTouchStart={(e) => handleMouseDown(e, 'sw')}
-                />
+                >
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                </div>
                 <div
                     className={cn(
-                        "absolute -bottom-2 -right-2 w-4 h-4 bg-white border-2 border-indigo-500 rounded-full cursor-nwse-resize",
-                        "hover:scale-125 transition-transform"
+                        "absolute -bottom-3 -right-3 w-10 h-10 bg-white border-3 border-indigo-500 rounded-full cursor-nwse-resize shadow-lg",
+                        "hover:scale-110 transition-transform",
+                        "flex items-center justify-center"
                     )}
                     onMouseDown={(e) => handleMouseDown(e, 'se')}
                     onTouchStart={(e) => handleMouseDown(e, 'se')}
-                />
+                >
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                </div>
 
-                {/* Edge handles */}
+                {/* Edge handles - larger for mobile */}
                 <div
-                    className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-4 bg-white border-2 border-indigo-500 rounded cursor-ns-resize hover:scale-125 transition-transform"
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-10 bg-white border-3 border-indigo-500 rounded-lg cursor-ns-resize shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
                     onMouseDown={(e) => handleMouseDown(e, 'n')}
                     onTouchStart={(e) => handleMouseDown(e, 'n')}
-                />
+                >
+                    <div className="w-6 h-1 bg-indigo-500 rounded-full" />
+                </div>
                 <div
-                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-4 bg-white border-2 border-indigo-500 rounded cursor-ns-resize hover:scale-125 transition-transform"
+                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-12 h-10 bg-white border-3 border-indigo-500 rounded-lg cursor-ns-resize shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
                     onMouseDown={(e) => handleMouseDown(e, 's')}
                     onTouchStart={(e) => handleMouseDown(e, 's')}
-                />
+                >
+                    <div className="w-6 h-1 bg-indigo-500 rounded-full" />
+                </div>
                 <div
-                    className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-8 bg-white border-2 border-indigo-500 rounded cursor-ew-resize hover:scale-125 transition-transform"
+                    className="absolute -left-3 top-1/2 -translate-y-1/2 w-10 h-12 bg-white border-3 border-indigo-500 rounded-lg cursor-ew-resize shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
                     onMouseDown={(e) => handleMouseDown(e, 'w')}
                     onTouchStart={(e) => handleMouseDown(e, 'w')}
-                />
+                >
+                    <div className="w-1 h-6 bg-indigo-500 rounded-full" />
+                </div>
                 <div
-                    className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-8 bg-white border-2 border-indigo-500 rounded cursor-ew-resize hover:scale-125 transition-transform"
+                    className="absolute -right-3 top-1/2 -translate-y-1/2 w-10 h-12 bg-white border-3 border-indigo-500 rounded-lg cursor-ew-resize shadow-lg hover:scale-110 transition-transform flex items-center justify-center"
                     onMouseDown={(e) => handleMouseDown(e, 'e')}
                     onTouchStart={(e) => handleMouseDown(e, 'e')}
-                />
+                >
+                    <div className="w-1 h-6 bg-indigo-500 rounded-full" />
+                </div>
             </div>
 
             {/* Action buttons */}
