@@ -427,23 +427,23 @@ export function Canvas() {
                     {/* Alignment Guides */}
                     {alignmentGuides.showCenterX && (
                         <div
-                            className="absolute top-0 bottom-0 w-[2px] bg-primary pointer-events-none z-10"
+                            className="absolute top-0 bottom-0 w-0.5 bg-pink-500 pointer-events-none z-10"
                             style={{
                                 left: '50%',
                                 transform: `translateX(-50%) scale(${displayScale})`,
                                 transformOrigin: 'center center',
-                                opacity: 0.7,
+                                opacity: 0.8,
                             }}
                         />
                     )}
                     {alignmentGuides.showCenterY && (
                         <div
-                            className="absolute left-0 right-0 h-[2px] bg-primary pointer-events-none z-10"
+                            className="absolute left-0 right-0 h-0.5 bg-pink-500 pointer-events-none z-10"
                             style={{
                                 top: '50%',
                                 transform: `translateY(-50%) scale(${displayScale})`,
                                 transformOrigin: 'center center',
-                                opacity: 0.7,
+                                opacity: 0.8,
                             }}
                         />
                     )}
