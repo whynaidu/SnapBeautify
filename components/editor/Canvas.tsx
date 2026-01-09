@@ -15,6 +15,7 @@ export function Canvas() {
     const [displayScale, setDisplayScale] = useState(1);
     const [isDragging, setIsDragging] = useState(false);
     const [draggedTextId, setDraggedTextId] = useState<string | null>(null);
+    const [alignmentGuides, setAlignmentGuides] = useState({ showCenterX: false, showCenterY: false });
 
     const {
         originalImage,
@@ -187,6 +188,34 @@ export function Canvas() {
         return () => window.removeEventListener('resize', updateScale);
     }, [canvasWidth, canvasHeight, originalImage, isCropping]);
 
+    // Helper function to snap to center and show alignment guides
+    const snapToCenter = useCallback((x: number, y: number) => {
+        const snapThreshold = 3; // 3% distance threshold for snapping
+        const centerX = 50;
+        const centerY = 50;
+
+        let snappedX = x;
+        let snappedY = y;
+        let showCenterX = false;
+        let showCenterY = false;
+
+        // Check if close to center X
+        if (Math.abs(x - centerX) < snapThreshold) {
+            snappedX = centerX;
+            showCenterX = true;
+        }
+
+        // Check if close to center Y
+        if (Math.abs(y - centerY) < snapThreshold) {
+            snappedY = centerY;
+            showCenterY = true;
+        }
+
+        setAlignmentGuides({ showCenterX, showCenterY });
+
+        return { x: snappedX, y: snappedY };
+    }, []);
+
     // Handle text overlay dragging
     const handleCanvasMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
         if (!canvasRef.current || textOverlays.length === 0) return;
@@ -238,12 +267,13 @@ export function Canvas() {
 
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
-        const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
-        const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+        let x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+        let y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
 
-        // If dragging, update position
+        // If dragging, update position with snapping
         if (isDragging && draggedTextId) {
-            updateTextOverlay(draggedTextId, { x, y });
+            const snapped = snapToCenter(x, y);
+            updateTextOverlay(draggedTextId, { x: snapped.x, y: snapped.y });
             return;
         }
 
@@ -280,11 +310,12 @@ export function Canvas() {
 
             canvas.style.cursor = isOverText ? 'grab' : 'default';
         }
-    }, [isDragging, draggedTextId, updateTextOverlay, textOverlays]);
+    }, [isDragging, draggedTextId, updateTextOverlay, textOverlays, snapToCenter]);
 
     const handleCanvasMouseUp = useCallback(() => {
         setIsDragging(false);
         setDraggedTextId(null);
+        setAlignmentGuides({ showCenterX: false, showCenterY: false });
     }, []);
 
     const handleCanvasMouseLeave = useCallback(() => {
@@ -293,6 +324,7 @@ export function Canvas() {
         }
         setIsDragging(false);
         setDraggedTextId(null);
+        setAlignmentGuides({ showCenterX: false, showCenterY: false });
     }, []);
 
     // Touch event handlers for mobile
@@ -345,15 +377,17 @@ export function Canvas() {
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
         const touch = e.touches[0];
-        const x = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
-        const y = Math.max(0, Math.min(100, ((touch.clientY - rect.top) / rect.height) * 100));
+        let x = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
+        let y = Math.max(0, Math.min(100, ((touch.clientY - rect.top) / rect.height) * 100));
 
-        updateTextOverlay(draggedTextId, { x, y });
-    }, [isDragging, draggedTextId, updateTextOverlay]);
+        const snapped = snapToCenter(x, y);
+        updateTextOverlay(draggedTextId, { x: snapped.x, y: snapped.y });
+    }, [isDragging, draggedTextId, updateTextOverlay, snapToCenter]);
 
     const handleCanvasTouchEnd = useCallback(() => {
         setIsDragging(false);
         setDraggedTextId(null);
+        setAlignmentGuides({ showCenterX: false, showCenterY: false });
     }, []);
 
     return (
@@ -390,6 +424,29 @@ export function Canvas() {
                         }}
                         className="rounded-lg shadow-2xl"
                     />
+                    {/* Alignment Guides */}
+                    {alignmentGuides.showCenterX && (
+                        <div
+                            className="absolute top-0 bottom-0 w-[2px] bg-primary pointer-events-none z-10"
+                            style={{
+                                left: '50%',
+                                transform: `translateX(-50%) scale(${displayScale})`,
+                                transformOrigin: 'center center',
+                                opacity: 0.7,
+                            }}
+                        />
+                    )}
+                    {alignmentGuides.showCenterY && (
+                        <div
+                            className="absolute left-0 right-0 h-[2px] bg-primary pointer-events-none z-10"
+                            style={{
+                                top: '50%',
+                                transform: `translateY(-50%) scale(${displayScale})`,
+                                transformOrigin: 'center center',
+                                opacity: 0.7,
+                            }}
+                        />
+                    )}
                     {isCropping && originalImage && (
                         <CropOverlay
                             canvasWidth={originalImage.width}
