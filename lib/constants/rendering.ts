@@ -45,6 +45,10 @@ export const FRAME_OFFSETS: Record<FrameType, { x: number; y: number; top: numbe
     windows: { x: 0, y: 32, top: 32, bottom: 0, left: 0, right: 0 },
     iphone: { x: 24, y: 24, top: 12, bottom: 12, left: 12, right: 12 }, // Thinner 12px bezel
     android: { x: 18, y: 28, top: 14, bottom: 14, left: 9, right: 9 }, // MagicUI Android dimensions
+    instagram: { x: 16, y: 60, top: 60, bottom: 50, left: 16, right: 16 }, // Header + footer padding
+    facebook: { x: 16, y: 70, top: 70, bottom: 50, left: 16, right: 16 }, // Header + footer padding
+    twitter: { x: 16, y: 60, top: 60, bottom: 50, left: 16, right: 16 }, // Header + footer padding
+    linkedin: { x: 16, y: 70, top: 70, bottom: 50, left: 16, right: 16 }, // Header + footer padding
 } as const;
 
 /**

@@ -8,7 +8,7 @@ import { calculateLayout, calculateBorderRadii } from './layout';
 import { drawBackground, BackgroundOptions } from './background';
 import { drawShadow, ShadowOptions } from './shadow';
 import { initializeCanvas, applyRotation, drawClippedImage } from './helpers';
-import { drawFrame, drawFrameOverlay, getiPhoneScreenBounds, getAndroidScreenBounds } from './frames';
+import { drawFrame, drawFrameOverlay, getiPhoneScreenBounds, getAndroidScreenBounds, getSocialMediaContentBounds } from './frames';
 
 export interface RenderOptions {
     canvas: HTMLCanvasElement;
@@ -249,6 +249,20 @@ export function renderCanvas(options: RenderOptions): void {
             Math.PI
         );
         ctx.closePath();
+        ctx.clip();
+    } else if (frameType === 'instagram' || frameType === 'facebook' || frameType === 'twitter' || frameType === 'linkedin') {
+        // For social media frames, clip to content area (between header and footer)
+        const contentBounds = getSocialMediaContentBounds(
+            layout.contentX,
+            layout.contentY,
+            layout.contentWidth,
+            layout.contentHeight,
+            frameType
+        );
+
+        // Create rectangular clipping path for content area
+        ctx.beginPath();
+        ctx.rect(contentBounds.x, contentBounds.y, contentBounds.width, contentBounds.height);
         ctx.clip();
     }
 

@@ -36,6 +36,18 @@ export function drawFrame(
         case 'android':
             drawAndroidFrame(ctx, x, y, width, height, borderRadius, scale);
             break;
+        case 'instagram':
+            drawInstagramFrame(ctx, x, y, width, height, borderRadius);
+            break;
+        case 'facebook':
+            drawFacebookFrame(ctx, x, y, width, height, borderRadius);
+            break;
+        case 'twitter':
+            drawTwitterFrame(ctx, x, y, width, height, borderRadius);
+            break;
+        case 'linkedin':
+            drawLinkedInFrame(ctx, x, y, width, height, borderRadius);
+            break;
     }
 }
 
@@ -599,6 +611,515 @@ function drawAndroidCameraOverlay(
     ctx.arc(189, 28, 4, 0, Math.PI * 2);
     ctx.fillStyle = '#0a0a0a';
     ctx.fill();
+
+    ctx.restore();
+}
+
+/**
+ * Get social media frame content bounds for clipping
+ * Returns the area where the actual content/image should be displayed
+ */
+export function getSocialMediaContentBounds(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    frameType: 'instagram' | 'facebook' | 'twitter' | 'linkedin'
+): { x: number; y: number; width: number; height: number; radius: number } {
+    let headerHeight: number;
+    let footerHeight: number;
+    let radius: number;
+
+    switch (frameType) {
+        case 'instagram':
+            headerHeight = 60;
+            footerHeight = 50;
+            radius = 0; // Square content area
+            break;
+        case 'facebook':
+            headerHeight = 70;
+            footerHeight = 50;
+            radius = 0;
+            break;
+        case 'twitter':
+            headerHeight = 60;
+            footerHeight = 50;
+            radius = 0;
+            break;
+        case 'linkedin':
+            headerHeight = 70;
+            footerHeight = 50;
+            radius = 0;
+            break;
+    }
+
+    return {
+        x: x,
+        y: y + headerHeight,
+        width: width,
+        height: height - headerHeight - footerHeight,
+        radius: radius,
+    };
+}
+
+/**
+ * Draw Instagram post frame
+ */
+function drawInstagramFrame(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    borderRadius: number
+): void {
+    ctx.save();
+
+    const headerHeight = 60;
+    const footerHeight = 50;
+
+    // Main white card background
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    roundedRect(ctx, x, y, width, height, borderRadius);
+    ctx.fill();
+
+    // Header section (username bar)
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x, y, width, headerHeight);
+
+    // Profile picture circle
+    const profileSize = 32;
+    const profileX = x + 12;
+    const profileY = y + headerHeight / 2;
+
+    // Profile picture border (gradient effect)
+    const gradient = ctx.createLinearGradient(profileX - profileSize / 2, profileY, profileX + profileSize / 2, profileY);
+    gradient.addColorStop(0, '#f09433');
+    gradient.addColorStop(0.25, '#e6683c');
+    gradient.addColorStop(0.5, '#dc2743');
+    gradient.addColorStop(0.75, '#cc2366');
+    gradient.addColorStop(1, '#bc1888');
+
+    ctx.beginPath();
+    ctx.arc(profileX, profileY, profileSize / 2 + 2, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    // Inner white circle (profile background)
+    ctx.beginPath();
+    ctx.arc(profileX, profileY, profileSize / 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
+    // Gray circle (profile photo placeholder)
+    ctx.beginPath();
+    ctx.arc(profileX, profileY, profileSize / 2 - 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#e4e4e7';
+    ctx.fill();
+
+    // Username text
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 14px -apple-system, system-ui, sans-serif';
+    ctx.fillText('Username', profileX + profileSize / 2 + 12, profileY + 4);
+
+    // Menu dots (three dots)
+    const dotX = x + width - 24;
+    const dotY = y + headerHeight / 2;
+    ctx.fillStyle = '#262626';
+    for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(dotX, dotY + (i - 1) * 5, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Footer section (action buttons) - positioned at the bottom of the frame
+    const footerY = y + height - footerHeight;
+
+    // Like icon (heart)
+    const iconStartX = x + 16;
+    const iconY = footerY + 12;
+
+    ctx.strokeStyle = '#262626';
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Heart
+    ctx.beginPath();
+    ctx.moveTo(iconStartX + 12, iconY + 20);
+    ctx.bezierCurveTo(iconStartX + 12, iconY + 17, iconStartX + 10, iconY + 14, iconStartX + 6, iconY + 14);
+    ctx.bezierCurveTo(iconStartX + 2, iconY + 14, iconStartX, iconY + 16, iconStartX, iconY + 19);
+    ctx.bezierCurveTo(iconStartX, iconY + 23, iconStartX + 3, iconY + 26, iconStartX + 12, iconY + 34);
+    ctx.bezierCurveTo(iconStartX + 21, iconY + 26, iconStartX + 24, iconY + 23, iconStartX + 24, iconY + 19);
+    ctx.bezierCurveTo(iconStartX + 24, iconY + 16, iconStartX + 22, iconY + 14, iconStartX + 18, iconY + 14);
+    ctx.bezierCurveTo(iconStartX + 14, iconY + 14, iconStartX + 12, iconY + 17, iconStartX + 12, iconY + 20);
+    ctx.stroke();
+
+    // Comment icon (speech bubble)
+    const commentX = iconStartX + 40;
+    ctx.beginPath();
+    ctx.moveTo(commentX, iconY + 20);
+    ctx.lineTo(commentX + 22, iconY + 20);
+    ctx.quadraticCurveTo(commentX + 24, iconY + 20, commentX + 24, iconY + 18);
+    ctx.lineTo(commentX + 24, iconY + 10);
+    ctx.quadraticCurveTo(commentX + 24, iconY + 8, commentX + 22, iconY + 8);
+    ctx.lineTo(commentX + 2, iconY + 8);
+    ctx.quadraticCurveTo(commentX, iconY + 8, commentX, iconY + 10);
+    ctx.lineTo(commentX, iconY + 18);
+    ctx.quadraticCurveTo(commentX, iconY + 20, commentX + 2, iconY + 20);
+    ctx.stroke();
+
+    // Share icon (paper plane)
+    const shareX = iconStartX + 80;
+    ctx.beginPath();
+    ctx.moveTo(shareX + 2, iconY + 8);
+    ctx.lineTo(shareX + 22, iconY - 2);
+    ctx.lineTo(shareX + 12, iconY + 18);
+    ctx.lineTo(shareX + 8, iconY + 14);
+    ctx.lineTo(shareX + 2, iconY + 8);
+    ctx.stroke();
+
+    // Save icon (bookmark) - right aligned
+    const saveX = x + width - 30;
+    ctx.beginPath();
+    ctx.moveTo(saveX, iconY + 8);
+    ctx.lineTo(saveX + 16, iconY + 8);
+    ctx.lineTo(saveX + 16, iconY + 24);
+    ctx.lineTo(saveX + 8, iconY + 18);
+    ctx.lineTo(saveX, iconY + 24);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+/**
+ * Draw Facebook post frame
+ */
+function drawFacebookFrame(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    borderRadius: number
+): void {
+    ctx.save();
+
+    const headerHeight = 70;
+    const footerHeight = 50;
+
+    // Main white card background
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    roundedRect(ctx, x, y, width, height, borderRadius);
+    ctx.fill();
+
+    // Header section
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x, y, width, headerHeight);
+
+    // Facebook logo text
+    ctx.fillStyle = '#1877f2';
+    ctx.font = 'bold 28px -apple-system, system-ui, sans-serif';
+    ctx.fillText('facebook', x + 16, y + 40);
+
+    // Header buttons (right side)
+    const buttonY = y + 24;
+    const buttonSize = 36;
+    const buttonSpacing = 8;
+
+    // Search button
+    const searchX = x + width - buttonSize * 3 - buttonSpacing * 2 - 16;
+    ctx.beginPath();
+    ctx.arc(searchX + buttonSize / 2, buttonY + buttonSize / 2, buttonSize / 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#f0f2f5';
+    ctx.fill();
+
+    // Search icon
+    ctx.strokeStyle = '#65676b';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(searchX + buttonSize / 2 - 2, buttonY + buttonSize / 2 - 2, 7, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(searchX + buttonSize / 2 + 4, buttonY + buttonSize / 2 + 4);
+    ctx.lineTo(searchX + buttonSize / 2 + 8, buttonY + buttonSize / 2 + 8);
+    ctx.stroke();
+
+    // Add button
+    const addX = searchX + buttonSize + buttonSpacing;
+    ctx.beginPath();
+    ctx.arc(addX + buttonSize / 2, buttonY + buttonSize / 2, buttonSize / 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#f0f2f5';
+    ctx.fill();
+
+    // Plus icon
+    ctx.strokeStyle = '#65676b';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(addX + buttonSize / 2, buttonY + 10);
+    ctx.lineTo(addX + buttonSize / 2, buttonY + buttonSize - 10);
+    ctx.moveTo(addX + 10, buttonY + buttonSize / 2);
+    ctx.lineTo(addX + buttonSize - 10, buttonY + buttonSize / 2);
+    ctx.stroke();
+
+    // Menu button
+    const menuX = addX + buttonSize + buttonSpacing;
+    ctx.beginPath();
+    ctx.arc(menuX + buttonSize / 2, buttonY + buttonSize / 2, buttonSize / 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#f0f2f5';
+    ctx.fill();
+
+    // Menu icon (three dots)
+    ctx.fillStyle = '#65676b';
+    for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(menuX + buttonSize / 2 + (i - 1) * 8, buttonY + buttonSize / 2, 2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Footer section (reactions and comment area) - positioned at bottom of frame
+    const footerY = y + height - footerHeight;
+
+    // Reaction icons
+    const reactionStartX = x + 16;
+    const reactionY = footerY + 8;
+
+    // Like (thumbs up) - using emoji representation
+    ctx.fillStyle = '#1877f2';
+    ctx.beginPath();
+    ctx.arc(reactionStartX + 12, reactionY + 12, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText('👍', reactionStartX + 6, reactionY + 18);
+
+    // Heart
+    ctx.fillStyle = '#f33e58';
+    ctx.beginPath();
+    ctx.arc(reactionStartX + 36, reactionY + 12, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText('❤️', reactionStartX + 30, reactionY + 18);
+
+    // Comment text
+    ctx.fillStyle = '#65676b';
+    ctx.font = '13px -apple-system, system-ui, sans-serif';
+    ctx.fillText('36 Comments', reactionStartX + 60, reactionY + 12);
+
+    // Comment input box
+    ctx.fillStyle = '#f0f2f5';
+    ctx.beginPath();
+    roundedRect(ctx, x + 16, footerY + 28, width - 32, 20, 16);
+    ctx.fill();
+
+    // Placeholder text
+    ctx.fillStyle = '#65676b';
+    ctx.font = '12px -apple-system, system-ui, sans-serif';
+    ctx.fillText('Write your comment...', x + 28, footerY + 40);
+
+    ctx.restore();
+}
+
+/**
+ * Draw Twitter/X post frame
+ */
+function drawTwitterFrame(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    borderRadius: number
+): void {
+    ctx.save();
+
+    const headerHeight = 60;
+    const footerHeight = 50;
+
+    // Main card background
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    roundedRect(ctx, x, y, width, height, borderRadius);
+    ctx.fill();
+
+    // Header section
+    const profileSize = 40;
+    const profileX = x + 16;
+    const profileY = y + 16;
+
+    // Profile picture (gray circle)
+    ctx.beginPath();
+    ctx.arc(profileX + profileSize / 2, profileY + profileSize / 2, profileSize / 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#e1e8ed';
+    ctx.fill();
+
+    // Username and handle
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 15px -apple-system, system-ui, sans-serif';
+    ctx.fillText('Display Name', profileX + profileSize + 12, profileY + 16);
+
+    ctx.fillStyle = '#657786';
+    ctx.font = '14px -apple-system, system-ui, sans-serif';
+    ctx.fillText('@username', profileX + profileSize + 12, profileY + 34);
+
+    // Twitter/X logo
+    const logoX = x + width - 40;
+    const logoY = y + 16;
+
+    // X logo (simple X shape)
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(logoX, logoY);
+    ctx.lineTo(logoX + 20, logoY + 20);
+    ctx.moveTo(logoX + 20, logoY);
+    ctx.lineTo(logoX, logoY + 20);
+    ctx.stroke();
+
+    // Footer section (action buttons) - positioned at bottom of frame
+    const footerY = y + height - footerHeight;
+    const iconY = footerY + 10;
+
+    ctx.strokeStyle = '#657786';
+    ctx.fillStyle = '#657786';
+    ctx.lineWidth = 1.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Reply icon (speech bubble)
+    const replyX = x + 20;
+    ctx.beginPath();
+    ctx.arc(replyX + 10, iconY + 12, 8, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(replyX + 7, iconY + 19);
+    ctx.lineTo(replyX + 4, iconY + 23);
+    ctx.stroke();
+
+    // Retweet icon
+    const retweetX = x + width / 4 + 20;
+    ctx.beginPath();
+    ctx.moveTo(retweetX, iconY + 10);
+    ctx.lineTo(retweetX + 14, iconY + 10);
+    ctx.lineTo(retweetX + 10, iconY + 6);
+    ctx.moveTo(retweetX + 14, iconY + 10);
+    ctx.lineTo(retweetX + 10, iconY + 14);
+    ctx.moveTo(retweetX + 14, iconY + 18);
+    ctx.lineTo(retweetX, iconY + 18);
+    ctx.lineTo(retweetX + 4, iconY + 22);
+    ctx.moveTo(retweetX, iconY + 18);
+    ctx.lineTo(retweetX + 4, iconY + 14);
+    ctx.stroke();
+
+    // Like icon (heart)
+    const likeX = x + width / 2 + 20;
+    ctx.beginPath();
+    ctx.moveTo(likeX + 10, iconY + 20);
+    ctx.bezierCurveTo(likeX + 10, iconY + 18, likeX + 8, iconY + 15, likeX + 5, iconY + 15);
+    ctx.bezierCurveTo(likeX + 2, iconY + 15, likeX, iconY + 17, likeX, iconY + 19);
+    ctx.bezierCurveTo(likeX, iconY + 22, likeX + 2, iconY + 24, likeX + 10, iconY + 30);
+    ctx.bezierCurveTo(likeX + 18, iconY + 24, likeX + 20, iconY + 22, likeX + 20, iconY + 19);
+    ctx.bezierCurveTo(likeX + 20, iconY + 17, likeX + 18, iconY + 15, likeX + 15, iconY + 15);
+    ctx.bezierCurveTo(likeX + 12, iconY + 15, likeX + 10, iconY + 18, likeX + 10, iconY + 20);
+    ctx.stroke();
+
+    // Share icon
+    const shareX = x + width - 60;
+    ctx.beginPath();
+    ctx.moveTo(shareX + 4, iconY + 14);
+    ctx.lineTo(shareX + 16, iconY + 6);
+    ctx.lineTo(shareX + 16, iconY + 22);
+    ctx.closePath();
+    ctx.stroke();
+
+    ctx.restore();
+}
+
+/**
+ * Draw LinkedIn post frame
+ */
+function drawLinkedInFrame(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    borderRadius: number
+): void {
+    ctx.save();
+
+    const headerHeight = 70;
+    const footerHeight = 50;
+
+    // Main white card background
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    roundedRect(ctx, x, y, width, height, borderRadius);
+    ctx.fill();
+
+    // Header section
+    const profileSize = 48;
+    const profileX = x + 16;
+    const profileY = y + 12;
+
+    // Profile picture (gray circle)
+    ctx.beginPath();
+    ctx.arc(profileX + profileSize / 2, profileY + profileSize / 2, profileSize / 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#dbe7f2';
+    ctx.fill();
+
+    // Name and title
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 14px -apple-system, system-ui, sans-serif';
+    ctx.fillText('Professional Name', profileX + profileSize + 12, profileY + 16);
+
+    ctx.fillStyle = '#666666';
+    ctx.font = '12px -apple-system, system-ui, sans-serif';
+    ctx.fillText('Job Title at Company', profileX + profileSize + 12, profileY + 32);
+
+    ctx.fillStyle = '#666666';
+    ctx.font = '11px -apple-system, system-ui, sans-serif';
+    ctx.fillText('1h • 🌎', profileX + profileSize + 12, profileY + 46);
+
+    // Menu dots (right side)
+    const menuX = x + width - 30;
+    const menuY = y + 30;
+    ctx.fillStyle = '#666666';
+    for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(menuX + i * 6, menuY, 2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Footer section (reaction buttons)
+    const footerY = y + height - footerHeight;
+
+    // Separator line
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x + 16, footerY);
+    ctx.lineTo(x + width - 16, footerY);
+    ctx.stroke();
+
+    // Action buttons
+    const buttonWidth = (width - 32) / 3;
+    const buttonY = footerY + 12;
+
+    // Like button
+    ctx.fillStyle = '#666666';
+    ctx.font = '13px -apple-system, system-ui, sans-serif';
+    ctx.fillText('👍 Like', x + buttonWidth / 2 - 20, buttonY + 16);
+
+    // Comment button
+    ctx.fillText('💬 Comment', x + buttonWidth * 1.5 - 30, buttonY + 16);
+
+    // Share button
+    ctx.fillText('↗️ Share', x + buttonWidth * 2.5 - 20, buttonY + 16);
 
     ctx.restore();
 }

@@ -51,6 +51,34 @@ export const FRAME_CONFIGS: Record<FrameType, FrameConfig> = {
         borderRadius: 42, // Outer device body radius (MagicUI)
         padding: 9, // Bezel thickness (MagicUI: SCREEN_X)
     },
+    instagram: {
+        name: 'Instagram',
+        type: 'instagram',
+        titleBarHeight: 60, // Header with username
+        borderRadius: 16,
+        padding: 16,
+    },
+    facebook: {
+        name: 'Facebook',
+        type: 'facebook',
+        titleBarHeight: 70, // Header with logo and buttons
+        borderRadius: 12,
+        padding: 16,
+    },
+    twitter: {
+        name: 'Twitter',
+        type: 'twitter',
+        titleBarHeight: 60, // Header with profile
+        borderRadius: 16,
+        padding: 16,
+    },
+    linkedin: {
+        name: 'LinkedIn',
+        type: 'linkedin',
+        titleBarHeight: 70, // Header with profile and menu
+        borderRadius: 8,
+        padding: 16,
+    },
 };
 
 export const ASPECT_RATIO_PRESETS = [

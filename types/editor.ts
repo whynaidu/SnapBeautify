@@ -1,7 +1,7 @@
 // Editor TypeScript Types
 
 export type BackgroundType = 'solid' | 'gradient' | 'mesh' | 'image' | 'transparent' | 'textPattern' | 'waveSplit' | 'logoPattern';
-export type FrameType = 'none' | 'browser' | 'macos' | 'windows' | 'iphone' | 'android';
+export type FrameType = 'none' | 'browser' | 'macos' | 'windows' | 'iphone' | 'android' | 'instagram' | 'facebook' | 'twitter' | 'linkedin';
 // export type ShadowSize = 'none' | 'sm' | 'md' | 'lg' | 'xl'; // Removed in favor of custom controls
 export type ExportFormat = 'png' | 'jpeg' | 'webp';
 export type ExportScale = 1 | 2 | 3 | 4;
