@@ -33,9 +33,16 @@ Turn your boring screenshots into beautiful framed images with gorgeous backgrou
 ## 🚀 Features
 
 ### 🎨 Backgrounds & Theming
-- **Dynamic Backgrounds**: Solid colors, gradients, and beautiful mesh gradients
-- **Transparency Support**: Export with transparent backgrounds
+- **Dynamic Backgrounds**:
+  - Solid colors with extensive palette
+  - Linear gradients with 360° angle control
+  - Beautiful mesh gradients
+  - **Text Pattern**: Overlay large text on gradients (customizable font, size, weight, positions)
+  - **Logo Pattern**: Repeating logo grid with adjustable size, opacity, and spacing
+  - **Wave Split**: Half gradient, half solid with smooth wave divider (flippable)
+- **Transparency Support**: Export with transparent backgrounds (PNG)
 - **Dark/Light Mode**: System-aware theme with manual toggle
+- **Custom Gradient Control**: Fine-tune gradient angles from 0° to 360°
 
 ### 🖼️ Device Frames
 Professional device mockups:
@@ -49,6 +56,13 @@ Professional device mockups:
 - **Smart Shadows**: Color, blur, and opacity controls
 - **Zoom & Rotate**: Scale and rotate images precisely
 - **Image Scaling**: 0.1x to 2x zoom capability
+- **Text Overlays**: Add multiple text layers with:
+  - Draggable positioning on canvas
+  - Custom colors, fonts, sizes, and weights
+  - Duplicate functionality to copy styled text
+- **Image Cropping**:
+  - Interactive crop tool with resize handles
+  - Revert to original uncropped image anytime
 
 ### 📐 Social Media Ready
 Preset aspect ratios for:
@@ -139,12 +153,12 @@ SnapBeautify follows a clean, modular architecture with strict separation of con
 
 The original 830-line monolithic renderer was refactored into focused modules:
 
-- **renderer.ts** (165 lines): Orchestration only
+- **renderer.ts** (330 lines): Orchestration + text overlays
 - **layout.ts** (160 lines): Dimension calculations + memoization
-- **background.ts** (235 lines): Background rendering + gradient caching
+- **background.ts** (500 lines): Background rendering (solid, gradient, mesh, text pattern, logo pattern, wave split) + caching
 - **shadow.ts** (96 lines): Shadow effects
-- **frames.ts** (348 lines): Device frame rendering
-- **helpers.ts** (131 lines): Shared utilities
+- **frames.ts** (450 lines): Device frame rendering (browser, macOS, Windows, iPhone, Android)
+- **helpers.ts** (131 lines): Shared utilities + image manipulation
 
 #### 2. **Memory Management**
 
@@ -682,14 +696,26 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 🚀 Roadmap
 
+### Recently Added ✅
+
+- [x] Text overlays with drag-and-drop positioning
+- [x] Text overlay duplication
+- [x] Image cropping with revert functionality
+- [x] Logo pattern backgrounds
+- [x] Text pattern backgrounds
+- [x] Wave split backgrounds
+- [x] Gradient angle controls
+- [x] Improved UI layout (3-column background selector)
+
 ### Coming Soon
 
 - [ ] More device frames (iPad, MacBook, Surface)
 - [ ] Batch processing for multiple images
-- [ ] Custom background images
+- [ ] Custom background images upload
 - [ ] Watermark support
 - [ ] Templates and presets system
 - [ ] Undo/Redo functionality
+- [ ] Keyboard shortcuts
 
 ### Future
 
@@ -698,6 +724,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 - [ ] AI-powered backgrounds
 - [ ] Browser extension
 - [ ] API for automation
+- [ ] Video screenshot beautification
 
 ---
 
