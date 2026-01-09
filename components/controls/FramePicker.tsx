@@ -53,6 +53,12 @@ const FRAME_OPTIONS: FrameOption[] = [
         description: 'Android Style',
     },
     {
+        type: 'linkedin',
+        label: 'LinkedIn',
+        icon: <Linkedin className="w-5 h-5" />,
+        description: 'LI Post',
+    },
+    {
         type: 'instagram',
         label: 'Instagram',
         icon: <Instagram className="w-5 h-5" />,
@@ -76,12 +82,7 @@ const FRAME_OPTIONS: FrameOption[] = [
         disabled: true,
         comingSoon: true,
     },
-    {
-        type: 'linkedin',
-        label: 'LinkedIn',
-        icon: <Linkedin className="w-5 h-5" />,
-        description: 'LI Post',
-    },
+
 ];
 
 export function FramePicker() {
