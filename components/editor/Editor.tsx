@@ -30,16 +30,16 @@ export function Editor() {
 
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
                 <Canvas />
-                {/* Desktop: Show sidebar (hide when cropping), Mobile: Hide (use bottom sheet) */}
-                {!isCropping && (
+                {/* Desktop: Show sidebar only when image is loaded (hide when cropping), Mobile: Hide (use bottom sheet) */}
+                {originalImage && !isCropping && (
                     <div className="hidden md:block h-full">
                         <ControlPanel />
                     </div>
                 )}
             </div>
 
-            {/* Hide export bar when cropping */}
-            {!isCropping && <ExportBar />}
+            {/* Hide export bar when cropping or no image */}
+            {originalImage && !isCropping && <ExportBar />}
 
             {/* Mobile: Show bottom control panel (hide when cropping) */}
             {isMobile && originalImage && !isCropping && <MobileControlPanel />}

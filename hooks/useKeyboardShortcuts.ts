@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 interface KeyboardShortcutsOptions {
     onCopy?: () => void;
     onDownload?: () => void;
+    onClear?: () => void;
 }
 
 export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
@@ -214,11 +215,16 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
                 toast.info('Reset to defaults');
             }
 
-            // Escape - Clear image
+            // Escape - Clear image (with confirmation)
             if (e.key === 'Escape' && originalImage) {
                 e.preventDefault();
-                clearImage();
-                toast.info('Image cleared');
+                if (options.onClear) {
+                    options.onClear();
+                } else {
+                    // Fallback to direct clear if no callback provided
+                    clearImage();
+                    toast.info('Image cleared');
+                }
             }
 
             // Shadow presets shortcut removed in favor of granular controls

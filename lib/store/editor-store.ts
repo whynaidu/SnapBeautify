@@ -109,13 +109,10 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         });
     },
 
-    clearImage: () =>
-        set({
-            originalImage: null,
-            imageDataUrl: null,
-            uncroppedImage: null,
-            uncroppedImageDataUrl: null,
-        }),
+    clearImage: () => {
+        // Reset all settings to defaults and clear the image
+        get().resetToDefaults();
+    },
 
     setBackgroundType: (type: BackgroundType) => set({ backgroundType: type }),
 
