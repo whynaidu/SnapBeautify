@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Sparkles, RotateCcw, Settings, Moon, Sun, Laptop, Crop, Undo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,6 +11,16 @@ import {
     DropdownMenuSeparator,
     DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
@@ -17,9 +28,11 @@ import { toast } from 'sonner';
 export function Header() {
     const { resetToDefaults, originalImage, enterCropMode, isCropping, uncroppedImage, revertCrop } = useEditorStore();
     const { setTheme, theme } = useTheme();
+    const [showResetDialog, setShowResetDialog] = useState(false);
 
-    const handleReset = () => {
+    const handleResetConfirm = () => {
         resetToDefaults();
+        setShowResetDialog(false);
         toast.info('All settings reset to defaults');
     };
 
@@ -74,7 +87,7 @@ export function Header() {
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={handleReset}
+                            onClick={() => setShowResetDialog(true)}
                             className="text-muted-foreground hover:text-foreground"
                         >
                             <RotateCcw className="w-4 h-4 mr-1" />
@@ -112,6 +125,23 @@ export function Header() {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
+
+            <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Reset all settings?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will reset all adjustments to their default values. This action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleResetConfirm}>
+                            Reset All
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </header>
     );
 }
