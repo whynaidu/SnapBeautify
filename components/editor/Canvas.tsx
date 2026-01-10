@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { renderCanvas } from '@/lib/canvas/renderer';
 import { DropZone } from './DropZone';
@@ -8,6 +8,9 @@ import { CropOverlay } from './CropOverlay';
 import { cn } from '@/lib/utils';
 import { measureRender } from '@/lib/utils/performance';
 import { useThrottle } from '@/lib/hooks/useThrottle';
+import { useSubscription } from '@/lib/subscription/context';
+import { checkPremiumFeaturesUsed } from '@/lib/subscription/feature-gates';
+import { Crown } from 'lucide-react';
 
 export function Canvas() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -16,6 +19,9 @@ export function Canvas() {
     const [isDragging, setIsDragging] = useState(false);
     const [draggedTextId, setDraggedTextId] = useState<string | null>(null);
     const [alignmentGuides, setAlignmentGuides] = useState({ showCenterX: false, showCenterY: false });
+
+    // Get subscription status
+    const { isPro } = useSubscription();
 
     const {
         originalImage,
@@ -51,7 +57,43 @@ export function Canvas() {
         updateTextOverlay,
         selectTextOverlay,
         isCropping,
+        exportFormat,
+        exportScale,
     } = useEditorStore();
+
+    // Check if premium features are being used (for watermark)
+    const premiumUsage = useMemo(() => {
+        return checkPremiumFeaturesUsed({
+            backgroundType,
+            frameType,
+            textPatternPositions,
+            textPatternRows,
+            textOverlays,
+            padding,
+            shadowBlur,
+            shadowOpacity,
+            borderRadius,
+            imageScale,
+            exportFormat,
+            exportScale,
+        });
+    }, [
+        backgroundType,
+        frameType,
+        textPatternPositions,
+        textPatternRows,
+        textOverlays,
+        padding,
+        shadowBlur,
+        shadowOpacity,
+        borderRadius,
+        imageScale,
+        exportFormat,
+        exportScale,
+    ]);
+
+    // Show watermark if free user is using premium features
+    const showWatermark = !isPro && premiumUsage.isPremiumUsed;
 
     // Create a memoized render function
     const performRender = useCallback(async () => {
@@ -427,6 +469,67 @@ export function Canvas() {
                         }}
                         className="rounded-lg shadow-2xl"
                     />
+
+                    {/* Premium Watermark Overlay */}
+                    {showWatermark && (
+                        <div
+                            className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg"
+                            style={{
+                                transform: `scale(${displayScale})`,
+                                transformOrigin: 'center center',
+                            }}
+                        >
+                            {/* Diagonal watermark pattern */}
+                            <div
+                                className="absolute inset-0"
+                                style={{
+                                    background: 'repeating-linear-gradient(45deg, transparent, transparent 80px, rgba(99, 102, 241, 0.15) 80px, rgba(99, 102, 241, 0.15) 160px)',
+                                }}
+                            />
+
+                            {/* Repeating watermark text */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div
+                                    className="absolute w-[200%] h-[200%] flex flex-wrap items-center justify-center gap-16"
+                                    style={{
+                                        transform: 'rotate(-30deg)',
+                                    }}
+                                >
+                                    {Array.from({ length: 25 }).map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className="text-2xl font-bold text-indigo-500/30 whitespace-nowrap select-none"
+                                            style={{ textShadow: '0 0 10px rgba(99, 102, 241, 0.3)' }}
+                                        >
+                                            SNAPBEAUTIFY PRO
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Central upgrade badge */}
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 rounded-xl shadow-2xl flex flex-col items-center gap-2 max-w-xs text-center">
+                                    <Crown className="w-8 h-8" />
+                                    <span className="font-bold text-lg">Premium Features Used</span>
+                                    <span className="text-sm text-white/80">
+                                        Upgrade to Pro to export without watermark
+                                    </span>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            window.dispatchEvent(new CustomEvent('show-upgrade-modal', {
+                                                detail: { featureId: 'premium_features', message: 'Remove watermark and export your beautiful design!' }
+                                            }));
+                                        }}
+                                        className="pointer-events-auto mt-2 bg-white text-indigo-600 font-semibold px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors"
+                                    >
+                                        Upgrade Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     {/* Alignment Guides */}
                     {alignmentGuides.showCenterX && (
                         <div

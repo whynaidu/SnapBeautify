@@ -359,3 +359,121 @@ export function isAspectRatioAvailable(ratio: string, userPlan: SubscriptionPlan
   if (userPlan !== 'free') return true;
   return (FREE_TIER_LIMITS.freeAspectRatios as readonly string[]).includes(ratio);
 }
+
+// =============================================
+// PREMIUM FEATURE DETECTION (for watermark system)
+// =============================================
+
+export interface EditorStateForCheck {
+  backgroundType: string;
+  frameType: string;
+  textPatternPositions: string[];
+  textPatternRows: number;
+  textOverlays: Array<{ fontFamily?: string; fontSize?: number; fontWeight?: number }>;
+  padding: number;
+  shadowBlur: number;
+  shadowOpacity: number;
+  borderRadius: number;
+  imageScale: number;
+  exportFormat: string;
+  exportScale: number;
+}
+
+export interface PremiumUsageResult {
+  isPremiumUsed: boolean;
+  premiumFeatures: string[];
+}
+
+/**
+ * Check if current editor state uses any premium features
+ * Used for watermark system - let users try features but watermark output
+ */
+export function checkPremiumFeaturesUsed(state: EditorStateForCheck): PremiumUsageResult {
+  const premiumFeatures: string[] = [];
+
+  // 1. Premium background types
+  if (state.backgroundType === 'waveSplit') {
+    premiumFeatures.push('Wave Split background');
+  }
+  if (state.backgroundType === 'logoPattern') {
+    premiumFeatures.push('Logo Pattern background');
+  }
+
+  // 2. Text pattern premium features
+  if (state.backgroundType === 'textPattern') {
+    // Non-center positions are premium
+    const hasNonCenterPosition = state.textPatternPositions.some(p => p !== 'center');
+    if (hasNonCenterPosition) {
+      premiumFeatures.push('Text pattern positions (Top/Bottom)');
+    }
+    // Repeat mode (rows > 1) is premium
+    if (state.textPatternRows > 1) {
+      premiumFeatures.push('Text pattern repeat mode');
+    }
+  }
+
+  // 3. Premium frames (anything other than 'none' or 'browser')
+  if (state.frameType !== 'none' && state.frameType !== 'browser') {
+    premiumFeatures.push(`${state.frameType} frame`);
+  }
+
+  // 4. More than 1 text overlay
+  if (state.textOverlays.length > FREE_TIER_LIMITS.maxTextOverlays) {
+    premiumFeatures.push('Multiple text overlays');
+  }
+
+  // 5. Check text overlay premium settings
+  for (const overlay of state.textOverlays) {
+    // Premium font sizes (not in free presets)
+    if (overlay.fontSize && !(FREE_TIER_LIMITS.freeFontSizes as readonly number[]).includes(overlay.fontSize)) {
+      if (!premiumFeatures.includes('Custom font sizes')) {
+        premiumFeatures.push('Custom font sizes');
+      }
+    }
+    // Premium font weights (not 400 or 700)
+    if (overlay.fontWeight && !(FREE_TIER_LIMITS.freeFontWeights as readonly number[]).includes(overlay.fontWeight)) {
+      if (!premiumFeatures.includes('Premium font weights')) {
+        premiumFeatures.push('Premium font weights');
+      }
+    }
+  }
+
+  // 6. Premium padding (not in free presets)
+  if (!(FREE_TIER_LIMITS.freePaddingPresets as readonly number[]).includes(state.padding)) {
+    premiumFeatures.push('Custom padding');
+  }
+
+  // 7. Custom shadow settings
+  if (state.shadowBlur !== FREE_TIER_LIMITS.fixedShadowBlur) {
+    premiumFeatures.push('Custom shadow blur');
+  }
+  if (state.shadowOpacity !== FREE_TIER_LIMITS.fixedShadowOpacity * 100) {
+    premiumFeatures.push('Custom shadow opacity');
+  }
+
+  // 8. Premium border radius (not in free presets)
+  if (!(FREE_TIER_LIMITS.freeBorderRadiusPresets as readonly number[]).includes(state.borderRadius)) {
+    premiumFeatures.push('Custom border radius');
+  }
+
+  // 9. Image scale outside free range (50-150%)
+  const scalePercent = state.imageScale * 100;
+  if (scalePercent < FREE_TIER_LIMITS.imageScaleMin || scalePercent > FREE_TIER_LIMITS.imageScaleMax) {
+    premiumFeatures.push('Extended image scale');
+  }
+
+  // 10. Premium export format
+  if (state.exportFormat === 'webp') {
+    premiumFeatures.push('WebP export format');
+  }
+
+  // 11. Premium export scale (3x or 4x)
+  if (state.exportScale > 2) {
+    premiumFeatures.push(`${state.exportScale}x export quality`);
+  }
+
+  return {
+    isPremiumUsed: premiumFeatures.length > 0,
+    premiumFeatures,
+  };
+}

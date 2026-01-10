@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -8,10 +8,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Copy, Download, ChevronDown, Check, Share2, Loader2, Crown } from 'lucide-react';
+import { Copy, Download, ChevronDown, Check, Share2, Loader2, Crown, Lock } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { useSubscription } from '@/lib/subscription/context';
-import { FREE_TIER_LIMITS } from '@/lib/subscription/feature-gates';
+import { FREE_TIER_LIMITS, checkPremiumFeaturesUsed } from '@/lib/subscription/feature-gates';
 import {
     copyCanvasToClipboard,
     downloadCanvas,
@@ -110,7 +110,42 @@ export function ExportBar() {
         canvasWidth,
         canvasHeight,
         textOverlays,
+        textPatternRows,
     } = useEditorStore();
+
+    // Check if premium features are being used
+    const premiumUsage = useMemo(() => {
+        return checkPremiumFeaturesUsed({
+            backgroundType,
+            frameType,
+            textPatternPositions,
+            textPatternRows,
+            textOverlays,
+            padding,
+            shadowBlur,
+            shadowOpacity,
+            borderRadius,
+            imageScale,
+            exportFormat,
+            exportScale,
+        });
+    }, [
+        backgroundType,
+        frameType,
+        textPatternPositions,
+        textPatternRows,
+        textOverlays,
+        padding,
+        shadowBlur,
+        shadowOpacity,
+        borderRadius,
+        imageScale,
+        exportFormat,
+        exportScale,
+    ]);
+
+    // Block export if free user has premium features
+    const canExport = isPro || !premiumUsage.isPremiumUsed;
 
     // Check capabilities on mount
     useEffect(() => {
@@ -253,6 +288,19 @@ export function ExportBar() {
 
     const wrapExport = async (action: () => Promise<void>) => {
         if (isExporting) return;
+
+        // Check if free user is trying to export with premium features
+        if (!canExport) {
+            const featureList = premiumUsage.premiumFeatures.slice(0, 3).join(', ');
+            const moreCount = premiumUsage.premiumFeatures.length > 3
+                ? ` and ${premiumUsage.premiumFeatures.length - 3} more`
+                : '';
+            showUpgradeModal(
+                'premium_features',
+                `You're using premium features: ${featureList}${moreCount}. Upgrade to Pro to export without watermark!`
+            );
+            return;
+        }
 
         // Check export limit for free users
         if (!hasUnlimitedExports && exportsRemaining <= 0) {
@@ -473,6 +521,14 @@ export function ExportBar() {
             </div>
 
             <div className="flex items-center gap-1 sm:gap-2">
+                {/* Premium features warning badge */}
+                {!canExport && (
+                    <div className="hidden sm:flex items-center gap-1 text-xs text-orange-500 bg-orange-500/10 px-2 py-1 rounded">
+                        <Lock className="w-3 h-3" />
+                        <span>Premium features in use</span>
+                    </div>
+                )}
+
                 {/* On mobile: show Share button, on desktop: show Copy button */}
                 {isMobile ? (
                     canShare && (
@@ -481,9 +537,9 @@ export function ExportBar() {
                             size="sm"
                             onClick={handleShare}
                             disabled={!originalImage || isExporting}
-                            className="gap-1 sm:gap-2 px-2 sm:px-4 border-border hover:bg-accent hover:text-accent-foreground"
+                            className={`gap-1 sm:gap-2 px-2 sm:px-4 border-border hover:bg-accent hover:text-accent-foreground ${!canExport ? 'border-orange-500/50' : ''}`}
                         >
-                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Share2 className="w-4 h-4" />}
+                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : !canExport ? <Lock className="w-4 h-4 text-orange-500" /> : <Share2 className="w-4 h-4" />}
                             <span className="hidden sm:inline">Share</span>
                         </Button>
                     )
@@ -494,9 +550,9 @@ export function ExportBar() {
                             size="sm"
                             onClick={handleCopy}
                             disabled={!originalImage || isExporting}
-                            className="gap-1 sm:gap-2 px-2 sm:px-4 border-border hover:bg-accent hover:text-accent-foreground"
+                            className={`gap-1 sm:gap-2 px-2 sm:px-4 border-border hover:bg-accent hover:text-accent-foreground ${!canExport ? 'border-orange-500/50' : ''}`}
                         >
-                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
+                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : !canExport ? <Lock className="w-4 h-4 text-orange-500" /> : <Copy className="w-4 h-4" />}
                             <span className="hidden sm:inline">Copy</span>
                         </Button>
                     )
@@ -506,10 +562,10 @@ export function ExportBar() {
                     size="sm"
                     onClick={handleDownload}
                     disabled={!originalImage || isExporting}
-                    className="gap-1 sm:gap-2 px-2 sm:px-4 shadow-sm"
+                    className={`gap-1 sm:gap-2 px-2 sm:px-4 shadow-sm ${!canExport ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600' : ''}`}
                 >
-                    {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                    <span className="sm:inline">Save</span>
+                    {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : !canExport ? <Crown className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+                    <span className="sm:inline">{!canExport ? 'Upgrade' : 'Save'}</span>
                 </Button>
 
                 <div className="h-6 w-px bg-border mx-1" />
