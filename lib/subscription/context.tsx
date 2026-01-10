@@ -199,9 +199,16 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
             name: 'SnapBeautify Pro',
             description: isLifetime
               ? 'Lifetime Access - One Time Payment'
-              : `${planType.charAt(0).toUpperCase() + planType.slice(1)} Subscription`,
+              : `${planType.charAt(0).toUpperCase() + planType.slice(1)} Subscription - Auto-renews`,
+            currency: 'INR',
             prefill: {
               email: user?.email || '',
+            },
+            // Enable recurring for subscriptions (required for UPI AutoPay mandate)
+            ...(isLifetime ? {} : { recurring: '1' as const }),
+            notes: {
+              userId,
+              planType,
             },
             handler: async (response: RazorpayPaymentResponse) => {
               // Verify payment - different endpoints for order vs subscription
@@ -240,6 +247,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
               ondismiss: () => {
                 console.log('Razorpay modal closed');
               },
+              confirm_close: true, // Ask user to confirm before closing
             },
           };
 

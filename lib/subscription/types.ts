@@ -63,6 +63,7 @@ export interface RazorpayOptions {
   subscription_id?: string;  // For recurring subscriptions
   order_id?: string;         // For one-time payments (lifetime)
   amount?: number;           // Required for orders (in paise)
+  currency?: string;         // Currency code (INR, USD)
   name: string;
   description: string;
   handler: (response: RazorpayPaymentResponse) => void;
@@ -76,7 +77,19 @@ export interface RazorpayOptions {
   };
   modal?: {
     ondismiss?: () => void;
+    confirm_close?: boolean;
   };
+  // Recurring payment options for UPI AutoPay
+  recurring?: '1' | '0';
+  subscription_card_change?: '1' | '0';
+  // Notes for tracking
+  notes?: {
+    userId?: string;
+    planType?: string;
+  };
+  // Callback URL for redirect flow (optional)
+  callback_url?: string;
+  redirect?: boolean;
 }
 
 // Feature Gating

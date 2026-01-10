@@ -54,18 +54,20 @@ export async function POST(request: NextRequest) {
     // Get plan ID based on plan type
     const planId = RAZORPAY_PLAN_IDS[planType as keyof typeof RAZORPAY_PLAN_IDS];
 
-    // Create subscription
+    // Create subscription with UPI AutoPay support
     const subscription = await razorpay.subscriptions.create({
       plan_id: planId,
       customer_notify: 1,
-      total_count: planType === 'monthly' ? 12 : 1, // 12 months for monthly, 1 for annual
+      total_count: planType === 'monthly' ? 120 : 10, // Allow up to 10 years of renewals
       notes: {
         userId,
         email: email || '',
         name: name || '',
         planType,
       },
-    }) as { id: string; plan_id?: string };
+      // Expire the subscription link after 30 minutes if not completed
+      expire_by: Math.floor(Date.now() / 1000) + 1800,
+    }) as { id: string; plan_id?: string; short_url?: string };
 
     // Get amount based on plan type
     const amount = planType === 'monthly' ? 19900 : 99900; // In paise
