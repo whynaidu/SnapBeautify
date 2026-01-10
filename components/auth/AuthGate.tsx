@@ -4,7 +4,7 @@ import { useAuth } from '@/lib/auth/context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, Mail, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -18,6 +18,7 @@ export function AuthGate({ children }: AuthGateProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +40,8 @@ export function AuthGate({ children }: AuthGateProps) {
         if (error) {
           toast.error(error.message);
         } else {
-          toast.success('Check your email to confirm your account');
+          // Show the email sent confirmation screen
+          setEmailSent(true);
         }
       }
     } catch {
@@ -47,6 +49,12 @@ export function AuthGate({ children }: AuthGateProps) {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleBackToLogin = () => {
+    setEmailSent(false);
+    setMode('login');
+    setPassword('');
   };
 
   // Show loading state
@@ -65,6 +73,57 @@ export function AuthGate({ children }: AuthGateProps) {
 
   // Show login screen if not authenticated
   if (!isAuthenticated) {
+    // Show email confirmation screen after signup
+    if (emailSent) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center p-4">
+          <div className="w-full max-w-sm">
+            <div className="flex flex-col items-center gap-4 text-center">
+              {/* Email Icon */}
+              <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <Mail className="w-8 h-8 text-green-600 dark:text-green-400" />
+              </div>
+
+              {/* Title */}
+              <h1 className="text-2xl font-semibold text-foreground">
+                Check your email
+              </h1>
+
+              {/* Description */}
+              <p className="text-muted-foreground">
+                We&apos;ve sent a confirmation link to
+              </p>
+              <p className="font-medium text-foreground">
+                {email}
+              </p>
+
+              {/* Instructions */}
+              <div className="bg-muted/50 rounded-lg p-4 mt-2 w-full">
+                <p className="text-sm text-muted-foreground">
+                  Click the link in your email to verify your account and get started with SnapBeautify.
+                </p>
+              </div>
+
+              {/* Spam notice */}
+              <p className="text-xs text-muted-foreground mt-2">
+                Didn&apos;t receive the email? Check your spam folder.
+              </p>
+
+              {/* Back to login */}
+              <Button
+                variant="ghost"
+                className="mt-4"
+                onClick={handleBackToLogin}
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to login
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
