@@ -80,7 +80,7 @@ export function ExportBar() {
         setIsMobile(isMobileDevice());
     }, []);
 
-    const createExportCanvas = (scaleOverride?: number) => {
+    const createExportCanvas = async (scaleOverride?: number) => {
         if (!originalImage) return null;
 
         const scale = scaleOverride || exportScale;
@@ -91,7 +91,7 @@ export function ExportBar() {
         const exportCanvas = canvasPool.acquire(width, height);
 
         try {
-            renderCanvas({
+            await renderCanvas({
                 canvas: exportCanvas,
                 image: originalImage,
                 backgroundType,
@@ -141,7 +141,7 @@ export function ExportBar() {
             async () => {
                 let exportCanvas: HTMLCanvasElement | null = null;
                 try {
-                    exportCanvas = createExportCanvas(currentScale);
+                    exportCanvas = await createExportCanvas(currentScale);
                     if (!exportCanvas) return false;
 
                     // Small delay to ensure UI updates before heavy canvas operation

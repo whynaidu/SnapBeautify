@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Palette, Square, Sun, Frame, Type, ChevronUp, ChevronDown } from 'lucide-react';
+import { Palette, Square, Sun, Frame, Type, ChevronUp, ChevronDown, Sparkles } from 'lucide-react';
 import { BackgroundPicker } from '@/components/controls/BackgroundPicker';
 import { PaddingControl } from '@/components/controls/PaddingControl';
 import { ShadowControl } from '@/components/controls/ShadowControl';
@@ -11,6 +11,7 @@ import { FramePicker } from '@/components/controls/FramePicker';
 import { AspectRatioPicker } from '@/components/controls/AspectRatioPicker';
 import { ScaleControl } from '@/components/controls/ScaleControl';
 import { TextOverlayControl } from '@/components/controls/TextOverlayControl';
+import { TemplatePresets } from '@/components/controls/TemplatePresets';
 import { Button } from '@/components/ui/button';
 
 export function MobileControlPanel() {
@@ -45,46 +46,57 @@ export function MobileControlPanel() {
             {/* Expandable content */}
             {isExpanded && (
                 <div className="h-[calc(60vh-3.5rem)] overflow-y-auto">
-                    <Tabs defaultValue="background" className="w-full">
-                        <TabsList className="w-full grid grid-cols-5 bg-background border-b border-border rounded-none h-12 p-0 sticky top-0 z-10">
+                    <Tabs defaultValue="templates" className="w-full">
+                        <TabsList className="w-full grid grid-cols-6 bg-background border-b border-border rounded-none h-12 p-0 sticky top-0 z-10">
+                            <TabsTrigger
+                                value="templates"
+                                className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
+                            >
+                                <Sparkles className="w-3.5 h-3.5" />
+                                <span className="text-[9px]">Temp</span>
+                            </TabsTrigger>
                             <TabsTrigger
                                 value="background"
                                 className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
                             >
-                                <Palette className="w-4 h-4" />
-                                <span className="text-[10px]">BG</span>
+                                <Palette className="w-3.5 h-3.5" />
+                                <span className="text-[9px]">BG</span>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="style"
                                 className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
                             >
-                                <Square className="w-4 h-4" />
-                                <span className="text-[10px]">Style</span>
+                                <Square className="w-3.5 h-3.5" />
+                                <span className="text-[9px]">Style</span>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="shadow"
                                 className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
                             >
-                                <Sun className="w-4 h-4" />
-                                <span className="text-[10px]">Shadow</span>
+                                <Sun className="w-3.5 h-3.5" />
+                                <span className="text-[9px]">Shad</span>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="frame"
                                 className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
                             >
-                                <Frame className="w-4 h-4" />
-                                <span className="text-[10px]">Frame</span>
+                                <Frame className="w-3.5 h-3.5" />
+                                <span className="text-[9px]">Frame</span>
                             </TabsTrigger>
                             <TabsTrigger
                                 value="text"
                                 className="rounded-none data-[state=active]:bg-muted data-[state=active]:shadow-none h-full flex-col gap-0.5"
                             >
-                                <Type className="w-4 h-4" />
-                                <span className="text-[10px]">Text</span>
+                                <Type className="w-3.5 h-3.5" />
+                                <span className="text-[9px]">Text</span>
                             </TabsTrigger>
                         </TabsList>
 
                         <div className="p-4">
+                            <TabsContent value="templates" className="mt-0 space-y-6">
+                                <TemplatePresets />
+                            </TabsContent>
+
                             <TabsContent value="background" className="mt-0 space-y-6">
                                 <BackgroundPicker />
                             </TabsContent>

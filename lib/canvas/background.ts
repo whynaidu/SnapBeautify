@@ -17,6 +17,7 @@ export interface BackgroundOptions {
     textPatternColor?: string;
     textPatternOpacity?: number;
     textPatternPositions?: TextPosition[];
+    textPatternRows?: number;
     textPatternFontFamily?: string;
     textPatternFontSize?: number;
     textPatternFontWeight?: number;
@@ -206,7 +207,7 @@ function calculateTextPosition(
 }
 
 /**
- * Draw text pattern background (gradient with large text overlay at multiple positions)
+ * Draw text pattern background (gradient with large text overlay at multiple positions or rows)
  */
 export function drawTextPattern(
     ctx: CanvasRenderingContext2D,
@@ -220,21 +221,14 @@ export function drawTextPattern(
     positions: TextPosition[] = ['center'],
     fontFamily: string = 'system-ui, -apple-system, sans-serif',
     fontSizeMultiplier: number = 0.35,
-    fontWeight: number = 900
+    fontWeight: number = 900,
+    rows: number = 1
 ): void {
     // Draw gradient background first
     drawGradientBackground(ctx, width, height, gradientColors, gradientAngle);
 
-    // Draw large text pattern overlay at each position
+    // Draw large text pattern overlay
     ctx.save();
-
-    // Dynamically reduce font size when multiple positions are selected to prevent overlap
-    const positionScaleFactor = positions.length === 3 ? 0.7 : positions.length === 2 ? 0.85 : 1;
-    const adjustedFontSizeMultiplier = fontSizeMultiplier * positionScaleFactor;
-
-    // Calculate font size based on canvas dimensions
-    const fontSize = Math.min(width, height) * adjustedFontSizeMultiplier;
-    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
 
     // Set text style with opacity
     const r = parseInt(textColor.slice(1, 3), 16);
@@ -242,18 +236,65 @@ export function drawTextPattern(
     const b = parseInt(textColor.slice(5, 7), 16);
     ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${textOpacity})`;
 
-    // Calculate max width to prevent text clipping (96% of canvas width for less side padding)
-    const maxWidth = width * 0.96;
+    // If rows > 1, use the new repeating rows mode
+    if (rows > 1) {
+        // Calculate row height to fill the entire canvas
+        const rowHeight = height / rows;
 
-    // Draw text at each selected position
-    positions.forEach(position => {
-        const pos = calculateTextPosition(width, height, position);
-        ctx.textAlign = pos.align;
-        ctx.textBaseline = pos.baseline;
+        // Calculate font size based on row height (70% of row height)
+        // Also consider fontSizeMultiplier for user control
+        const baseFontSize = rowHeight * 0.7;
+        const fontSize = baseFontSize * (fontSizeMultiplier / 0.35); // Normalize around default 0.35
 
-        // Draw text with max width to prevent clipping
-        ctx.fillText(text, pos.x, pos.y, maxWidth);
-    });
+        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+
+        // Measure text width to calculate horizontal repetition
+        const textMetrics = ctx.measureText(text);
+        const textWidth = textMetrics.width;
+        const spacing = textWidth * 0.08; // 8% spacing between repetitions (tighter)
+        const totalTextWidth = textWidth + spacing;
+
+        // Calculate how many times to repeat text horizontally
+        const repeatCount = Math.ceil(width / totalTextWidth) + 1;
+
+        // Draw each row, evenly distributed across the full canvas height
+        for (let i = 0; i < rows; i++) {
+            const y = (i + 0.5) * rowHeight; // Center text in each row slot
+
+            // Offset every other row for a staggered pattern effect
+            const offsetX = (i % 2 === 0) ? 0 : -totalTextWidth / 2;
+
+            // Repeat text horizontally to fill the width
+            for (let j = 0; j < repeatCount; j++) {
+                const x = offsetX + j * totalTextWidth;
+                ctx.fillText(text, x, y);
+            }
+        }
+    } else {
+        // Legacy mode: use positions (top, center, bottom)
+        // Dynamically reduce font size when multiple positions are selected to prevent overlap
+        const positionScaleFactor = positions.length === 3 ? 0.7 : positions.length === 2 ? 0.85 : 1;
+        const adjustedFontSizeMultiplier = fontSizeMultiplier * positionScaleFactor;
+
+        // Calculate font size based on canvas dimensions
+        const fontSize = Math.min(width, height) * adjustedFontSizeMultiplier;
+        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+
+        // Calculate max width to prevent text clipping (96% of canvas width for less side padding)
+        const maxWidth = width * 0.96;
+
+        // Draw text at each selected position
+        positions.forEach(position => {
+            const pos = calculateTextPosition(width, height, position);
+            ctx.textAlign = pos.align;
+            ctx.textBaseline = pos.baseline;
+
+            // Draw text with max width to prevent clipping
+            ctx.fillText(text, pos.x, pos.y, maxWidth);
+        });
+    }
 
     ctx.restore();
 }
@@ -437,6 +478,7 @@ export function drawBackground(
         textPatternFontFamily = 'system-ui, -apple-system, sans-serif',
         textPatternFontSize = 0.35,
         textPatternFontWeight = 900,
+        textPatternRows = 1,
         waveSplitFlipped = false,
         logoPatternImage = null,
         logoPatternOpacity = 0.3,
@@ -470,7 +512,8 @@ export function drawBackground(
                 textPatternPositions,
                 textPatternFontFamily,
                 textPatternFontSize,
-                textPatternFontWeight
+                textPatternFontWeight,
+                textPatternRows
             );
             break;
 

@@ -25,6 +25,7 @@ export interface RenderOptions {
     textPatternFontFamily?: string;
     textPatternFontSize?: number;
     textPatternFontWeight?: number;
+    textPatternRows?: number;
     waveSplitFlipped?: boolean;
     logoPatternImage?: HTMLImageElement | null;
     logoPatternOpacity?: number;
@@ -47,7 +48,7 @@ export interface RenderOptions {
 /**
  * Main render function - orchestrates all rendering steps
  */
-export function renderCanvas(options: RenderOptions): void {
+export async function renderCanvas(options: RenderOptions): Promise<void> {
     const {
         canvas,
         image,
@@ -63,6 +64,7 @@ export function renderCanvas(options: RenderOptions): void {
         textPatternFontFamily,
         textPatternFontSize,
         textPatternFontWeight,
+        textPatternRows = 1,
         waveSplitFlipped = false,
         logoPatternImage = null,
         logoPatternOpacity = 0.3,
@@ -114,6 +116,7 @@ export function renderCanvas(options: RenderOptions): void {
         textPatternFontFamily,
         textPatternFontSize,
         textPatternFontWeight,
+        textPatternRows,
         waveSplitFlipped,
         logoPatternImage,
         logoPatternOpacity,
@@ -324,13 +327,51 @@ export function renderCanvas(options: RenderOptions): void {
 
     // Draw text overlays on top of everything
     if (textOverlays && textOverlays.length > 0) {
+        // Load all fonts first before rendering
+        if (typeof document !== 'undefined' && document.fonts) {
+            const fontLoadPromises = textOverlays.map((overlay) => {
+                const fontSpec = `${overlay.fontWeight} ${overlay.fontSize}px ${overlay.fontFamily}`;
+                return document.fonts.load(fontSpec).catch((err) => {
+                    console.warn(`Failed to load font: ${overlay.fontFamily}`, err);
+                    // Continue even if font fails to load (will use fallback)
+                    return null;
+                });
+            });
+
+            // Wait for all fonts to load
+            await Promise.all(fontLoadPromises);
+        }
+
         ctx.save();
         textOverlays.forEach((overlay) => {
             const x = (layout.canvasWidth * overlay.x) / 100;
             const y = (layout.canvasHeight * overlay.y) / 100;
 
+            // Set font - format: "weight size family"
             ctx.font = `${overlay.fontWeight} ${overlay.fontSize}px ${overlay.fontFamily}`;
-            ctx.fillStyle = overlay.color;
+
+            // Apply gradient or solid color
+            if (overlay.useGradient && overlay.gradientColors && overlay.gradientColors.length === 2) {
+                // Calculate gradient angle
+                const angle = (overlay.gradientAngle || 90) * (Math.PI / 180);
+                const textMetrics = ctx.measureText(overlay.text);
+                const textWidth = textMetrics.width;
+                const textHeight = overlay.fontSize;
+
+                // Create gradient based on angle
+                const x0 = x - textWidth / 2;
+                const y0 = y - textHeight / 2;
+                const x1 = x0 + Math.cos(angle) * textWidth;
+                const y1 = y0 + Math.sin(angle) * textHeight;
+
+                const gradient = ctx.createLinearGradient(x0, y0, x1, y1);
+                gradient.addColorStop(0, overlay.gradientColors[0]);
+                gradient.addColorStop(1, overlay.gradientColors[1]);
+                ctx.fillStyle = gradient;
+            } else {
+                ctx.fillStyle = overlay.color;
+            }
+
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
 

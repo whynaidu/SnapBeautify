@@ -26,6 +26,45 @@ export interface TextPattern {
     textOpacity: number;
 }
 
+export interface TemplatePreset {
+    id: string;
+    name: string;
+    description: string;
+    category: 'minimal' | 'vibrant' | 'professional' | 'creative' | 'wave' | 'text';
+    preview: {
+        backgroundType: BackgroundType;
+        backgroundColor?: string;
+        gradientColors?: [string, string];
+        gradientAngle?: number;
+        meshGradientCSS?: string;
+        textPatternText?: string;
+        textPatternPositions?: TextPosition[];
+        waveSplitFlipped?: boolean;
+    };
+    settings: {
+        backgroundType: BackgroundType;
+        backgroundColor?: string;
+        gradientColors?: [string, string];
+        gradientAngle?: number;
+        meshGradientCSS?: string;
+        textPatternText?: string;
+        textPatternColor?: string;
+        textPatternOpacity?: number;
+        textPatternPositions?: TextPosition[];
+        textPatternRows?: number;
+        textPatternFontFamily?: string;
+        textPatternFontSize?: number;
+        textPatternFontWeight?: number;
+        waveSplitFlipped?: boolean;
+        padding?: number;
+        shadowBlur?: number;
+        shadowOpacity?: number;
+        borderRadius?: number;
+        imageScale?: number;
+        textOverlays?: Omit<TextOverlay, 'id'>[];
+    };
+}
+
 export type TextPosition = 'top' | 'center' | 'bottom';
 
 export interface TextOverlay {
@@ -37,6 +76,9 @@ export interface TextOverlay {
     fontSize: number; // pixels
     fontFamily: string;
     fontWeight: number; // 100-900
+    useGradient?: boolean; // If true, use gradient colors instead of solid color
+    gradientColors?: [string, string]; // Gradient colors [start, end]
+    gradientAngle?: number; // Gradient angle in degrees
 }
 
 export interface CropArea {
@@ -77,7 +119,8 @@ export interface EditorState {
     textPatternText: string;
     textPatternColor: string;
     textPatternOpacity: number;
-    textPatternPositions: TextPosition[]; // Array for multiple positions
+    textPatternPositions: TextPosition[]; // Array for multiple positions (legacy)
+    textPatternRows: number; // Number of text rows to display (1-12)
     textPatternFontFamily: string;
     textPatternFontSize: number; // percentage 0.1 - 1.0
     textPatternFontWeight: number; // 100-900
@@ -131,6 +174,7 @@ export interface EditorActions {
     setTextPattern: (text: string, colors: [string, string], angle: number, textColor: string, textOpacity: number) => void;
     setTextPatternText: (text: string) => void;
     toggleTextPatternPosition: (position: TextPosition) => void; // Toggle position in/out of array
+    setTextPatternRows: (rows: number) => void;
     setTextPatternFontFamily: (fontFamily: string) => void;
     setTextPatternFontSize: (size: number) => void;
     setTextPatternFontWeight: (weight: number) => void;
@@ -162,4 +206,5 @@ export interface EditorActions {
     applyCrop: () => Promise<void>;
     revertCrop: () => void;
     resetToDefaults: () => void;
+    applyTemplate: (template: TemplatePreset) => void;
 }

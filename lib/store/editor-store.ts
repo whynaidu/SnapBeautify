@@ -10,6 +10,7 @@ import {
     TextPosition,
     TextOverlay,
     CropArea,
+    TemplatePreset,
 } from '@/types/editor';
 import { calculateFrameOffsets } from '@/lib/canvas/layout';
 
@@ -27,7 +28,8 @@ const DEFAULT_STATE: EditorState = {
     textPatternText: 'WELCOME',
     textPatternColor: '#ffffff',
     textPatternOpacity: 0.1,
-    textPatternPositions: ['center'], // Default to center only
+    textPatternPositions: ['center'], // Default to center only (legacy)
+    textPatternRows: 1, // Default to 1 row
     textPatternFontFamily: 'system-ui, -apple-system, sans-serif',
     textPatternFontSize: 0.35, // 35% of canvas dimension
     textPatternFontWeight: 900,
@@ -36,12 +38,12 @@ const DEFAULT_STATE: EditorState = {
     logoPatternOpacity: 0.3,
     logoPatternSize: 0.3, // 30% of canvas dimension
     logoPatternSpacing: 1.5, // 1.5x spacing between logos
-    padding: 64,
+    padding: 160,
     shadowBlur: 20, // Default blur
     shadowOpacity: 50, // Default opacity %
     shadowColor: 'rgba(0, 0, 0, 0.5)',
     borderRadius: 12,
-    imageScale: 1,
+    imageScale: 0.75,
     rotation: 0,
     frameType: 'none',
     frameColor: '#1f2937',
@@ -91,19 +93,21 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
     ...DEFAULT_STATE,
 
     setImage: (image: HTMLImageElement, dataUrl: string) => {
-        const padding = get().padding;
+        const padding = DEFAULT_STATE.padding;
+        const imageScale = DEFAULT_STATE.imageScale;
         const frameType = get().frameType;
 
         // Calculate additional dimensions for frames using centralized function
-        const frameOffsets = calculateFrameOffsets(frameType, 1);
+        const frameOffsets = calculateFrameOffsets(frameType, imageScale);
 
-        const width = image.width + padding * 2 + frameOffsets.offsetX;
-        const height = image.height + padding * 2 + frameOffsets.offsetY;
+        const width = Math.round(image.width * imageScale) + padding * 2 + frameOffsets.offsetX;
+        const height = Math.round(image.height * imageScale) + padding * 2 + frameOffsets.offsetY;
 
         set({
             originalImage: image,
             imageDataUrl: dataUrl,
-            imageScale: 1, // Reset scale for new image
+            imageScale: imageScale,
+            padding: padding,
             canvasWidth: width,
             canvasHeight: height,
         });
@@ -168,6 +172,8 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
 
         set({ textPatternPositions: newPositions });
     },
+
+    setTextPatternRows: (rows: number) => set({ textPatternRows: Math.max(1, Math.min(12, rows)) }),
 
     setTextPatternFontFamily: (fontFamily: string) => set({ textPatternFontFamily: fontFamily }),
 
@@ -369,16 +375,16 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         // Update the store with the cropped image
         const padding = state.padding;
         const frameType = state.frameType;
-        const frameOffsets = calculateFrameOffsets(frameType, 1);
-        const width = croppedImage.width + padding * 2 + frameOffsets.offsetX;
-        const height = croppedImage.height + padding * 2 + frameOffsets.offsetY;
+        const imageScale = state.imageScale;
+        const frameOffsets = calculateFrameOffsets(frameType, imageScale);
+        const width = Math.round(croppedImage.width * imageScale) + padding * 2 + frameOffsets.offsetX;
+        const height = Math.round(croppedImage.height * imageScale) + padding * 2 + frameOffsets.offsetY;
 
         set({
             originalImage: croppedImage,
             imageDataUrl: croppedDataUrl,
             uncroppedImage: uncroppedImage,
             uncroppedImageDataUrl: uncroppedImageDataUrl,
-            imageScale: 1,
             canvasWidth: width,
             canvasHeight: height,
             isCropping: false,
@@ -393,19 +399,111 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
         // Restore the original uncropped image
         const padding = state.padding;
         const frameType = state.frameType;
-        const frameOffsets = calculateFrameOffsets(frameType, 1);
-        const width = state.uncroppedImage.width + padding * 2 + frameOffsets.offsetX;
-        const height = state.uncroppedImage.height + padding * 2 + frameOffsets.offsetY;
+        const imageScale = state.imageScale;
+        const frameOffsets = calculateFrameOffsets(frameType, imageScale);
+        const width = Math.round(state.uncroppedImage.width * imageScale) + padding * 2 + frameOffsets.offsetX;
+        const height = Math.round(state.uncroppedImage.height * imageScale) + padding * 2 + frameOffsets.offsetY;
 
         set({
             originalImage: state.uncroppedImage,
             imageDataUrl: state.uncroppedImageDataUrl,
             uncroppedImage: null,
             uncroppedImageDataUrl: null,
-            imageScale: 1,
             canvasWidth: width,
             canvasHeight: height,
         });
+    },
+
+    applyTemplate: (template: TemplatePreset) => {
+        const state = get();
+        const settings = template.settings;
+
+        // Build the update object
+        const updates: Partial<EditorState> = {
+            backgroundType: settings.backgroundType,
+        };
+
+        // Apply background settings based on type
+        if (settings.backgroundColor !== undefined) {
+            updates.backgroundColor = settings.backgroundColor;
+        }
+        if (settings.gradientColors !== undefined) {
+            updates.gradientColors = settings.gradientColors;
+        }
+        if (settings.gradientAngle !== undefined) {
+            updates.gradientAngle = settings.gradientAngle;
+        }
+        if (settings.meshGradientCSS !== undefined) {
+            updates.meshGradientCSS = settings.meshGradientCSS;
+        }
+        if (settings.textPatternText !== undefined) {
+            updates.textPatternText = settings.textPatternText;
+        }
+        if (settings.textPatternColor !== undefined) {
+            updates.textPatternColor = settings.textPatternColor;
+        }
+        if (settings.textPatternOpacity !== undefined) {
+            updates.textPatternOpacity = settings.textPatternOpacity;
+        }
+        if (settings.textPatternPositions !== undefined) {
+            updates.textPatternPositions = settings.textPatternPositions;
+        }
+        // Handle textPatternRows - if template has positions but no rows, use position mode (rows = 1)
+        // If template explicitly sets rows, use that value
+        if (settings.textPatternRows !== undefined) {
+            updates.textPatternRows = settings.textPatternRows;
+        } else if (settings.backgroundType === 'textPattern') {
+            // Default to position mode (1 row) for text pattern templates without explicit rows
+            updates.textPatternRows = 1;
+        }
+        if (settings.textPatternFontFamily !== undefined) {
+            updates.textPatternFontFamily = settings.textPatternFontFamily;
+        }
+        if (settings.textPatternFontSize !== undefined) {
+            updates.textPatternFontSize = settings.textPatternFontSize;
+        }
+        if (settings.textPatternFontWeight !== undefined) {
+            updates.textPatternFontWeight = settings.textPatternFontWeight;
+        }
+        if (settings.waveSplitFlipped !== undefined) {
+            updates.waveSplitFlipped = settings.waveSplitFlipped;
+        }
+
+        // Apply styling settings
+        if (settings.padding !== undefined) {
+            updates.padding = settings.padding;
+        }
+        if (settings.shadowBlur !== undefined) {
+            updates.shadowBlur = settings.shadowBlur;
+        }
+        if (settings.shadowOpacity !== undefined) {
+            updates.shadowOpacity = settings.shadowOpacity;
+        }
+        if (settings.borderRadius !== undefined) {
+            updates.borderRadius = settings.borderRadius;
+        }
+        if (settings.imageScale !== undefined) {
+            updates.imageScale = settings.imageScale;
+        }
+
+        // Apply text overlays - always reset to avoid old overlays persisting
+        if (settings.textOverlays !== undefined && settings.textOverlays.length > 0) {
+            const newOverlays = settings.textOverlays.map((overlay, index) => ({
+                ...overlay,
+                id: `text-${Date.now()}-${index}`,
+            }));
+            updates.textOverlays = newOverlays;
+            updates.selectedTextOverlayId = newOverlays.length > 0 ? newOverlays[0].id : null;
+        } else {
+            // Clear any existing text overlays if template doesn't have any
+            updates.textOverlays = [];
+            updates.selectedTextOverlayId = null;
+        }
+
+        // Recalculate canvas dimensions if needed
+        const finalUpdates = recalculateCanvasDimensions(state, updates);
+
+        set(finalUpdates);
     },
 
     resetToDefaults: () => set(DEFAULT_STATE),

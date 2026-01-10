@@ -11,11 +11,12 @@ export function middleware(request: NextRequest) {
     // Content Security Policy
     const cspDirectives = [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline'", // unsafe-eval needed for Next.js dev, remove in production
-        "style-src 'self' 'unsafe-inline'", // unsafe-inline needed for Tailwind
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com", // unsafe-eval needed for Next.js dev
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // Allow Google Fonts stylesheets
+        "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com", // Explicit for stylesheet loading
         "img-src 'self' data: blob: https:",
-        "font-src 'self' data:",
-        "connect-src 'self' https:",
+        "font-src 'self' data: https://fonts.gstatic.com", // Allow Google Fonts font files
+        "connect-src 'self' https: https://vitals.vercel-insights.com",
         "media-src 'self' blob: data:",
         "object-src 'none'",
         "base-uri 'self'",
@@ -27,9 +28,9 @@ export function middleware(request: NextRequest) {
     // In production, remove unsafe directives
     if (process.env.NODE_ENV === 'production') {
         const productionCSP = cspDirectives.map(directive => {
-            // Remove unsafe-eval from production
+            // Remove unsafe-eval from production but keep Vercel scripts
             if (directive.startsWith('script-src')) {
-                return "script-src 'self' 'unsafe-inline'";
+                return "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com";
             }
             return directive;
         });

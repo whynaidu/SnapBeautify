@@ -21,6 +21,7 @@ export function useCanvas() {
         textPatternFontFamily,
         textPatternFontSize,
         textPatternFontWeight,
+        textPatternRows,
         waveSplitFlipped,
         padding,
         shadowBlur,
@@ -36,10 +37,10 @@ export function useCanvas() {
         textOverlays,
     } = useEditorStore();
 
-    const render = useCallback(() => {
+    const render = useCallback(async () => {
         if (!canvasRef.current || !originalImage) return;
 
-        renderCanvas({
+        await renderCanvas({
             canvas: canvasRef.current,
             image: originalImage,
             backgroundType,
@@ -54,6 +55,7 @@ export function useCanvas() {
             textPatternFontFamily,
             textPatternFontSize,
             textPatternFontWeight,
+            textPatternRows,
             waveSplitFlipped,
             padding,
             shadowBlur,
@@ -82,6 +84,7 @@ export function useCanvas() {
         textPatternFontFamily,
         textPatternFontSize,
         textPatternFontWeight,
+        textPatternRows,
         waveSplitFlipped,
         padding,
         shadowBlur,
@@ -96,14 +99,14 @@ export function useCanvas() {
         textOverlays,
     ]);
 
-    const renderExport = useCallback((): HTMLCanvasElement => {
+    const renderExport = useCallback(async (): Promise<HTMLCanvasElement> => {
         const exportCanvas = document.createElement('canvas');
 
         if (!originalImage) {
             throw new Error('No image to export');
         }
 
-        renderCanvas({
+        await renderCanvas({
             canvas: exportCanvas,
             image: originalImage,
             backgroundType,
@@ -118,6 +121,7 @@ export function useCanvas() {
             textPatternFontFamily,
             textPatternFontSize,
             textPatternFontWeight,
+            textPatternRows,
             waveSplitFlipped,
             padding,
             shadowBlur,
@@ -148,6 +152,7 @@ export function useCanvas() {
         textPatternFontFamily,
         textPatternFontSize,
         textPatternFontWeight,
+        textPatternRows,
         waveSplitFlipped,
         padding,
         shadowBlur,

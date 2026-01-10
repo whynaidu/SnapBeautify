@@ -31,6 +31,7 @@ export function Canvas() {
         textPatternFontFamily,
         textPatternFontSize,
         textPatternFontWeight,
+        textPatternRows,
         waveSplitFlipped,
         logoPatternImage,
         logoPatternOpacity,
@@ -53,13 +54,13 @@ export function Canvas() {
     } = useEditorStore();
 
     // Create a memoized render function
-    const performRender = useCallback(() => {
+    const performRender = useCallback(async () => {
         if (!canvasRef.current || !originalImage) return;
 
-        measureRender(
+        await measureRender(
             'canvas:render',
-            () => {
-                renderCanvas({
+            async () => {
+                await renderCanvas({
                     canvas: canvasRef.current!,
                     image: originalImage,
                     backgroundType,
@@ -74,6 +75,7 @@ export function Canvas() {
                     textPatternFontFamily,
                     textPatternFontSize,
                     textPatternFontWeight,
+                    textPatternRows,
                     waveSplitFlipped,
                     logoPatternImage,
                     logoPatternOpacity,
@@ -112,6 +114,7 @@ export function Canvas() {
         textPatternFontFamily,
         textPatternFontSize,
         textPatternFontWeight,
+        textPatternRows,
         waveSplitFlipped,
         logoPatternImage,
         logoPatternOpacity,

@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { PRESET_GRADIENTS, SOLID_COLORS, MESH_GRADIENTS, TEXT_PATTERNS } from '@/lib/constants/gradients';
+import { FONTS_BY_CATEGORY, FONT_CATEGORIES, FontCategory } from '@/lib/constants/fonts';
 import { cn } from '@/lib/utils';
-import { Check, Pipette, X } from 'lucide-react';
+import { Check, Pipette, X, Search } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
 
 export function BackgroundPicker() {
     const {
@@ -21,6 +23,7 @@ export function BackgroundPicker() {
         textPatternFontFamily,
         textPatternFontSize,
         textPatternFontWeight,
+        textPatternRows,
         waveSplitFlipped,
         logoPatternImage,
         logoPatternOpacity,
@@ -36,6 +39,7 @@ export function BackgroundPicker() {
         setTextPatternFontFamily,
         setTextPatternFontSize,
         setTextPatternFontWeight,
+        setTextPatternRows,
         toggleWaveSplitFlip,
         setLogoPattern,
         clearLogoPattern,
@@ -51,6 +55,40 @@ export function BackgroundPicker() {
     const isGradientActive = backgroundType === 'gradient';
     // Check if text pattern is active
     const isTextPatternActive = backgroundType === 'textPattern';
+
+    // Font picker state
+    const [fontCategory, setFontCategory] = useState<FontCategory>('popular');
+    const [fontSearch, setFontSearch] = useState('');
+
+    // Helper function to find which category a font belongs to
+    const findFontCategory = (fontFamily: string): FontCategory | null => {
+        for (const [category, fonts] of Object.entries(FONTS_BY_CATEGORY)) {
+            if (fonts.some(font => font.fontFamily === fontFamily)) {
+                return category as FontCategory;
+            }
+        }
+        return null;
+    };
+
+    // Auto-select the correct font category when text pattern font changes
+    useEffect(() => {
+        if (textPatternFontFamily) {
+            const category = findFontCategory(textPatternFontFamily);
+            if (category && category !== fontCategory) {
+                setFontCategory(category);
+                setFontSearch(''); // Clear search when switching categories
+            }
+        }
+    }, [textPatternFontFamily]);
+
+    // Filter fonts based on search
+    const filteredFonts = useMemo(() => {
+        const fonts = FONTS_BY_CATEGORY[fontCategory];
+        if (!fontSearch.trim()) return fonts;
+        return fonts.filter(font =>
+            font.name.toLowerCase().includes(fontSearch.toLowerCase())
+        );
+    }, [fontCategory, fontSearch]);
 
     return (
         <div className="space-y-4">
@@ -407,59 +445,177 @@ export function BackgroundPicker() {
                         />
                     </div>
 
-                    {/* Text Position Selector - Multi-select */}
-                    <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
-                        <Label className="text-[10px] uppercase text-muted-foreground">Text Position (Multi-select)</Label>
-                        <div className="grid grid-cols-3 gap-2">
-                            {(['top', 'center', 'bottom'] as const).map((position) => {
-                                const isSelected = textPatternPositions.includes(position);
-                                const labels = {
-                                    'top': 'Top',
-                                    'center': 'Center',
-                                    'bottom': 'Bottom',
-                                };
+                    {/* Text Layout Mode Toggle */}
+                    <div className="space-y-3 p-3 bg-muted/30 rounded-lg border border-border">
+                        <Label className="text-[10px] uppercase text-muted-foreground">Text Layout</Label>
 
-                                return (
-                                    <Button
-                                        key={position}
-                                        variant={isSelected ? 'default' : 'outline'}
-                                        size="sm"
-                                        onClick={() => toggleTextPatternPosition(position)}
-                                        className={cn(
-                                            'h-10',
-                                            isSelected && 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                                        )}
-                                    >
-                                        {labels[position]}
-                                    </Button>
-                                );
-                            })}
+                        {/* Mode Toggle */}
+                        <div className="grid grid-cols-2 gap-2">
+                            <Button
+                                variant={textPatternRows === 1 ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setTextPatternRows(1)}
+                                className={cn(
+                                    'h-9',
+                                    textPatternRows === 1 && 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                                )}
+                            >
+                                Position
+                            </Button>
+                            <Button
+                                variant={textPatternRows > 1 ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setTextPatternRows(textPatternRows === 1 ? 4 : textPatternRows)}
+                                className={cn(
+                                    'h-9',
+                                    textPatternRows > 1 && 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                                )}
+                            >
+                                Repeat
+                            </Button>
                         </div>
-                        <p className="text-[10px] text-muted-foreground mt-1">
-                            Select multiple positions to show text {textPatternPositions.length} time{textPatternPositions.length !== 1 ? 's' : ''}
-                        </p>
+
+                        {/* Position Mode Controls */}
+                        {textPatternRows === 1 && (
+                            <div className="space-y-2 pt-2 border-t border-border/50">
+                                <Label className="text-[10px] text-muted-foreground">Select Positions</Label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {(['top', 'center', 'bottom'] as const).map((position) => {
+                                        const isSelected = textPatternPositions.includes(position);
+                                        const labels = {
+                                            'top': 'Top',
+                                            'center': 'Center',
+                                            'bottom': 'Bottom',
+                                        };
+
+                                        return (
+                                            <Button
+                                                key={position}
+                                                variant={isSelected ? 'default' : 'outline'}
+                                                size="sm"
+                                                onClick={() => toggleTextPatternPosition(position)}
+                                                className={cn(
+                                                    'h-9',
+                                                    isSelected && 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                                                )}
+                                            >
+                                                {labels[position]}
+                                            </Button>
+                                        );
+                                    })}
+                                </div>
+                                <p className="text-[10px] text-muted-foreground">
+                                    Large text at {textPatternPositions.length} position{textPatternPositions.length !== 1 ? 's' : ''}
+                                </p>
+                            </div>
+                        )}
+
+                        {/* Repeat Mode Controls */}
+                        {textPatternRows > 1 && (
+                            <div className="space-y-2 pt-2 border-t border-border/50">
+                                <div className="flex justify-between items-center">
+                                    <Label className="text-[10px] text-muted-foreground">Number of Rows</Label>
+                                    <span className="text-xs text-muted-foreground">{textPatternRows}</span>
+                                </div>
+                                <Slider
+                                    value={[textPatternRows]}
+                                    onValueChange={([value]) => setTextPatternRows(value)}
+                                    min={2}
+                                    max={12}
+                                    step={1}
+                                    className="w-full"
+                                />
+                                <p className="text-[10px] text-muted-foreground">
+                                    Wallpaper pattern with {textPatternRows} rows
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Font Family Selector */}
-                    <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
+                    <div className="space-y-3 p-3 bg-muted/30 rounded-lg border border-border">
                         <Label className="text-[10px] uppercase text-muted-foreground">Font Family</Label>
-                        <select
-                            value={textPatternFontFamily}
-                            onChange={(e) => setTextPatternFontFamily(e.target.value)}
-                            className="w-full h-9 px-3 rounded-md border border-border bg-background text-sm"
-                        >
-                            <option value="system-ui, -apple-system, sans-serif">System UI (Default)</option>
-                            <option value="Arial, sans-serif">Arial</option>
-                            <option value="Helvetica, sans-serif">Helvetica</option>
-                            <option value="'Times New Roman', serif">Times New Roman</option>
-                            <option value="Georgia, serif">Georgia</option>
-                            <option value="'Courier New', monospace">Courier New</option>
-                            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
-                            <option value="Verdana, sans-serif">Verdana</option>
-                            <option value="Impact, sans-serif">Impact</option>
-                            <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
-                            <option value="'Brush Script MT', cursive">Brush Script MT</option>
-                        </select>
+
+                        {/* Search Input */}
+                        <div className="relative">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                            <Input
+                                value={fontSearch}
+                                onChange={(e) => setFontSearch(e.target.value)}
+                                placeholder="Search fonts..."
+                                className="h-8 pl-8 text-xs"
+                            />
+                        </div>
+
+                        {/* Font Category Pills */}
+                        <div className="flex flex-wrap gap-1">
+                            {(Object.keys(FONT_CATEGORIES) as FontCategory[]).map((category) => (
+                                <button
+                                    key={category}
+                                    onClick={() => {
+                                        setFontCategory(category);
+                                        setFontSearch('');
+                                    }}
+                                    className={cn(
+                                        'px-2 py-0.5 rounded-full text-[9px] font-medium transition-all',
+                                        fontCategory === category
+                                            ? 'bg-primary text-primary-foreground shadow-sm'
+                                            : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                                    )}
+                                >
+                                    {FONT_CATEGORIES[category]}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Font List */}
+                        <div className="max-h-40 overflow-y-auto rounded-md border border-border bg-background/50">
+                            <div className="p-1 space-y-0.5">
+                                {filteredFonts.length === 0 ? (
+                                    <div className="text-center py-4 text-xs text-muted-foreground">
+                                        No fonts found
+                                    </div>
+                                ) : (
+                                    filteredFonts.map((font) => {
+                                        const isSelected = textPatternFontFamily === font.fontFamily;
+                                        return (
+                                            <button
+                                                key={font.fontFamily}
+                                                onClick={() => setTextPatternFontFamily(font.fontFamily)}
+                                                className={cn(
+                                                    'w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-all group',
+                                                    isSelected
+                                                        ? 'bg-primary text-primary-foreground'
+                                                        : 'hover:bg-muted/80'
+                                                )}
+                                            >
+                                                {/* Font Preview */}
+                                                <span
+                                                    className={cn(
+                                                        'text-base leading-none w-6 text-center',
+                                                        !isSelected && 'text-muted-foreground group-hover:text-foreground'
+                                                    )}
+                                                    style={{ fontFamily: font.fontFamily }}
+                                                >
+                                                    Aa
+                                                </span>
+                                                {/* Font Name */}
+                                                <span
+                                                    className="flex-1 text-xs truncate"
+                                                    style={{ fontFamily: font.fontFamily }}
+                                                >
+                                                    {font.name}
+                                                </span>
+                                                {/* Check Icon */}
+                                                {isSelected && (
+                                                    <Check className="w-3 h-3 shrink-0" />
+                                                )}
+                                            </button>
+                                        );
+                                    })
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Font Size Slider */}

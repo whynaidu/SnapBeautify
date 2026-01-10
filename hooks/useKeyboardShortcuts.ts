@@ -55,7 +55,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
 
         try {
             const exportCanvas = document.createElement('canvas');
-            renderCanvas({
+            await renderCanvas({
                 canvas: exportCanvas,
                 image: originalImage,
                 backgroundType,
@@ -117,7 +117,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
         textOverlays,
     ]);
 
-    const handleDownload = useCallback(() => {
+    const handleDownload = useCallback(async () => {
         if (!originalImage) {
             toast.error('No image to download');
             return;
@@ -125,7 +125,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
 
         try {
             const exportCanvas = document.createElement('canvas');
-            renderCanvas({
+            await renderCanvas({
                 canvas: exportCanvas,
                 image: originalImage,
                 backgroundType,
@@ -155,7 +155,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions = {}) {
             });
 
             const timestamp = new Date().toISOString().slice(0, 10);
-            downloadCanvas(exportCanvas, `snapbeautify-${timestamp}`, exportFormat);
+            await downloadCanvas(exportCanvas, `snapbeautify-${timestamp}`, exportFormat);
             toast.success('Downloaded!');
         } catch {
             toast.error('Failed to download');

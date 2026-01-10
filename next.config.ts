@@ -46,55 +46,63 @@ const nextConfig: NextConfig = {
   },
 
   // Security headers (only for web builds, not static exports)
+  // Note: CSP disabled in development as Next.js dev server applies its own restrictive CSP
   headers: !isStatic ? async () => {
+    // Skip CSP in development - Next.js dev server has its own restrictions
+    const cspHeader = isProduction ? {
+      key: 'Content-Security-Policy',
+      value: [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "img-src 'self' data: blob: https:",
+        "font-src 'self' data: https://fonts.gstatic.com",
+        "connect-src 'self' https://vitals.vercel-insights.com https://va.vercel-scripts.com",
+        "media-src 'self' blob:",
+        "worker-src 'self' blob:",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'"
+      ].join('; ')
+    } : null;
+
+    const headers = [
+      // Prevent clickjacking
+      {
+        key: 'X-Frame-Options',
+        value: 'DENY'
+      },
+      // Prevent MIME type sniffing
+      {
+        key: 'X-Content-Type-Options',
+        value: 'nosniff'
+      },
+      // Referrer policy
+      {
+        key: 'Referrer-Policy',
+        value: 'strict-origin-when-cross-origin'
+      },
+      // Permissions policy
+      {
+        key: 'Permissions-Policy',
+        value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+      },
+      // Strict Transport Security (HSTS)
+      {
+        key: 'Strict-Transport-Security',
+        value: 'max-age=31536000; includeSubDomains'
+      }
+    ];
+
+    if (cspHeader) {
+      headers.unshift(cspHeader);
+    }
+
     return [
       {
         source: '/:path*',
-        headers: [
-          // Content Security Policy
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'", // unsafe-inline needed for Next.js, unsafe-eval for canvas operations
-              "style-src 'self' 'unsafe-inline'", // unsafe-inline needed for CSS-in-JS
-              "img-src 'self' data: blob: https:", // data: and blob: for image processing
-              "font-src 'self' data:",
-              "connect-src 'self'",
-              "media-src 'self' blob:",
-              "worker-src 'self' blob:",
-              "frame-ancestors 'none'", // Prevent clickjacking
-              "base-uri 'self'",
-              "form-action 'self'",
-              "upgrade-insecure-requests"
-            ].join('; ')
-          },
-          // Prevent clickjacking
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY'
-          },
-          // Prevent MIME type sniffing
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          },
-          // Referrer policy
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
-          },
-          // Permissions policy
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()'
-          },
-          // Strict Transport Security (HSTS)
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains'
-          }
-        ]
+        headers
       }
     ];
   } : undefined,
