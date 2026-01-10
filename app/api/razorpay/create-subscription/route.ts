@@ -4,12 +4,24 @@ import { RAZORPAY_PLAN_IDS } from '@/lib/subscription/pricing';
 
 // Initialize Razorpay instance
 function getRazorpayInstance() {
-  const keyId = process.env.RAZORPAY_KEY_ID;
-  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  const keyId = process.env.RAZORPAY_KEY_ID?.trim();
+  const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim();
 
   if (!keyId || !keySecret) {
+    console.error('Razorpay credentials missing:', {
+      hasKeyId: !!keyId,
+      hasKeySecret: !!keySecret,
+      keyIdPrefix: keyId?.substring(0, 10)
+    });
     throw new Error('Razorpay credentials not configured');
   }
+
+  // Log key format for debugging (only prefix)
+  console.log('Razorpay init:', {
+    keyIdPrefix: keyId.substring(0, 12) + '...',
+    keyIdLength: keyId.length,
+    isTestMode: keyId.startsWith('rzp_test_')
+  });
 
   return new Razorpay({
     key_id: keyId,

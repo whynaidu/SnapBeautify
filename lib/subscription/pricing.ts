@@ -62,14 +62,50 @@ export function getPricingForCountry(countryCode: string): PricingConfig {
 }
 
 /**
- * Detect user's country from request headers (Vercel provides this)
+ * Detect user's country from request headers or IP geolocation
  */
 export async function detectCountry(): Promise<string> {
   try {
     const headersList = await headers();
-    // Vercel provides country in headers
-    const country = headersList.get('x-vercel-ip-country');
-    return country || 'US';
+
+    // 1. Check for environment variable override (for development/testing)
+    if (process.env.FORCE_COUNTRY) {
+      return process.env.FORCE_COUNTRY.toUpperCase();
+    }
+
+    // 2. Vercel provides country in headers (production)
+    const vercelCountry = headersList.get('x-vercel-ip-country');
+    if (vercelCountry) {
+      return vercelCountry;
+    }
+
+    // 3. Check Cloudflare header
+    const cfCountry = headersList.get('cf-ipcountry');
+    if (cfCountry) {
+      return cfCountry;
+    }
+
+    // 4. For local development, try to detect via IP geolocation API
+    // This runs server-side so it's secure
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        // Use a free IP geolocation service
+        const response = await fetch('https://ipapi.co/json/', {
+          cache: 'force-cache' // Cache the result
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.country_code) {
+            return data.country_code;
+          }
+        }
+      } catch (geoError) {
+        console.log('IP geolocation failed, using default:', geoError);
+      }
+    }
+
+    // 5. Default to US
+    return 'US';
   } catch {
     return 'US';
   }

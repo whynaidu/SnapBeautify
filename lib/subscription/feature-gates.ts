@@ -8,11 +8,35 @@ const FEATURE_CONFIG: Record<FeatureId, {
   // Background Features
   premium_backgrounds: {
     requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro to access premium gradient and mesh backgrounds',
+    upgradeMessage: 'Upgrade to Pro to access Wave Split and Logo Pattern backgrounds',
   },
-  pattern_backgrounds: {
+  all_gradients: {
     requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro to use pattern backgrounds',
+    upgradeMessage: 'Upgrade to Pro to access all 78 gradient presets',
+  },
+  all_solid_colors: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro to access all 72 solid colors',
+  },
+  all_mesh_gradients: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro to access all mesh gradient presets',
+  },
+  custom_gradient_colors: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro to create custom gradient colors',
+  },
+  wave_split: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro to use Wave Split backgrounds',
+  },
+  logo_pattern: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro to use Logo Pattern backgrounds',
+  },
+  text_pattern_positions: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro to use all text positions (Top, Bottom)',
   },
   text_pattern_repeat: {
     requiredPlan: 'monthly',
@@ -20,47 +44,95 @@ const FEATURE_CONFIG: Record<FeatureId, {
   },
 
   // Frame Features
-  custom_frames: {
-    requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro to create custom frames',
-  },
   all_frames: {
     requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro to access all social media frame templates',
+    upgradeMessage: 'Upgrade to Pro to access all device frames (macOS, Windows, iPhone, Android, Social Media)',
   },
 
-  // Text Features
-  advanced_text_styling: {
+  // Text Overlay Features
+  unlimited_text_overlays: {
     requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro for advanced text styling options',
+    upgradeMessage: 'Upgrade to Pro to add unlimited text overlays',
   },
-  custom_fonts: {
+  all_fonts: {
     requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro to use custom fonts',
+    upgradeMessage: 'Upgrade to Pro to access all 60+ fonts',
+  },
+  font_search: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro to search fonts',
+  },
+  all_font_sizes: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro for full font size range (12-200px)',
+  },
+  all_font_weights: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro for all font weights (Thin, Light, Black)',
+  },
+  gradient_text: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro for gradient text colors',
+  },
+  all_text_colors: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro for full text color picker',
+  },
+  duplicate_overlay: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro to duplicate text overlays',
+  },
+
+  // Image Settings
+  all_padding_values: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro for full padding range (0-200px)',
+  },
+  shadow_customization: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro to customize shadow blur and opacity',
+  },
+  shadow_color: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro for custom shadow colors',
+  },
+  all_border_radius: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro for full border radius range',
+  },
+  extended_image_scale: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro for extended image scale (10-200%)',
   },
 
   // Export Features
+  webp_export: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro to export in WebP format',
+  },
   '4k_export': {
     requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro for 4K export quality',
-  },
-  no_watermark: {
-    requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro to remove watermark from exports',
+    upgradeMessage: 'Upgrade to Pro for 3x and 4x export quality',
   },
   unlimited_exports: {
     requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro for unlimited exports (Free: 5/day)',
+    upgradeMessage: 'Upgrade to Pro for unlimited exports (Free: 10/day)',
   },
-  batch_export: {
+
+  // Aspect Ratios
+  all_aspect_ratios: {
     requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro for batch export functionality',
+    upgradeMessage: 'Upgrade to Pro to access all aspect ratios',
+  },
+  social_media_ratios: {
+    requiredPlan: 'monthly',
+    upgradeMessage: 'Upgrade to Pro for social media aspect ratio presets',
   },
 
   // Templates
-  templates_all: {
+  all_templates: {
     requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro to access all premium templates',
+    upgradeMessage: 'Upgrade to Pro to access all 47 premium templates',
   },
 };
 
@@ -151,23 +223,84 @@ export function getLockedFeatures(plan: SubscriptionPlan): FeatureId[] {
   return features;
 }
 
-// Free tier limits
+// =============================================
+// FREE TIER LIMITS (Based on Feature Analysis Report)
+// =============================================
 export const FREE_TIER_LIMITS = {
-  exportsPerDay: 5,
-  maxExportResolution: 720, // 720p
-  watermarkEnabled: true,
-  freeBackgroundTypes: ['solid', 'gradient'] as const,
-  freeFrameCount: 3, // Only first 3 frames
-  freeTemplateCount: 5, // Only first 5 templates
+  // Export limits
+  exportsPerDay: 10,  // 10 exports per day for free users
+
+  // Background limits
+  solidColorCount: 24,        // First 24 colors (out of 72)
+  gradientPresetCount: 20,    // First 20 gradients (out of 78)
+  meshGradientCount: 5,       // First 5 mesh gradients (out of 15+)
+  freeBackgroundTypes: ['solid', 'gradient', 'mesh', 'textPattern', 'transparent'] as const,
+  blockedBackgroundTypes: ['waveSplit', 'logoPattern'] as const,
+  textPatternFreePosition: 'center' as const,  // Only center position free
+
+  // Frame limits
+  freeFrames: ['none', 'browser'] as const,  // Only None and Browser
+
+  // Text overlay limits
+  maxTextOverlays: 1,         // Only 1 text overlay
+  freeFontCount: 10,          // First 10 fonts (Popular category)
+  freeFontSizes: [24, 36, 48] as const,  // 3 preset sizes
+  freeFontWeights: [400, 700] as const,  // Normal and Bold only
+  freeTextColors: 12,         // 12 preset colors
+
+  // Image settings limits
+  freePaddingPresets: [32, 64, 96] as const,  // 3 presets
+  fixedShadowBlur: 20,        // Fixed blur
+  fixedShadowOpacity: 0.5,    // Fixed 50% opacity
+  freeBorderRadiusPresets: [0, 12, 24] as const,  // 3 presets
+  imageScaleMin: 50,          // 50-150% range
+  imageScaleMax: 150,
+
+  // Export limits
+  freeExportFormats: ['png', 'jpeg'] as const,  // No WebP
+  freeExportScales: [1, 2] as const,  // 1x and 2x only
+
+  // Aspect ratio limits
+  freeAspectRatios: ['free', '16:9', '1:1'] as const,
+
+  // Template limits
+  freeTemplateCount: 6,       // 6 free templates
+  freeTemplates: [
+    'Pure White', 'Dark Slate',       // 2 from Minimal (actual names from templates.ts)
+    'Sunset Glow', 'Ocean Waves',     // 2 from Vibrant (actual names from templates.ts)
+    'Welcome Text', 'Creative Text'   // 2 from Text Pattern (actual names from templates.ts)
+  ] as const,
 };
 
-// Pro tier features
+// =============================================
+// PRO TIER FEATURES
+// =============================================
 export const PRO_TIER_FEATURES = {
+  // Export
   exportsPerDay: Infinity,
-  maxExportResolution: 4096, // 4K
-  watermarkEnabled: false,
+  allExportFormats: ['png', 'jpeg', 'webp'] as const,
+  allExportScales: [1, 2, 3, 4] as const,
+
+  // All access
+  allSolidColors: 72,
+  allGradients: 78,
+  allMeshGradients: 15,
   allBackgroundTypes: true,
   allFrames: true,
+  unlimitedTextOverlays: true,
+  allFonts: true,
+  fontSearch: true,
+  allFontSizes: true,   // 12-200px
+  allFontWeights: true, // All 5 weights
+  gradientText: true,
+  fullColorPicker: true,
+  duplicateOverlay: true,
+  allPaddingValues: true,  // 0-200px
+  shadowCustomization: true,
+  shadowColor: true,
+  allBorderRadius: true,
+  extendedImageScale: true,  // 10-200%
+  allAspectRatios: true,
   allTemplates: true,
   prioritySupport: true,
 };
@@ -188,16 +321,41 @@ export function hasExceededExportLimit(
 /**
  * Get max export resolution for plan
  */
-export function getMaxExportResolution(userPlan: SubscriptionPlan): number {
+export function getMaxExportScale(userPlan: SubscriptionPlan): number {
   if (userPlan === 'free') {
-    return FREE_TIER_LIMITS.maxExportResolution;
+    return 2; // Max 2x for free
   }
-  return PRO_TIER_FEATURES.maxExportResolution;
+  return 4; // Max 4x for Pro
 }
 
 /**
- * Check if watermark should be applied
+ * Check if a frame is available for free users
  */
-export function shouldApplyWatermark(userPlan: SubscriptionPlan): boolean {
-  return userPlan === 'free';
+export function isFrameAvailable(frameType: string, userPlan: SubscriptionPlan): boolean {
+  if (userPlan !== 'free') return true;
+  return (FREE_TIER_LIMITS.freeFrames as readonly string[]).includes(frameType);
+}
+
+/**
+ * Check if an export format is available
+ */
+export function isExportFormatAvailable(format: string, userPlan: SubscriptionPlan): boolean {
+  if (userPlan !== 'free') return true;
+  return (FREE_TIER_LIMITS.freeExportFormats as readonly string[]).includes(format);
+}
+
+/**
+ * Check if an export scale is available
+ */
+export function isExportScaleAvailable(scale: number, userPlan: SubscriptionPlan): boolean {
+  if (userPlan !== 'free') return true;
+  return (FREE_TIER_LIMITS.freeExportScales as readonly number[]).includes(scale);
+}
+
+/**
+ * Check if an aspect ratio is available
+ */
+export function isAspectRatioAvailable(ratio: string, userPlan: SubscriptionPlan): boolean {
+  if (userPlan !== 'free') return true;
+  return (FREE_TIER_LIMITS.freeAspectRatios as readonly string[]).includes(ratio);
 }

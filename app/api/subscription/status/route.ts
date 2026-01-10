@@ -3,6 +3,19 @@ import { getUserSubscription, hasProAccess, getExportCount } from '@/lib/subscri
 import { FREE_TIER_LIMITS } from '@/lib/subscription/feature-gates';
 import type { SubscriptionStatusResponse } from '@/lib/subscription/types';
 
+// Default response for when database is not available
+const DEFAULT_RESPONSE: SubscriptionStatusResponse & {
+  exportCount: number;
+  exportsRemaining: number;
+} = {
+  isPro: false,
+  subscription: null,
+  plan: 'free',
+  expiresAt: null,
+  exportCount: 0,
+  exportsRemaining: FREE_TIER_LIMITS.exportsPerDay,
+};
+
 export async function GET(request: NextRequest) {
   try {
     const userId = request.nextUrl.searchParams.get('userId');
@@ -14,10 +27,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      // Return default free tier for invalid user IDs (development mode)
+      return NextResponse.json(DEFAULT_RESPONSE);
+    }
+
     const [subscription, isPro, exportCount] = await Promise.all([
-      getUserSubscription(userId),
-      hasProAccess(userId),
-      getExportCount(userId),
+      getUserSubscription(userId).catch(() => null),
+      hasProAccess(userId).catch(() => false),
+      getExportCount(userId).catch(() => 0),
     ]);
 
     const response: SubscriptionStatusResponse & {
@@ -37,9 +57,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(response);
   } catch (error) {
     console.error('Error getting subscription status:', error);
-    return NextResponse.json(
-      { error: 'Failed to get subscription status' },
-      { status: 500 }
-    );
+    // Return default free tier on error instead of 500
+    return NextResponse.json(DEFAULT_RESPONSE);
   }
 }

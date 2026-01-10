@@ -11,16 +11,17 @@ export function middleware(request: NextRequest) {
     // Content Security Policy
     const cspDirectives = [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com", // unsafe-eval needed for Next.js dev
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com https://checkout.razorpay.com https://api.razorpay.com https://js.stripe.com", // Payment gateways + Next.js dev
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // Allow Google Fonts stylesheets
         "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com", // Explicit for stylesheet loading
         "img-src 'self' data: blob: https:",
         "font-src 'self' data: https://fonts.gstatic.com", // Allow Google Fonts font files
-        "connect-src 'self' https: https://vitals.vercel-insights.com",
+        "connect-src 'self' https: https://vitals.vercel-insights.com https://api.razorpay.com https://lumberjack.razorpay.com",
+        "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://js.stripe.com", // Payment iframes
         "media-src 'self' blob: data:",
         "object-src 'none'",
         "base-uri 'self'",
-        "form-action 'self'",
+        "form-action 'self' https://api.razorpay.com",
         "frame-ancestors 'none'",
         "upgrade-insecure-requests",
     ];
@@ -28,9 +29,9 @@ export function middleware(request: NextRequest) {
     // In production, remove unsafe directives
     if (process.env.NODE_ENV === 'production') {
         const productionCSP = cspDirectives.map(directive => {
-            // Remove unsafe-eval from production but keep Vercel scripts
+            // Remove unsafe-eval from production but keep payment gateways
             if (directive.startsWith('script-src')) {
-                return "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com";
+                return "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://checkout.razorpay.com https://api.razorpay.com https://js.stripe.com";
             }
             return directive;
         });

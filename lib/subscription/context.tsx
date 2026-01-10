@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/lib/auth/context';
 import type {
   Subscription,
   SubscriptionPlan,
@@ -30,14 +31,13 @@ interface SubscriptionContextType extends UserSubscriptionState {
   checkFeature: (featureId: FeatureId) => { hasAccess: boolean; upgradeMessage?: string };
   initiateCheckout: (planType: 'monthly' | 'annual' | 'lifetime') => Promise<void>;
   openCustomerPortal: () => Promise<void>;
+  requireAuth: () => boolean; // Returns true if already authenticated
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | null>(null);
 
-// Mock user ID for demo - in production, this would come from auth
-const DEMO_USER_ID = 'demo-user-123';
-
 export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isPro, setIsPro] = useState(false);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
@@ -46,6 +46,9 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   const [pricing, setPricing] = useState<PricingConfig | null>(null);
   const [exportCount, setExportCount] = useState(0);
   const [exportsRemaining, setExportsRemaining] = useState(FREE_TIER_LIMITS.exportsPerDay);
+
+  // Get current user ID
+  const userId = user?.id;
 
   // Fetch pricing configuration
   const fetchPricing = useCallback(async () => {
@@ -62,8 +65,19 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
 
   // Fetch subscription status
   const fetchStatus = useCallback(async () => {
+    if (!userId) {
+      // Not logged in - reset to free tier
+      setIsPro(false);
+      setSubscription(null);
+      setPlan('free');
+      setExpiresAt(null);
+      setExportCount(0);
+      setExportsRemaining(FREE_TIER_LIMITS.exportsPerDay);
+      return;
+    }
+
     try {
-      const response = await fetch(`/api/subscription/status?userId=${DEMO_USER_ID}`);
+      const response = await fetch(`/api/subscription/status?userId=${userId}`);
       if (response.ok) {
         const data = await response.json();
         setIsPro(data.isPro);
@@ -76,7 +90,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     } catch (error) {
       console.error('Error fetching subscription status:', error);
     }
-  }, []);
+  }, [userId]);
 
   // Refresh all subscription data
   const refresh = useCallback(async () => {
@@ -85,10 +99,12 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     setIsLoading(false);
   }, [fetchPricing, fetchStatus]);
 
-  // Initial load
+  // Initial load and when auth changes
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (!authLoading) {
+      refresh();
+    }
+  }, [refresh, authLoading, userId]);
 
   // Check if user has access to a feature
   const checkFeature = useCallback(
@@ -101,6 +117,18 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     },
     [plan]
   );
+
+  // Trigger auth modal if not authenticated
+  const requireAuth = useCallback((): boolean => {
+    if (isAuthenticated) {
+      return true;
+    }
+    // Dispatch event to open auth modal
+    window.dispatchEvent(new CustomEvent('show-auth-modal', {
+      detail: { defaultTab: 'signup' }
+    }));
+    return false;
+  }, [isAuthenticated]);
 
   // Load Razorpay script
   const loadRazorpayScript = useCallback((): Promise<boolean> => {
@@ -121,8 +149,13 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   // Initiate checkout based on gateway
   const initiateCheckout = useCallback(
     async (planType: 'monthly' | 'annual' | 'lifetime') => {
-      if (!pricing) {
-        console.error('Pricing not loaded');
+      // Require authentication first
+      if (!requireAuth()) {
+        return;
+      }
+
+      if (!pricing || !userId) {
+        console.error('Pricing not loaded or user not authenticated');
         return;
       }
 
@@ -130,7 +163,6 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         // Razorpay checkout for India
         if (planType === 'lifetime') {
           // For lifetime, we need a different approach (one-time payment)
-          // For now, redirect to a contact page or handle separately
           console.log('Lifetime deals for India - contact support');
           return;
         }
@@ -147,7 +179,8 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               planType,
-              userId: DEMO_USER_ID,
+              userId,
+              email: user?.email,
             }),
           });
 
@@ -162,6 +195,9 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
             subscription_id: data.subscriptionId,
             name: 'SnapBeautify Pro',
             description: `${planType.charAt(0).toUpperCase() + planType.slice(1)} Subscription`,
+            prefill: {
+              email: user?.email || '',
+            },
             handler: async (response: RazorpayPaymentResponse) => {
               // Verify payment
               const verifyResponse = await fetch('/api/razorpay/verify', {
@@ -169,7 +205,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   ...response,
-                  userId: DEMO_USER_ID,
+                  userId,
                   planType,
                   amount: pricing[planType],
                 }),
@@ -177,7 +213,10 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
 
               if (verifyResponse.ok) {
                 await refresh();
-                // Show success message or redirect
+                // Show success message
+                window.dispatchEvent(new CustomEvent('subscription-success', {
+                  detail: { plan: planType }
+                }));
               } else {
                 console.error('Payment verification failed');
               }
@@ -205,9 +244,10 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               planType,
-              userId: DEMO_USER_ID,
-              successUrl: `${window.location.origin}/subscription/success`,
-              cancelUrl: `${window.location.origin}/pricing`,
+              userId,
+              email: user?.email,
+              successUrl: `${window.location.origin}/?subscription=success`,
+              cancelUrl: `${window.location.origin}/?subscription=cancelled`,
             }),
           });
 
@@ -225,17 +265,19 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         }
       }
     },
-    [pricing, loadRazorpayScript, refresh]
+    [pricing, loadRazorpayScript, refresh, requireAuth, userId, user?.email]
   );
 
   // Open customer portal (Stripe only)
   const openCustomerPortal = useCallback(async () => {
+    if (!userId) return;
+
     try {
       const response = await fetch('/api/stripe/create-portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: DEMO_USER_ID,
+          userId,
           returnUrl: window.location.href,
         }),
       });
@@ -252,10 +294,10 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     } catch (error) {
       console.error('Error opening customer portal:', error);
     }
-  }, []);
+  }, [userId]);
 
   const value: SubscriptionContextType = {
-    isLoading,
+    isLoading: isLoading || authLoading,
     isPro,
     subscription,
     plan,
@@ -267,6 +309,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     checkFeature,
     initiateCheckout,
     openCustomerPortal,
+    requireAuth,
   };
 
   return (

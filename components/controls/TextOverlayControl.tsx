@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { useEditorStore } from '@/lib/store/editor-store';
-import { Plus, Trash2, Type, Copy, Search, Check } from 'lucide-react';
+import { useSubscription } from '@/lib/subscription/context';
+import { FREE_TIER_LIMITS } from '@/lib/subscription/feature-gates';
+import { Plus, Trash2, Type, Copy, Search, Check, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FONTS_BY_CATEGORY, FONT_CATEGORIES, FontCategory } from '@/lib/constants/fonts';
 import { useState, useMemo, useEffect } from 'react';
@@ -24,6 +26,51 @@ export function TextOverlayControl() {
     const [selectedFontCategory, setSelectedFontCategory] = useState<FontCategory>('popular');
     const [fontSearch, setFontSearch] = useState('');
     const selectedOverlay = textOverlays.find(t => t.id === selectedTextOverlayId);
+
+    // Subscription access
+    const { checkFeature } = useSubscription();
+    const hasUnlimitedOverlays = checkFeature('unlimited_text_overlays').hasAccess;
+    const hasAllFonts = checkFeature('all_fonts').hasAccess;
+    const hasFontSearch = checkFeature('font_search').hasAccess;
+    const hasAllFontWeights = checkFeature('all_font_weights').hasAccess;
+    const hasGradientText = checkFeature('gradient_text').hasAccess;
+    const hasDuplicateOverlay = checkFeature('duplicate_overlay').hasAccess;
+    const hasAllTextColors = checkFeature('all_text_colors').hasAccess;
+
+    // Free tier limits
+    const MAX_FREE_OVERLAYS = FREE_TIER_LIMITS.maxTextOverlays;
+    const FREE_FONTS = FREE_TIER_LIMITS.freeFontCount;
+    const FREE_FONT_WEIGHTS = FREE_TIER_LIMITS.freeFontWeights;
+
+    // Show upgrade modal
+    const showUpgradeModal = (feature: string, message: string) => {
+        window.dispatchEvent(
+            new CustomEvent('show-upgrade-modal', {
+                detail: { featureId: feature, message },
+            })
+        );
+    };
+
+    // Check if user can add more overlays
+    const canAddOverlay = hasUnlimitedOverlays || textOverlays.length < MAX_FREE_OVERLAYS;
+
+    // Handle add overlay with limit check
+    const handleAddOverlay = () => {
+        if (!canAddOverlay) {
+            showUpgradeModal('unlimited_text_overlays', `Free users can only add ${MAX_FREE_OVERLAYS} text overlay. Upgrade to Pro for unlimited text overlays!`);
+            return;
+        }
+        addTextOverlay();
+    };
+
+    // Handle duplicate with check
+    const handleDuplicate = (id: string) => {
+        if (!hasDuplicateOverlay) {
+            showUpgradeModal('duplicate_overlay', 'Upgrade to Pro to duplicate text overlays');
+            return;
+        }
+        duplicateTextOverlay(id);
+    };
 
     // Helper function to find which category a font belongs to
     const findFontCategory = (fontFamily: string): FontCategory | null => {
@@ -59,14 +106,22 @@ export function TextOverlayControl() {
         <div className="space-y-4">
             {/* Header and Add Button */}
             <div className="flex items-center justify-between">
-                <Label className="text-sm font-medium">Text Overlays</Label>
+                <Label className="text-sm font-medium flex items-center gap-2">
+                    Text Overlays
+                    {!hasUnlimitedOverlays && (
+                        <span className="text-[10px] text-muted-foreground">({MAX_FREE_OVERLAYS} free)</span>
+                    )}
+                </Label>
                 <Button
-                    onClick={addTextOverlay}
+                    onClick={handleAddOverlay}
                     size="sm"
-                    className="h-8"
+                    className={cn("h-8 relative", !canAddOverlay && "opacity-75")}
                 >
                     <Plus className="w-3 h-3 mr-1" />
                     Add Text
+                    {!canAddOverlay && (
+                        <Crown className="w-3 h-3 absolute -top-1 -right-1 text-orange-500" />
+                    )}
                 </Button>
             </div>
 
@@ -96,14 +151,17 @@ export function TextOverlayControl() {
                                 <Button
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        duplicateTextOverlay(overlay.id);
+                                        handleDuplicate(overlay.id);
                                     }}
                                     variant="ghost"
                                     size="sm"
-                                    className="h-7 w-7 p-0 flex-shrink-0 hover:bg-primary/10"
-                                    title="Duplicate"
+                                    className={cn("h-7 w-7 p-0 flex-shrink-0 hover:bg-primary/10 relative", !hasDuplicateOverlay && "opacity-60")}
+                                    title={hasDuplicateOverlay ? "Duplicate" : "Duplicate (PRO)"}
                                 >
                                     <Copy className="w-3 h-3" />
+                                    {!hasDuplicateOverlay && (
+                                        <Crown className="w-2 h-2 absolute -top-0.5 -right-0.5 text-orange-500" />
+                                    )}
                                 </Button>
                                 <Button
                                     onClick={(e) => {
@@ -129,7 +187,7 @@ export function TextOverlayControl() {
                     <Type className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground mb-3">No text overlays yet</p>
                     <Button
-                        onClick={addTextOverlay}
+                        onClick={handleAddOverlay}
                         size="sm"
                         variant="outline"
                     >
@@ -171,16 +229,25 @@ export function TextOverlayControl() {
                                     Solid
                                 </Button>
                                 <Button
-                                    onClick={() => updateTextOverlay(selectedOverlay.id, {
-                                        useGradient: true,
-                                        gradientColors: selectedOverlay.gradientColors || ['#f97316', '#ec4899'],
-                                        gradientAngle: selectedOverlay.gradientAngle || 90,
-                                    })}
+                                    onClick={() => {
+                                        if (!hasGradientText) {
+                                            showUpgradeModal('gradient_text', 'Upgrade to Pro for gradient text colors');
+                                            return;
+                                        }
+                                        updateTextOverlay(selectedOverlay.id, {
+                                            useGradient: true,
+                                            gradientColors: selectedOverlay.gradientColors || ['#f97316', '#ec4899'],
+                                            gradientAngle: selectedOverlay.gradientAngle || 90,
+                                        });
+                                    }}
                                     variant={selectedOverlay.useGradient ? 'default' : 'ghost'}
                                     size="sm"
-                                    className="h-6 text-[10px] px-3"
+                                    className={cn("h-6 text-[10px] px-3 relative", !hasGradientText && "opacity-75")}
                                 >
                                     Gradient
+                                    {!hasGradientText && (
+                                        <Crown className="w-2 h-2 absolute -top-0.5 -right-0.5 text-orange-500" />
+                                    )}
                                 </Button>
                             </div>
                         </div>

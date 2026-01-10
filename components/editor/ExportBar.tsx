@@ -8,8 +8,10 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Copy, Download, ChevronDown, Check, Share2, Loader2, Moon, Sun } from 'lucide-react';
+import { Copy, Download, ChevronDown, Check, Share2, Loader2, Crown } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
+import { useSubscription } from '@/lib/subscription/context';
+import { FREE_TIER_LIMITS } from '@/lib/subscription/feature-gates';
 import {
     copyCanvasToClipboard,
     downloadCanvas,
@@ -34,6 +36,45 @@ export function ExportBar() {
     const [canShare, setCanShare] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
+
+    // Subscription for feature gating
+    const { checkFeature, exportsRemaining, isPro, refresh: refreshSubscription } = useSubscription();
+    const has4kExport = checkFeature('4k_export').hasAccess;
+    const hasUnlimitedExports = checkFeature('unlimited_exports').hasAccess;
+    const hasWebpExport = checkFeature('webp_export').hasAccess;
+
+    // Show upgrade modal for premium features
+    const showUpgradeModal = (feature: string, message: string) => {
+        window.dispatchEvent(
+            new CustomEvent('show-upgrade-modal', {
+                detail: { featureId: feature, message },
+            })
+        );
+    };
+
+    // Check if a scale is premium (3x and 4x are Pro only)
+    const isPremiumScale = (scale: ExportScale) => scale >= 3 && !has4kExport;
+
+    // Check if a format is premium (WebP is Pro only)
+    const isPremiumFormat = (format: ExportFormat) => format === 'webp' && !hasWebpExport;
+
+    // Handle scale selection with premium check
+    const handleScaleChange = (scale: ExportScale) => {
+        if (isPremiumScale(scale)) {
+            showUpgradeModal('4k_export', 'Upgrade to Pro for 3x and 4x export quality (up to 4K resolution)');
+            return;
+        }
+        setExportScale(scale);
+    };
+
+    // Handle format selection with premium check
+    const handleFormatChange = (format: ExportFormat) => {
+        if (isPremiumFormat(format)) {
+            showUpgradeModal('webp_export', 'Upgrade to Pro to export in WebP format (smaller file sizes)');
+            return;
+        }
+        setExportFormat(format);
+    };
 
     const {
         exportFormat,
@@ -195,11 +236,40 @@ export function ExportBar() {
         );
     };
 
+    // Increment export count on server
+    const incrementExport = async () => {
+        try {
+            await fetch('/api/subscription/increment-export', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: '00000000-0000-0000-0000-000000000000' }),
+            });
+            // Refresh subscription to update export count display
+            await refreshSubscription();
+        } catch (error) {
+            console.error('Failed to increment export count:', error);
+        }
+    };
+
     const wrapExport = async (action: () => Promise<void>) => {
         if (isExporting) return;
+
+        // Check export limit for free users
+        if (!hasUnlimitedExports && exportsRemaining <= 0) {
+            showUpgradeModal(
+                'unlimited_exports',
+                `You've reached your daily limit of ${FREE_TIER_LIMITS.exportsPerDay} exports. Upgrade to Pro for unlimited exports!`
+            );
+            return;
+        }
+
         setIsExporting(true);
         try {
             await action();
+            // Increment export count for free users
+            if (!hasUnlimitedExports) {
+                await incrementExport();
+            }
         } finally {
             setIsExporting(false);
         }
@@ -328,10 +398,15 @@ export function ExportBar() {
                         {(['png', 'jpeg', 'webp'] as ExportFormat[]).map((format) => (
                             <DropdownMenuItem
                                 key={format}
-                                onClick={() => setExportFormat(format)}
+                                onClick={() => handleFormatChange(format)}
                                 className="flex items-center justify-between"
                             >
-                                {format.toUpperCase()}
+                                <span className="flex items-center gap-2">
+                                    {format.toUpperCase()}
+                                    {isPremiumFormat(format) && (
+                                        <Crown className="w-3 h-3 text-orange-500" />
+                                    )}
+                                </span>
                                 {exportFormat === format && <Check className="w-4 h-4" />}
                             </DropdownMenuItem>
                         ))}
@@ -356,10 +431,17 @@ export function ExportBar() {
                         {([1, 2, 3, 4] as ExportScale[]).map((scale) => (
                             <DropdownMenuItem
                                 key={scale}
-                                onClick={() => setExportScale(scale)}
+                                onClick={() => handleScaleChange(scale)}
                                 className="flex items-center justify-between"
                             >
-                                {scale}x {scale === 2 && '(Retina)'}
+                                <span className="flex items-center gap-2">
+                                    {scale}x {scale === 2 && '(Retina)'}
+                                    {scale === 3 && '(3K)'}
+                                    {scale === 4 && '(4K)'}
+                                    {isPremiumScale(scale) && (
+                                        <Crown className="w-3 h-3 text-orange-500" />
+                                    )}
+                                </span>
                                 {exportScale === scale && <Check className="w-4 h-4" />}
                             </DropdownMenuItem>
                         ))}
@@ -375,6 +457,19 @@ export function ExportBar() {
                         </span>
                     )}
                 </span>
+
+                {/* Exports remaining for free users */}
+                {!hasUnlimitedExports && (
+                    <span className={`text-[10px] sm:text-xs hidden sm:inline ml-2 px-2 py-0.5 rounded ${
+                        exportsRemaining <= 1
+                            ? 'bg-red-500/20 text-red-400'
+                            : exportsRemaining <= 3
+                                ? 'bg-orange-500/20 text-orange-400'
+                                : 'bg-muted text-muted-foreground'
+                    }`}>
+                        {exportsRemaining} export{exportsRemaining !== 1 ? 's' : ''} left
+                    </span>
+                )}
             </div>
 
             <div className="flex items-center gap-1 sm:gap-2">

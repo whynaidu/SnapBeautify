@@ -1,11 +1,16 @@
--- SnapBeautify Subscription Schema
+-- SnapBeautify Subscription Schema (Production)
 -- Run this in your Supabase SQL editor
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Subscriptions table
-CREATE TABLE IF NOT EXISTS subscriptions (
+-- Drop existing tables if they exist (for clean reset)
+DROP TABLE IF EXISTS daily_exports CASCADE;
+DROP TABLE IF EXISTS payments CASCADE;
+DROP TABLE IF EXISTS subscriptions CASCADE;
+
+-- Subscriptions table (references auth.users)
+CREATE TABLE subscriptions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
 
@@ -30,17 +35,11 @@ CREATE TABLE IF NOT EXISTS subscriptions (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
 
   -- Constraints
-  CONSTRAINT unique_user_subscription UNIQUE (user_id),
-  CONSTRAINT valid_razorpay CHECK (
-    provider != 'razorpay' OR razorpay_subscription_id IS NOT NULL
-  ),
-  CONSTRAINT valid_stripe CHECK (
-    provider != 'stripe' OR stripe_subscription_id IS NOT NULL
-  )
+  CONSTRAINT unique_user_subscription UNIQUE (user_id)
 );
 
 -- Payments table (for transaction history)
-CREATE TABLE IF NOT EXISTS payments (
+CREATE TABLE payments (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   subscription_id UUID REFERENCES subscriptions(id) ON DELETE SET NULL,
@@ -57,7 +56,7 @@ CREATE TABLE IF NOT EXISTS payments (
 );
 
 -- Daily export tracking for free users
-CREATE TABLE IF NOT EXISTS daily_exports (
+CREATE TABLE daily_exports (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   export_date DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -68,14 +67,14 @@ CREATE TABLE IF NOT EXISTS daily_exports (
 );
 
 -- Indexes for performance
-CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
-CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON subscriptions(status);
-CREATE INDEX IF NOT EXISTS idx_subscriptions_provider ON subscriptions(provider);
-CREATE INDEX IF NOT EXISTS idx_subscriptions_razorpay ON subscriptions(razorpay_subscription_id) WHERE razorpay_subscription_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS idx_subscriptions_stripe ON subscriptions(stripe_subscription_id) WHERE stripe_subscription_id IS NOT NULL;
-CREATE INDEX IF NOT EXISTS idx_payments_user_id ON payments(user_id);
-CREATE INDEX IF NOT EXISTS idx_payments_created_at ON payments(created_at);
-CREATE INDEX IF NOT EXISTS idx_daily_exports_user_date ON daily_exports(user_id, export_date);
+CREATE INDEX idx_subscriptions_user_id ON subscriptions(user_id);
+CREATE INDEX idx_subscriptions_status ON subscriptions(status);
+CREATE INDEX idx_subscriptions_provider ON subscriptions(provider);
+CREATE INDEX idx_subscriptions_razorpay ON subscriptions(razorpay_subscription_id) WHERE razorpay_subscription_id IS NOT NULL;
+CREATE INDEX idx_subscriptions_stripe ON subscriptions(stripe_subscription_id) WHERE stripe_subscription_id IS NOT NULL;
+CREATE INDEX idx_payments_user_id ON payments(user_id);
+CREATE INDEX idx_payments_created_at ON payments(created_at);
+CREATE INDEX idx_daily_exports_user_date ON daily_exports(user_id, export_date);
 
 -- Updated at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -204,3 +203,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 GRANT EXECUTE ON FUNCTION has_pro_access(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION increment_export_count(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_export_count(UUID) TO authenticated;
+
+-- Confirm setup
+SELECT 'Production schema created successfully!' as message;

@@ -2,9 +2,11 @@
 
 import { Label } from '@/components/ui/label';
 import { useEditorStore } from '@/lib/store/editor-store';
+import { useSubscription } from '@/lib/subscription/context';
+import { FREE_TIER_LIMITS } from '@/lib/subscription/feature-gates';
 import { cn } from '@/lib/utils';
 import { FrameType } from '@/types/editor';
-import { Monitor, AppWindow, Laptop, Smartphone, Square, Instagram, Facebook, Twitter, Linkedin } from 'lucide-react';
+import { Monitor, AppWindow, Laptop, Smartphone, Square, Instagram, Facebook, Twitter, Linkedin, Crown } from 'lucide-react';
 
 interface FrameOption {
     type: FrameType;
@@ -87,6 +89,34 @@ const FRAME_OPTIONS: FrameOption[] = [
 
 export function FramePicker() {
     const { frameType, setFrameType } = useEditorStore();
+    const { checkFeature } = useSubscription();
+    const hasAllFrames = checkFeature('all_frames').hasAccess;
+
+    // Show upgrade modal for premium features
+    const showUpgradeModal = (feature: string) => {
+        window.dispatchEvent(
+            new CustomEvent('show-upgrade-modal', {
+                detail: { featureId: feature, message: `Upgrade to Pro to access all frame templates` },
+            })
+        );
+    };
+
+    // Check if a frame is premium (not in free frames list)
+    const isPremiumFrame = (frameType: FrameType) => {
+        return !(FREE_TIER_LIMITS.freeFrames as readonly string[]).includes(frameType);
+    };
+
+    // Handle frame selection with premium check
+    const handleFrameSelect = (option: FrameOption) => {
+        if (option.disabled) return;
+
+        if (isPremiumFrame(option.type) && !hasAllFrames) {
+            showUpgradeModal('all_frames');
+            return;
+        }
+
+        setFrameType(option.type);
+    };
 
     return (
         <div className="space-y-3">
@@ -95,47 +125,58 @@ export function FramePicker() {
             </Label>
 
             <div className="grid grid-cols-2 gap-2">
-                {FRAME_OPTIONS.map((option) => (
-                    <button
-                        key={option.type}
-                        onClick={() => !option.disabled && setFrameType(option.type)}
-                        disabled={option.disabled}
-                        className={cn(
-                            'flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 relative',
-                            option.disabled
-                                ? 'opacity-50 cursor-not-allowed bg-muted/50 border-border'
-                                : 'hover:bg-accent hover:border-accent-foreground/20',
-                            frameType === option.type && !option.disabled
-                                ? 'border-primary bg-primary/10 shadow-sm'
-                                : 'border-border bg-card'
-                        )}
-                    >
-                        {option.comingSoon && (
-                            <span className="absolute top-1 right-1 text-[9px] font-semibold px-1.5 py-0.5 bg-primary/20 text-primary rounded">
-                                SOON
-                            </span>
-                        )}
-                        <div
+                {FRAME_OPTIONS.map((option) => {
+                    const isPremium = isPremiumFrame(option.type) && !hasAllFrames;
+                    return (
+                        <button
+                            key={option.type}
+                            onClick={() => handleFrameSelect(option)}
+                            disabled={option.disabled}
                             className={cn(
-                                'p-2 rounded-lg transition-colors',
-                                frameType === option.type && !option.disabled ? 'text-primary' : 'text-muted-foreground'
+                                'flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 relative',
+                                option.disabled
+                                    ? 'opacity-50 cursor-not-allowed bg-muted/50 border-border'
+                                    : isPremium
+                                        ? 'hover:bg-accent hover:border-accent-foreground/20 opacity-75'
+                                        : 'hover:bg-accent hover:border-accent-foreground/20',
+                                frameType === option.type && !option.disabled && !isPremium
+                                    ? 'border-primary bg-primary/10 shadow-sm'
+                                    : 'border-border bg-card'
                             )}
                         >
-                            {option.icon}
-                        </div>
-                        <div className="text-center">
-                            <p
+                            {option.comingSoon && (
+                                <span className="absolute top-1 right-1 text-[9px] font-semibold px-1.5 py-0.5 bg-primary/20 text-primary rounded">
+                                    SOON
+                                </span>
+                            )}
+                            {isPremium && !option.comingSoon && (
+                                <span className="absolute top-1 right-1 flex items-center gap-0.5 text-[9px] font-semibold px-1.5 py-0.5 bg-orange-500/20 text-orange-500 rounded">
+                                    <Crown className="w-2.5 h-2.5" />
+                                    PRO
+                                </span>
+                            )}
+                            <div
                                 className={cn(
-                                    'text-sm font-medium transition-colors',
-                                    frameType === option.type && !option.disabled ? 'text-foreground' : 'text-muted-foreground'
+                                    'p-2 rounded-lg transition-colors',
+                                    frameType === option.type && !option.disabled && !isPremium ? 'text-primary' : 'text-muted-foreground'
                                 )}
                             >
-                                {option.label}
-                            </p>
-                            <p className="text-xs text-muted-foreground/70">{option.description}</p>
-                        </div>
-                    </button>
-                ))}
+                                {option.icon}
+                            </div>
+                            <div className="text-center">
+                                <p
+                                    className={cn(
+                                        'text-sm font-medium transition-colors',
+                                        frameType === option.type && !option.disabled && !isPremium ? 'text-foreground' : 'text-muted-foreground'
+                                    )}
+                                >
+                                    {option.label}
+                                </p>
+                                <p className="text-xs text-muted-foreground/70">{option.description}</p>
+                            </div>
+                        </button>
+                    );
+                })}
             </div>
 
             {frameType !== 'none' && (

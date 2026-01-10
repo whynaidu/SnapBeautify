@@ -24,6 +24,7 @@ import {
 import { useEditorStore } from '@/lib/store/editor-store';
 import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
+import { UserMenu } from '@/components/auth/UserMenu';
 
 export function Header() {
     const { resetToDefaults, originalImage, enterCropMode, isCropping, uncroppedImage, revertCrop } = useEditorStore();
@@ -124,6 +125,9 @@ export function Header() {
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+
+                {/* User Menu */}
+                <UserMenu />
             </div>
 
             <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
