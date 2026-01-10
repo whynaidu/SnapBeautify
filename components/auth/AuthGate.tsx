@@ -4,9 +4,8 @@ import { useAuth } from '@/lib/auth/context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Sparkles, Loader2, Mail, ArrowLeft } from 'lucide-react';
+import { Sparkles, Loader2, Mail, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 interface AuthGateProps {
   children: React.ReactNode;
@@ -19,12 +18,14 @@ export function AuthGate({ children }: AuthGateProps) {
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
     if (!email || !password) {
-      toast.error('Please enter email and password');
+      setError('Please enter email and password');
       return;
     }
 
@@ -33,19 +34,30 @@ export function AuthGate({ children }: AuthGateProps) {
       if (mode === 'login') {
         const { error } = await signIn(email, password);
         if (error) {
-          toast.error(error.message);
+          // Make error messages more user-friendly
+          if (error.message.includes('Invalid login credentials')) {
+            setError('Invalid email or password. Please try again.');
+          } else if (error.message.includes('Email not confirmed')) {
+            setError('Please verify your email before logging in.');
+          } else {
+            setError(error.message);
+          }
         }
       } else {
         const { error } = await signUp(email, password);
         if (error) {
-          toast.error(error.message);
+          if (error.message.includes('already registered')) {
+            setError('This email is already registered. Try logging in instead.');
+          } else {
+            setError(error.message);
+          }
         } else {
           // Show the email sent confirmation screen
           setEmailSent(true);
         }
       }
     } catch {
-      toast.error('An error occurred. Please try again.');
+      setError('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -55,6 +67,12 @@ export function AuthGate({ children }: AuthGateProps) {
     setEmailSent(false);
     setMode('login');
     setPassword('');
+    setError(null);
+  };
+
+  const handleModeSwitch = (newMode: 'login' | 'signup') => {
+    setMode(newMode);
+    setError(null);
   };
 
   // Show loading state
@@ -141,7 +159,7 @@ export function AuthGate({ children }: AuthGateProps) {
                   Don&apos;t have an account?{' '}
                   <button
                     type="button"
-                    onClick={() => setMode('signup')}
+                    onClick={() => handleModeSwitch('signup')}
                     className="underline underline-offset-4 hover:text-foreground"
                   >
                     Sign up
@@ -152,7 +170,7 @@ export function AuthGate({ children }: AuthGateProps) {
                   Already have an account?{' '}
                   <button
                     type="button"
-                    onClick={() => setMode('login')}
+                    onClick={() => handleModeSwitch('login')}
                     className="underline underline-offset-4 hover:text-foreground"
                   >
                     Login
@@ -190,6 +208,15 @@ export function AuthGate({ children }: AuthGateProps) {
                   minLength={6}
                 />
               </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="flex items-center gap-2 p-3 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 rounded-lg">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
