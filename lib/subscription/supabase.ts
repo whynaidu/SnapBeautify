@@ -40,24 +40,29 @@ export type PaymentInsert = Omit<PaymentRow, 'id' | 'created_at'>;
 // Server-side Supabase client (for API routes)
 let serverClient: SupabaseClient | null = null;
 
-export function createServerClient(): SupabaseClient {
+export function createServerClient(): SupabaseClient | null {
   if (serverClient) return serverClient;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error('Missing Supabase environment variables');
+    console.warn('Missing Supabase environment variables - subscription features disabled');
+    return null;
   }
 
-  serverClient = createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
-
-  return serverClient;
+  try {
+    serverClient = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
+    return serverClient;
+  } catch (error) {
+    console.error('Failed to create Supabase client:', error);
+    return null;
+  }
 }
 
 // Browser-side Supabase client
@@ -95,6 +100,7 @@ export function transformSubscription(row: SubscriptionRow): Subscription {
 // Get user's active subscription
 export async function getUserSubscription(userId: string): Promise<Subscription | null> {
   const supabase = createServerClient();
+  if (!supabase) return null;
 
   const { data, error } = await supabase
     .from('subscriptions')
@@ -141,6 +147,7 @@ export async function upsertSubscription(
   subscription: Omit<Subscription, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<Subscription | null> {
   const supabase = createServerClient();
+  if (!supabase) return null;
 
   const insertData: SubscriptionInsert = {
     user_id: subscription.userId,
@@ -179,6 +186,7 @@ export async function updateSubscriptionStatus(
   periodEnd?: Date
 ): Promise<boolean> {
   const supabase = createServerClient();
+  if (!supabase) return false;
 
   const updateData: Partial<SubscriptionInsert> = {
     status,
@@ -199,6 +207,7 @@ export async function updateSubscriptionStatus(
 // Log payment
 export async function logPayment(payment: PaymentInsert): Promise<boolean> {
   const supabase = createServerClient();
+  if (!supabase) return false;
 
   const { error } = await supabase
     .from('payments')
@@ -210,29 +219,45 @@ export async function logPayment(payment: PaymentInsert): Promise<boolean> {
 // Get user's export count for today
 export async function getExportCount(userId: string): Promise<number> {
   const supabase = createServerClient();
+  if (!supabase) return 0;
 
-  const { data, error } = await supabase
-    .rpc('get_export_count', { check_user_id: userId });
+  try {
+    const { data, error } = await supabase
+      .rpc('get_export_count', { check_user_id: userId });
 
-  if (error) {
-    console.error('Error getting export count:', error);
+    if (error) {
+      // Function may not exist yet if schema not applied
+      if (error.code !== 'PGRST202') {
+        console.error('Error getting export count:', error);
+      }
+      return 0;
+    }
+
+    return data || 0;
+  } catch {
     return 0;
   }
-
-  return data || 0;
 }
 
 // Increment user's export count
 export async function incrementExportCount(userId: string): Promise<number> {
   const supabase = createServerClient();
+  if (!supabase) return 0;
 
-  const { data, error } = await supabase
-    .rpc('increment_export_count', { check_user_id: userId });
+  try {
+    const { data, error } = await supabase
+      .rpc('increment_export_count', { check_user_id: userId });
 
-  if (error) {
-    console.error('Error incrementing export count:', error);
+    if (error) {
+      // Function may not exist yet if schema not applied
+      if (error.code !== 'PGRST202') {
+        console.error('Error incrementing export count:', error);
+      }
+      return 0;
+    }
+
+    return data || 0;
+  } catch {
     return 0;
   }
-
-  return data || 0;
 }
