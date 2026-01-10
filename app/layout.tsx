@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
-import Script from 'next/script';
+import { SubscriptionProvider } from '@/lib/subscription/context';
+import { UpgradeModal } from '@/components/subscription/UpgradeModal';
 
 export const metadata: Metadata = {
   title: 'SnapBeautify - Beautiful Screenshots Instantly',
@@ -52,7 +53,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <SubscriptionProvider>
+              {children}
+              <UpgradeModal />
+            </SubscriptionProvider>
           </ThemeProvider>
         </ErrorBoundary>
         <Analytics />
