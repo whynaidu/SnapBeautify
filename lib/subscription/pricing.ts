@@ -2,6 +2,7 @@ import { headers } from 'next/headers';
 import type { PricingConfig, Currency, PaymentProvider } from './types';
 
 // Pricing configuration for different regions
+// NOTE: Stripe is disabled - using Razorpay for all regions temporarily
 const PRICING_CONFIG: Record<string, PricingConfig> = {
   // India - PPP adjusted pricing
   IN: {
@@ -13,15 +14,16 @@ const PRICING_CONFIG: Record<string, PricingConfig> = {
     gateway: 'razorpay',
     countryCode: 'IN',
   },
-  // Default international pricing (USD)
+  // Default pricing - Using Razorpay until Stripe is configured
+  // TODO: Re-enable Stripe once account is set up
   DEFAULT: {
-    currency: 'USD',
-    symbol: '$',
-    monthly: 9,
-    annual: 79,
-    lifetime: 149,
-    gateway: 'stripe',
-    countryCode: 'US',
+    currency: 'INR',
+    symbol: '₹',
+    monthly: 199,
+    annual: 999,
+    lifetime: 2499,
+    gateway: 'razorpay',
+    countryCode: 'IN',
   },
 };
 
@@ -38,26 +40,14 @@ const STRIPE_COUNTRIES = [
 
 /**
  * Get pricing configuration based on country code
+ * NOTE: Currently returning Razorpay/INR for ALL countries until Stripe is configured
  */
 export function getPricingForCountry(countryCode: string): PricingConfig {
-  const normalizedCode = countryCode.toUpperCase();
-
-  if (INDIA_PRICING_COUNTRIES.includes(normalizedCode)) {
-    return PRICING_CONFIG.IN;
-  }
-
-  // For Stripe countries, use USD pricing
-  if (STRIPE_COUNTRIES.includes(normalizedCode)) {
-    return {
-      ...PRICING_CONFIG.DEFAULT,
-      countryCode: normalizedCode,
-    };
-  }
-
-  // Default to USD pricing for unknown countries
+  // TODO: Re-enable country-based pricing when Stripe is configured
+  // For now, use Razorpay (INR) for everyone
   return {
-    ...PRICING_CONFIG.DEFAULT,
-    countryCode: normalizedCode,
+    ...PRICING_CONFIG.IN,
+    countryCode: countryCode.toUpperCase(),
   };
 }
 

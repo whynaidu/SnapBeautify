@@ -30,21 +30,11 @@ export function TemplatePresets() {
     const [selectedCategory, setSelectedCategory] = useState<CategoryType>('vibrant');
     const [appliedTemplateId, setAppliedTemplateId] = useState<string | null>(null);
 
-    // Subscription access
-    const { checkFeature } = useSubscription();
-    const hasAllTemplates = checkFeature('all_templates').hasAccess;
+    // Subscription access (for PRO badge only)
+    const { isPro } = useSubscription();
 
     // Free template names from the report
     const freeTemplateNames = FREE_TIER_LIMITS.freeTemplates;
-
-    // Show upgrade modal
-    const showUpgradeModal = (message: string) => {
-        window.dispatchEvent(
-            new CustomEvent('show-upgrade-modal', {
-                detail: { featureId: 'all_templates', message },
-            })
-        );
-    };
 
     // Check if a template is free
     const isTemplateFree = (template: TemplatePreset): boolean => {
@@ -57,18 +47,10 @@ export function TemplatePresets() {
     };
 
     const handleCategorySelect = (category: CategoryType) => {
-        if (!isCategoryFree(category) && !hasAllTemplates) {
-            showUpgradeModal(`Upgrade to Pro to access ${CATEGORY_LABELS[category]} templates`);
-            return;
-        }
         setSelectedCategory(category);
     };
 
     const handleApplyTemplate = (template: TemplatePreset) => {
-        if (!isTemplateFree(template) && !hasAllTemplates) {
-            showUpgradeModal('Upgrade to Pro to access all premium templates');
-            return;
-        }
         applyTemplate(template);
         setAppliedTemplateId(template.id);
     };
@@ -81,7 +63,7 @@ export function TemplatePresets() {
                 <Sparkles className="w-4 h-4 text-primary" />
                 <Label className="text-muted-foreground text-xs uppercase tracking-wider flex items-center gap-2">
                     Template Presets
-                    {!hasAllTemplates && (
+                    {!isPro && (
                         <span className="text-[10px] text-muted-foreground">({FREE_TIER_LIMITS.freeTemplateCount} free)</span>
                     )}
                 </Label>
@@ -90,7 +72,7 @@ export function TemplatePresets() {
             {/* Category Selector */}
             <div className="grid grid-cols-3 gap-1.5">
                 {(Object.keys(CATEGORY_LABELS) as CategoryType[]).map((category) => {
-                    const isPremiumCategory = !isCategoryFree(category) && !hasAllTemplates;
+                    const isPremiumCategory = !isCategoryFree(category) && !isPro;
                     return (
                         <Button
                             key={category}
@@ -99,8 +81,7 @@ export function TemplatePresets() {
                             onClick={() => handleCategorySelect(category)}
                             className={cn(
                                 'h-8 text-xs relative',
-                                selectedCategory === category && 'bg-primary hover:bg-primary/90 text-primary-foreground',
-                                isPremiumCategory && 'opacity-60'
+                                selectedCategory === category && 'bg-primary hover:bg-primary/90 text-primary-foreground'
                             )}
                         >
                             {CATEGORY_LABELS[category]}
@@ -121,7 +102,7 @@ export function TemplatePresets() {
                     {templates.map((template) => {
                         const isApplied = appliedTemplateId === template.id;
                         const isFree = isTemplateFree(template);
-                        const isPremium = !isFree && !hasAllTemplates;
+                        const isPremium = !isFree && !isPro;
                         return (
                             <button
                                 key={template.id}
@@ -130,8 +111,7 @@ export function TemplatePresets() {
                                     'relative group rounded-lg overflow-hidden transition-all',
                                     isApplied
                                         ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-105'
-                                        : 'hover:scale-105 border border-border',
-                                    isPremium && 'opacity-60'
+                                        : 'hover:scale-105 border border-border'
                                 )}
                             >
                                 {/* Preview */}
@@ -201,7 +181,7 @@ export function TemplatePresets() {
             <div className="p-3 bg-muted/30 rounded-lg border border-border">
                 <p className="text-[10px] text-muted-foreground">
                     Click any template to instantly apply its background, styling, and text overlays to your image.
-                    {!hasAllTemplates && ' Upgrade to Pro for all 47 templates!'}
+                    {!isPro && ' Upgrade to Pro for all 47 templates!'}
                 </p>
             </div>
         </div>

@@ -89,32 +89,16 @@ const FRAME_OPTIONS: FrameOption[] = [
 
 export function FramePicker() {
     const { frameType, setFrameType } = useEditorStore();
-    const { checkFeature } = useSubscription();
-    const hasAllFrames = checkFeature('all_frames').hasAccess;
-
-    // Show upgrade modal for premium features
-    const showUpgradeModal = (feature: string) => {
-        window.dispatchEvent(
-            new CustomEvent('show-upgrade-modal', {
-                detail: { featureId: feature, message: `Upgrade to Pro to access all frame templates` },
-            })
-        );
-    };
+    const { isPro } = useSubscription();
 
     // Check if a frame is premium (not in free frames list)
     const isPremiumFrame = (frameType: FrameType) => {
         return !(FREE_TIER_LIMITS.freeFrames as readonly string[]).includes(frameType);
     };
 
-    // Handle frame selection with premium check
+    // Handle frame selection - allow all, watermark handles gating
     const handleFrameSelect = (option: FrameOption) => {
         if (option.disabled) return;
-
-        if (isPremiumFrame(option.type) && !hasAllFrames) {
-            showUpgradeModal('all_frames');
-            return;
-        }
-
         setFrameType(option.type);
     };
 
@@ -126,7 +110,7 @@ export function FramePicker() {
 
             <div className="grid grid-cols-2 gap-2">
                 {FRAME_OPTIONS.map((option) => {
-                    const isPremium = isPremiumFrame(option.type) && !hasAllFrames;
+                    const isPremium = isPremiumFrame(option.type) && !isPro;
                     return (
                         <button
                             key={option.type}
@@ -136,10 +120,8 @@ export function FramePicker() {
                                 'flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200 relative',
                                 option.disabled
                                     ? 'opacity-50 cursor-not-allowed bg-muted/50 border-border'
-                                    : isPremium
-                                        ? 'hover:bg-accent hover:border-accent-foreground/20 opacity-75'
-                                        : 'hover:bg-accent hover:border-accent-foreground/20',
-                                frameType === option.type && !option.disabled && !isPremium
+                                    : 'hover:bg-accent hover:border-accent-foreground/20',
+                                frameType === option.type && !option.disabled
                                     ? 'border-primary bg-primary/10 shadow-sm'
                                     : 'border-border bg-card'
                             )}
@@ -158,7 +140,7 @@ export function FramePicker() {
                             <div
                                 className={cn(
                                     'p-2 rounded-lg transition-colors',
-                                    frameType === option.type && !option.disabled && !isPremium ? 'text-primary' : 'text-muted-foreground'
+                                    frameType === option.type && !option.disabled ? 'text-primary' : 'text-muted-foreground'
                                 )}
                             >
                                 {option.icon}
@@ -167,7 +149,7 @@ export function FramePicker() {
                                 <p
                                     className={cn(
                                         'text-sm font-medium transition-colors',
-                                        frameType === option.type && !option.disabled && !isPremium ? 'text-foreground' : 'text-muted-foreground'
+                                        frameType === option.type && !option.disabled ? 'text-foreground' : 'text-muted-foreground'
                                     )}
                                 >
                                     {option.label}

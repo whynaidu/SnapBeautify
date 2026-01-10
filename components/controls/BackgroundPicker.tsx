@@ -91,49 +91,14 @@ export function BackgroundPicker() {
         );
     }, [fontCategory, fontSearch]);
 
-    // Subscription access - based on feature-analysis-report.html
-    const { isPro, checkFeature } = useSubscription();
-    const hasAllGradients = checkFeature('all_gradients').hasAccess;
-    const hasAllSolidColors = checkFeature('all_solid_colors').hasAccess;
-    const hasAllMeshGradients = checkFeature('all_mesh_gradients').hasAccess;
-    const hasCustomGradientColors = checkFeature('custom_gradient_colors').hasAccess;
-    const hasWaveSplit = checkFeature('wave_split').hasAccess;
-    const hasLogoPattern = checkFeature('logo_pattern').hasAccess;
-    const hasTextPatternPositions = checkFeature('text_pattern_positions').hasAccess;
-    const hasTextPatternRepeat = checkFeature('text_pattern_repeat').hasAccess;
-    const hasFontSearch = checkFeature('font_search').hasAccess;
-    const hasAllFonts = checkFeature('all_fonts').hasAccess;
+    // Subscription access (for PRO badge only)
+    const { isPro } = useSubscription();
 
     // Free tier limits from feature-analysis-report.html
     const FREE_SOLID_COLORS = 24;    // First 24 out of 72
     const FREE_GRADIENTS = 20;       // First 20 out of 78
     const FREE_MESH_GRADIENTS = 5;   // First 5 out of 15+
     const FREE_FONTS = 10;           // First 10 fonts (Popular category)
-
-    // Show upgrade modal for premium features
-    const showUpgradeModal = (feature: string, customMessage?: string) => {
-        window.dispatchEvent(
-            new CustomEvent('show-upgrade-modal', {
-                detail: {
-                    featureId: feature,
-                    message: customMessage || `Upgrade to Pro to access ${feature.replace(/_/g, ' ')}`
-                },
-            })
-        );
-    };
-
-    // Handle premium background type selection
-    const handleBackgroundTypeChange = (type: string) => {
-        if (type === 'waveSplit' && !hasWaveSplit) {
-            showUpgradeModal('wave_split', 'Upgrade to Pro to use Wave Split backgrounds');
-            return;
-        }
-        if (type === 'logoPattern' && !hasLogoPattern) {
-            showUpgradeModal('logo_pattern', 'Upgrade to Pro to use Logo Pattern backgrounds');
-            return;
-        }
-        setBackgroundType(type as typeof backgroundType);
-    };
 
     return (
         <div className="space-y-4">
@@ -168,14 +133,14 @@ export function BackgroundPicker() {
                 <Button
                     variant={backgroundType === 'waveSplit' ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => handleBackgroundTypeChange('waveSplit')}
+                    onClick={() => setBackgroundType('waveSplit')}
                     className={cn(
                         'h-9 relative',
                         backgroundType === 'waveSplit' && 'bg-primary hover:bg-primary/90 text-primary-foreground'
                     )}
                 >
                     Wave
-                    {!hasWaveSplit && (
+                    {!isPro && (
                         <Crown className="w-3 h-3 absolute -top-1 -right-1 text-orange-500" />
                     )}
                 </Button>
@@ -193,14 +158,14 @@ export function BackgroundPicker() {
                 <Button
                     variant={backgroundType === 'logoPattern' ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => handleBackgroundTypeChange('logoPattern')}
+                    onClick={() => setBackgroundType('logoPattern')}
                     className={cn(
                         'h-9 relative',
                         backgroundType === 'logoPattern' && 'bg-primary hover:bg-primary/90 text-primary-foreground'
                     )}
                 >
                     Logo
-                    {!hasLogoPattern && (
+                    {!isPro && (
                         <Crown className="w-3 h-3 absolute -top-1 -right-1 text-orange-500" />
                     )}
                 </Button>
@@ -221,24 +186,20 @@ export function BackgroundPicker() {
             {backgroundType === 'solid' && (
                 <div className="space-y-3">
                     <Label className="text-muted-foreground text-xs mb-2 block">
-                        Colors ({hasAllSolidColors ? SOLID_COLORS.length : `${FREE_SOLID_COLORS} free`})
+                        Colors ({isPro ? SOLID_COLORS.length : `${FREE_SOLID_COLORS} free`})
                     </Label>
                     <div className="grid grid-cols-8 gap-1.5">
                             {SOLID_COLORS.map((color, index) => {
-                                const isPremium = index >= FREE_SOLID_COLORS && !hasAllSolidColors;
+                                const isPremium = index >= FREE_SOLID_COLORS && !isPro;
                                 return (
                                     <button
                                         key={color}
-                                        onClick={() => isPremium
-                                            ? showUpgradeModal('all_solid_colors', 'Upgrade to Pro to access all 72 solid colors')
-                                            : setBackgroundColor(color)
-                                        }
+                                        onClick={() => setBackgroundColor(color)}
                                         className={cn(
                                             'w-full aspect-square rounded-md border-2 transition-all relative',
                                             backgroundColor === color
                                                 ? 'border-foreground/80 scale-110 z-10'
-                                                : 'border-transparent hover:scale-105',
-                                            isPremium && 'opacity-50'
+                                                : 'border-transparent hover:scale-105'
                                         )}
                                         style={{ backgroundColor: color }}
                                         title={isPremium ? `${color} (PRO)` : color}
@@ -284,13 +245,10 @@ export function BackgroundPicker() {
                 <div className="space-y-4">
                     {/* Custom Gradient Controls - Only show when standard gradient is active */}
                     {isGradientActive && (
-                        <div className={cn(
-                            "space-y-2 p-3 bg-muted/30 rounded-lg border border-border relative",
-                            !hasCustomGradientColors && "opacity-60"
-                        )}>
+                        <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border relative">
                             <Label className="text-[10px] uppercase text-muted-foreground flex items-center gap-2">
                                 Custom Gradient
-                                {!hasCustomGradientColors && (
+                                {!isPro && (
                                     <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-orange-500/20 rounded text-[10px] font-semibold text-orange-500">
                                         <Crown className="w-2.5 h-2.5" />
                                         PRO
@@ -305,14 +263,10 @@ export function BackgroundPicker() {
                                         <input
                                             type="color"
                                             value={gradientColors[0]}
-                                            onChange={(e) => hasCustomGradientColors
-                                                ? setGradient([e.target.value, gradientColors[1]], gradientAngle)
-                                                : showUpgradeModal('custom_gradient_colors', 'Upgrade to Pro to create custom gradient colors')
-                                            }
+                                            onChange={(e) => setGradient([e.target.value, gradientColors[1]], gradientAngle)}
                                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                            disabled={!hasCustomGradientColors}
                                         />
-                                        <Button variant="outline" size="sm" className="w-full h-8 px-2 justify-between" disabled={!hasCustomGradientColors}>
+                                        <Button variant="outline" size="sm" className="w-full h-8 px-2 justify-between">
                                             <span className="text-[10px]">Start</span>
                                             <div
                                                 className="w-3 h-3 rounded border border-zinc-600"
@@ -322,9 +276,8 @@ export function BackgroundPicker() {
                                     </div>
                                     <Input
                                         value={gradientColors[0]}
-                                        onChange={(e) => hasCustomGradientColors && setGradient([e.target.value, gradientColors[1]], gradientAngle)}
+                                        onChange={(e) => setGradient([e.target.value, gradientColors[1]], gradientAngle)}
                                         className="h-7 text-[10px] font-mono px-2"
-                                        disabled={!hasCustomGradientColors}
                                     />
                                 </div>
 
@@ -334,14 +287,10 @@ export function BackgroundPicker() {
                                         <input
                                             type="color"
                                             value={gradientColors[1]}
-                                            onChange={(e) => hasCustomGradientColors
-                                                ? setGradient([gradientColors[0], e.target.value], gradientAngle)
-                                                : showUpgradeModal('custom_gradient_colors', 'Upgrade to Pro to create custom gradient colors')
-                                            }
+                                            onChange={(e) => setGradient([gradientColors[0], e.target.value], gradientAngle)}
                                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                            disabled={!hasCustomGradientColors}
                                         />
-                                        <Button variant="outline" size="sm" className="w-full h-8 px-2 justify-between" disabled={!hasCustomGradientColors}>
+                                        <Button variant="outline" size="sm" className="w-full h-8 px-2 justify-between">
                                             <span className="text-[10px]">End</span>
                                             <div
                                                 className="w-3 h-3 rounded border border-border"
@@ -351,9 +300,8 @@ export function BackgroundPicker() {
                                     </div>
                                     <Input
                                         value={gradientColors[1]}
-                                        onChange={(e) => hasCustomGradientColors && setGradient([gradientColors[0], e.target.value], gradientAngle)}
+                                        onChange={(e) => setGradient([gradientColors[0], e.target.value], gradientAngle)}
                                         className="h-7 text-[10px] font-mono px-2"
-                                        disabled={!hasCustomGradientColors}
                                     />
                                 </div>
                             </div>
@@ -362,7 +310,7 @@ export function BackgroundPicker() {
 
                     <div>
                         <Label className="text-muted-foreground text-xs mb-2 block">
-                            Gradient Presets ({hasAllGradients ? PRESET_GRADIENTS.length : `${FREE_GRADIENTS} free`})
+                            Gradient Presets ({isPro ? PRESET_GRADIENTS.length : `${FREE_GRADIENTS} free`})
                         </Label>
                         <div className="grid grid-cols-6 gap-2">
                                 {PRESET_GRADIENTS.map((gradient, index) => {
@@ -371,21 +319,17 @@ export function BackgroundPicker() {
                                         isGradientActive &&
                                         gradientColors[0] === gradient.colors[0] &&
                                         gradientColors[1] === gradient.colors[1];
-                                    const isPremiumGradient = index >= FREE_GRADIENTS && !hasAllGradients;
+                                    const isPremiumGradient = index >= FREE_GRADIENTS && !isPro;
 
                                     return (
                                         <button
                                             key={gradient.name}
-                                            onClick={() => isPremiumGradient
-                                                ? showUpgradeModal('all_gradients', 'Upgrade to Pro to access all 78 gradient presets')
-                                                : setGradient(gradient.colors, gradient.angle)
-                                            }
+                                            onClick={() => setGradient(gradient.colors, gradient.angle)}
                                             className={cn(
                                                 'relative w-full aspect-square rounded-lg transition-all group',
                                                 isSelected
                                                     ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
-                                                    : 'hover:scale-105',
-                                                isPremiumGradient && 'opacity-50'
+                                                    : 'hover:scale-105'
                                             )}
                                             style={{
                                                 background: `linear-gradient(${gradient.angle}deg, ${gradient.colors[0]}, ${gradient.colors[1]})`,
@@ -427,26 +371,22 @@ export function BackgroundPicker() {
 
                     <div>
                         <Label className="text-muted-foreground text-xs mb-2 block">
-                            Mesh Gradients ({hasAllMeshGradients ? MESH_GRADIENTS.length : `${FREE_MESH_GRADIENTS} free`})
+                            Mesh Gradients ({isPro ? MESH_GRADIENTS.length : `${FREE_MESH_GRADIENTS} free`})
                         </Label>
                         <div className="grid grid-cols-5 gap-2">
                                 {MESH_GRADIENTS.map((mesh, index) => {
                                     // Only show as selected if it's a mesh type AND the CSS matches
                                     const isSelected = isMeshActive && meshGradientCSS === mesh.css;
-                                    const isPremiumMesh = index >= FREE_MESH_GRADIENTS && !hasAllMeshGradients;
+                                    const isPremiumMesh = index >= FREE_MESH_GRADIENTS && !isPro;
                                     return (
                                         <button
                                             key={mesh.name}
-                                            onClick={() => isPremiumMesh
-                                                ? showUpgradeModal('all_mesh_gradients', 'Upgrade to Pro to access all mesh gradient presets')
-                                                : setMeshGradient(mesh.css)
-                                            }
+                                            onClick={() => setMeshGradient(mesh.css)}
                                             className={cn(
                                                 'relative w-full aspect-square rounded-lg transition-all overflow-hidden group',
                                                 isSelected
                                                     ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
-                                                    : 'hover:scale-105',
-                                                isPremiumMesh && 'opacity-50'
+                                                    : 'hover:scale-105'
                                             )}
                                             style={{ background: mesh.css, backgroundColor: '#0f172a' }}
                                             title={isPremiumMesh ? `${mesh.name} (PRO)` : mesh.name}
@@ -567,17 +507,14 @@ export function BackgroundPicker() {
                             <Button
                                 variant={textPatternRows > 1 ? 'default' : 'outline'}
                                 size="sm"
-                                onClick={() => hasTextPatternRepeat
-                                    ? setTextPatternRows(textPatternRows === 1 ? 4 : textPatternRows)
-                                    : showUpgradeModal('text_pattern_repeat', 'Upgrade to Pro to use text repeat mode (wallpaper style)')
-                                }
+                                onClick={() => setTextPatternRows(textPatternRows === 1 ? 4 : textPatternRows)}
                                 className={cn(
                                     'h-9 relative',
                                     textPatternRows > 1 && 'bg-primary hover:bg-primary/90 text-primary-foreground'
                                 )}
                             >
                                 Repeat
-                                {!hasTextPatternRepeat && (
+                                {!isPro && (
                                     <Crown className="w-3 h-3 absolute -top-1 -right-1 text-orange-500" />
                                 )}
                             </Button>
@@ -588,14 +525,14 @@ export function BackgroundPicker() {
                             <div className="space-y-2 pt-2 border-t border-border/50">
                                 <Label className="text-[10px] text-muted-foreground flex items-center gap-2">
                                     Select Positions
-                                    {!hasTextPatternPositions && (
+                                    {!isPro && (
                                         <span className="text-[9px] text-muted-foreground/70">(Center free, Top/Bottom PRO)</span>
                                     )}
                                 </Label>
                                 <div className="grid grid-cols-3 gap-2">
                                     {(['top', 'center', 'bottom'] as const).map((position) => {
                                         const isSelected = textPatternPositions.includes(position);
-                                        const isPremiumPosition = position !== 'center' && !hasTextPatternPositions;
+                                        const isPremiumPosition = position !== 'center' && !isPro;
                                         const labels = {
                                             'top': 'Top',
                                             'center': 'Center',
@@ -607,14 +544,10 @@ export function BackgroundPicker() {
                                                 key={position}
                                                 variant={isSelected ? 'default' : 'outline'}
                                                 size="sm"
-                                                onClick={() => isPremiumPosition
-                                                    ? showUpgradeModal('text_pattern_positions', 'Upgrade to Pro to use Top and Bottom text positions')
-                                                    : toggleTextPatternPosition(position)
-                                                }
+                                                onClick={() => toggleTextPatternPosition(position)}
                                                 className={cn(
                                                     'h-9 relative',
-                                                    isSelected && 'bg-primary hover:bg-primary/90 text-primary-foreground',
-                                                    isPremiumPosition && 'opacity-75'
+                                                    isSelected && 'bg-primary hover:bg-primary/90 text-primary-foreground'
                                                 )}
                                             >
                                                 {labels[position]}
@@ -657,39 +590,33 @@ export function BackgroundPicker() {
                     <div className="space-y-3 p-3 bg-muted/30 rounded-lg border border-border">
                         <Label className="text-[10px] uppercase text-muted-foreground flex items-center gap-2">
                             Font Family
-                            {!hasAllFonts && (
+                            {!isPro && (
                                 <span className="text-[9px] text-muted-foreground/70">({FREE_FONTS} free)</span>
                             )}
                         </Label>
 
-                        {/* Search Input - PRO only */}
-                        <div className={cn("relative", !hasFontSearch && "opacity-60")}>
+                        {/* Search Input */}
+                        <div className="relative">
                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                             <Input
                                 value={fontSearch}
-                                onChange={(e) => hasFontSearch ? setFontSearch(e.target.value) : showUpgradeModal('font_search', 'Upgrade to Pro to search fonts')}
-                                placeholder={hasFontSearch ? "Search fonts..." : "Search (PRO)"}
+                                onChange={(e) => setFontSearch(e.target.value)}
+                                placeholder="Search fonts..."
                                 className="h-8 pl-8 text-xs"
-                                disabled={!hasFontSearch}
-                                onClick={() => !hasFontSearch && showUpgradeModal('font_search', 'Upgrade to Pro to search fonts')}
                             />
-                            {!hasFontSearch && (
+                            {!isPro && (
                                 <Crown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-orange-500" />
                             )}
                         </div>
 
-                        {/* Font Category Pills - Only Popular free, others PRO */}
+                        {/* Font Category Pills */}
                         <div className="flex flex-wrap gap-1">
                             {(Object.keys(FONT_CATEGORIES) as FontCategory[]).map((category) => {
-                                const isPremiumCategory = category !== 'popular' && !hasAllFonts;
+                                const isPremiumCategory = category !== 'popular' && !isPro;
                                 return (
                                     <button
                                         key={category}
                                         onClick={() => {
-                                            if (isPremiumCategory) {
-                                                showUpgradeModal('all_fonts', 'Upgrade to Pro to access all 60+ fonts');
-                                                return;
-                                            }
                                             setFontCategory(category);
                                             setFontSearch('');
                                         }}
@@ -697,8 +624,7 @@ export function BackgroundPicker() {
                                             'px-2 py-0.5 rounded-full text-[9px] font-medium transition-all relative',
                                             fontCategory === category
                                                 ? 'bg-primary text-primary-foreground shadow-sm'
-                                                : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
-                                            isPremiumCategory && 'opacity-60'
+                                                : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
                                         )}
                                     >
                                         {FONT_CATEGORIES[category]}
@@ -720,20 +646,17 @@ export function BackgroundPicker() {
                                 ) : (
                                     filteredFonts.map((font, index) => {
                                         const isSelected = textPatternFontFamily === font.fontFamily;
-                                        const isPremiumFont = fontCategory === 'popular' && index >= FREE_FONTS && !hasAllFonts;
+                                        // Premium if: non-popular category OR popular category beyond first 8 fonts
+                                        const isPremiumFont = (fontCategory !== 'popular' || index >= FREE_FONTS) && !isPro;
                                         return (
                                             <button
                                                 key={font.fontFamily}
-                                                onClick={() => isPremiumFont
-                                                    ? showUpgradeModal('all_fonts', 'Upgrade to Pro to access all fonts')
-                                                    : setTextPatternFontFamily(font.fontFamily)
-                                                }
+                                                onClick={() => setTextPatternFontFamily(font.fontFamily)}
                                                 className={cn(
                                                     'w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-all group relative',
                                                     isSelected
                                                         ? 'bg-primary text-primary-foreground'
-                                                        : 'hover:bg-muted/80',
-                                                    isPremiumFont && 'opacity-50'
+                                                        : 'hover:bg-muted/80'
                                                 )}
                                             >
                                                 {/* Font Preview */}
@@ -787,7 +710,7 @@ export function BackgroundPicker() {
                     <div className="space-y-2 p-3 bg-muted/30 rounded-lg border border-border">
                         <Label className="text-[10px] uppercase text-muted-foreground flex items-center gap-2">
                             Font Weight
-                            {!checkFeature('all_font_weights').hasAccess && (
+                            {!isPro && (
                                 <span className="text-[9px] text-muted-foreground/70">(Normal & Bold free)</span>
                             )}
                         </Label>
@@ -795,7 +718,7 @@ export function BackgroundPicker() {
                             {[100, 300, 400, 700, 900].map((weight) => {
                                 const isSelected = textPatternFontWeight === weight;
                                 const freeWeights = [400, 700]; // Normal and Bold only
-                                const isPremiumWeight = !freeWeights.includes(weight) && !checkFeature('all_font_weights').hasAccess;
+                                const isPremiumWeight = !freeWeights.includes(weight) && !isPro;
                                 const labels: Record<number, string> = {
                                     100: 'Thin',
                                     300: 'Light',
@@ -809,14 +732,10 @@ export function BackgroundPicker() {
                                         key={weight}
                                         variant={isSelected ? 'default' : 'outline'}
                                         size="sm"
-                                        onClick={() => isPremiumWeight
-                                            ? showUpgradeModal('all_font_weights', 'Upgrade to Pro for all font weights (Thin, Light, Black)')
-                                            : setTextPatternFontWeight(weight)
-                                        }
+                                        onClick={() => setTextPatternFontWeight(weight)}
                                         className={cn(
                                             'h-9 text-[10px] relative',
-                                            isSelected && 'bg-primary hover:bg-primary/90 text-primary-foreground',
-                                            isPremiumWeight && 'opacity-60'
+                                            isSelected && 'bg-primary hover:bg-primary/90 text-primary-foreground'
                                         )}
                                         title={isPremiumWeight ? `${labels[weight]} (PRO)` : labels[weight]}
                                     >

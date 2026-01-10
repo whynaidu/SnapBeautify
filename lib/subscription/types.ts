@@ -53,13 +53,16 @@ export interface RazorpaySubscription {
 
 export interface RazorpayPaymentResponse {
   razorpay_payment_id: string;
-  razorpay_subscription_id: string;
+  razorpay_subscription_id?: string; // For subscriptions
+  razorpay_order_id?: string;        // For one-time orders
   razorpay_signature: string;
 }
 
 export interface RazorpayOptions {
   key: string;
-  subscription_id: string;
+  subscription_id?: string;  // For recurring subscriptions
+  order_id?: string;         // For one-time payments (lifetime)
+  amount?: number;           // Required for orders (in paise)
   name: string;
   description: string;
   handler: (response: RazorpayPaymentResponse) => void;

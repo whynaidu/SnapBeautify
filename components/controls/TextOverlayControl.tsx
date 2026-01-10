@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { useSubscription } from '@/lib/subscription/context';
-import { FREE_TIER_LIMITS } from '@/lib/subscription/feature-gates';
+import { FREE_TIER_LIMITS, FREE_FONTS } from '@/lib/subscription/feature-gates';
 import { Plus, Trash2, Type, Copy, Search, Check, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FONTS_BY_CATEGORY, FONT_CATEGORIES, FontCategory } from '@/lib/constants/fonts';
@@ -27,48 +27,24 @@ export function TextOverlayControl() {
     const [fontSearch, setFontSearch] = useState('');
     const selectedOverlay = textOverlays.find(t => t.id === selectedTextOverlayId);
 
-    // Subscription access
-    const { checkFeature } = useSubscription();
-    const hasUnlimitedOverlays = checkFeature('unlimited_text_overlays').hasAccess;
-    const hasAllFonts = checkFeature('all_fonts').hasAccess;
-    const hasFontSearch = checkFeature('font_search').hasAccess;
-    const hasAllFontWeights = checkFeature('all_font_weights').hasAccess;
-    const hasGradientText = checkFeature('gradient_text').hasAccess;
-    const hasDuplicateOverlay = checkFeature('duplicate_overlay').hasAccess;
-    const hasAllTextColors = checkFeature('all_text_colors').hasAccess;
+    // Subscription access (for PRO badge only)
+    const { isPro } = useSubscription();
 
     // Free tier limits
     const MAX_FREE_OVERLAYS = FREE_TIER_LIMITS.maxTextOverlays;
-    const FREE_FONTS = FREE_TIER_LIMITS.freeFontCount;
+    const FREE_FONT_COUNT = FREE_TIER_LIMITS.freeFontCount;
     const FREE_FONT_WEIGHTS = FREE_TIER_LIMITS.freeFontWeights;
 
-    // Show upgrade modal
-    const showUpgradeModal = (feature: string, message: string) => {
-        window.dispatchEvent(
-            new CustomEvent('show-upgrade-modal', {
-                detail: { featureId: feature, message },
-            })
-        );
-    };
+    // Check if user can add more overlays (for display, not blocking)
+    const canAddOverlay = isPro || textOverlays.length < MAX_FREE_OVERLAYS;
 
-    // Check if user can add more overlays
-    const canAddOverlay = hasUnlimitedOverlays || textOverlays.length < MAX_FREE_OVERLAYS;
-
-    // Handle add overlay with limit check
+    // Handle add overlay - allow all, watermark handles gating
     const handleAddOverlay = () => {
-        if (!canAddOverlay) {
-            showUpgradeModal('unlimited_text_overlays', `Free users can only add ${MAX_FREE_OVERLAYS} text overlay. Upgrade to Pro for unlimited text overlays!`);
-            return;
-        }
         addTextOverlay();
     };
 
-    // Handle duplicate with check
+    // Handle duplicate - allow all, watermark handles gating
     const handleDuplicate = (id: string) => {
-        if (!hasDuplicateOverlay) {
-            showUpgradeModal('duplicate_overlay', 'Upgrade to Pro to duplicate text overlays');
-            return;
-        }
         duplicateTextOverlay(id);
     };
 
@@ -108,14 +84,14 @@ export function TextOverlayControl() {
             <div className="flex items-center justify-between">
                 <Label className="text-sm font-medium flex items-center gap-2">
                     Text Overlays
-                    {!hasUnlimitedOverlays && (
+                    {!isPro && (
                         <span className="text-[10px] text-muted-foreground">({MAX_FREE_OVERLAYS} free)</span>
                     )}
                 </Label>
                 <Button
                     onClick={handleAddOverlay}
                     size="sm"
-                    className={cn("h-8 relative", !canAddOverlay && "opacity-75")}
+                    className="h-8 relative"
                 >
                     <Plus className="w-3 h-3 mr-1" />
                     Add Text
@@ -155,11 +131,11 @@ export function TextOverlayControl() {
                                     }}
                                     variant="ghost"
                                     size="sm"
-                                    className={cn("h-7 w-7 p-0 flex-shrink-0 hover:bg-primary/10 relative", !hasDuplicateOverlay && "opacity-60")}
-                                    title={hasDuplicateOverlay ? "Duplicate" : "Duplicate (PRO)"}
+                                    className="h-7 w-7 p-0 flex-shrink-0 hover:bg-primary/10 relative"
+                                    title={isPro ? "Duplicate" : "Duplicate (PRO)"}
                                 >
                                     <Copy className="w-3 h-3" />
-                                    {!hasDuplicateOverlay && (
+                                    {!isPro && (
                                         <Crown className="w-2 h-2 absolute -top-0.5 -right-0.5 text-orange-500" />
                                     )}
                                 </Button>
@@ -230,10 +206,6 @@ export function TextOverlayControl() {
                                 </Button>
                                 <Button
                                     onClick={() => {
-                                        if (!hasGradientText) {
-                                            showUpgradeModal('gradient_text', 'Upgrade to Pro for gradient text colors');
-                                            return;
-                                        }
                                         updateTextOverlay(selectedOverlay.id, {
                                             useGradient: true,
                                             gradientColors: selectedOverlay.gradientColors || ['#f97316', '#ec4899'],
@@ -242,10 +214,10 @@ export function TextOverlayControl() {
                                     }}
                                     variant={selectedOverlay.useGradient ? 'default' : 'ghost'}
                                     size="sm"
-                                    className={cn("h-6 text-[10px] px-3 relative", !hasGradientText && "opacity-75")}
+                                    className="h-6 text-[10px] px-3 relative"
                                 >
                                     Gradient
-                                    {!hasGradientText && (
+                                    {!isPro && (
                                         <Crown className="w-2 h-2 absolute -top-0.5 -right-0.5 text-orange-500" />
                                     )}
                                 </Button>
@@ -343,17 +315,23 @@ export function TextOverlayControl() {
                             className="py-4"
                         />
                         <div className="grid grid-cols-5 gap-1.5">
-                            {[24, 36, 48, 64, 96].map((size) => (
-                                <Button
-                                    key={size}
-                                    onClick={() => updateTextOverlay(selectedOverlay.id, { fontSize: size })}
-                                    variant={selectedOverlay.fontSize === size ? 'default' : 'outline'}
-                                    size="sm"
-                                    className="h-7 text-xs"
-                                >
-                                    {size}
-                                </Button>
-                            ))}
+                            {[24, 36, 48, 64, 96].map((size) => {
+                                const isPremiumSize = !(FREE_TIER_LIMITS.freeFontSizes as readonly number[]).includes(size) && !isPro;
+                                return (
+                                    <Button
+                                        key={size}
+                                        onClick={() => updateTextOverlay(selectedOverlay.id, { fontSize: size })}
+                                        variant={selectedOverlay.fontSize === size ? 'default' : 'outline'}
+                                        size="sm"
+                                        className="h-7 text-xs relative"
+                                    >
+                                        {size}
+                                        {isPremiumSize && (
+                                            <Crown className="w-2 h-2 absolute -top-0.5 -right-0.5 text-orange-500" />
+                                        )}
+                                    </Button>
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -374,23 +352,29 @@ export function TextOverlayControl() {
 
                         {/* Font Category Pills */}
                         <div className="flex flex-wrap gap-1.5">
-                            {(Object.keys(FONT_CATEGORIES) as FontCategory[]).map((category) => (
-                                <button
-                                    key={category}
-                                    onClick={() => {
-                                        setSelectedFontCategory(category);
-                                        setFontSearch('');
-                                    }}
-                                    className={cn(
-                                        'px-2.5 py-1 rounded-full text-[10px] font-medium transition-all',
-                                        selectedFontCategory === category
-                                            ? 'bg-primary text-primary-foreground shadow-sm'
-                                            : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                                    )}
-                                >
-                                    {FONT_CATEGORIES[category]}
-                                </button>
-                            ))}
+                            {(Object.keys(FONT_CATEGORIES) as FontCategory[]).map((category) => {
+                                const isPremiumCategory = category !== 'popular' && !isPro;
+                                return (
+                                    <button
+                                        key={category}
+                                        onClick={() => {
+                                            setSelectedFontCategory(category);
+                                            setFontSearch('');
+                                        }}
+                                        className={cn(
+                                            'px-2.5 py-1 rounded-full text-[10px] font-medium transition-all relative',
+                                            selectedFontCategory === category
+                                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                                : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                                        )}
+                                    >
+                                        {FONT_CATEGORIES[category]}
+                                        {isPremiumCategory && (
+                                            <Crown className="inline-block w-2.5 h-2.5 ml-0.5 text-orange-500" />
+                                        )}
+                                    </button>
+                                );
+                            })}
                         </div>
 
                         {/* Font List */}
@@ -403,6 +387,7 @@ export function TextOverlayControl() {
                                 ) : (
                                     filteredFonts.map((font) => {
                                         const isSelected = selectedOverlay.fontFamily === font.fontFamily;
+                                        const isPremiumFont = !FREE_FONTS.includes(font.fontFamily) && !isPro;
                                         return (
                                             <button
                                                 key={font.fontFamily}
@@ -431,6 +416,10 @@ export function TextOverlayControl() {
                                                 >
                                                     {font.name}
                                                 </span>
+                                                {/* Premium Badge */}
+                                                {isPremiumFont && (
+                                                    <Crown className="w-3 h-3 text-orange-500 shrink-0" />
+                                                )}
                                                 {/* Check Icon */}
                                                 {isSelected && (
                                                     <Check className="w-4 h-4 shrink-0" />
@@ -453,17 +442,23 @@ export function TextOverlayControl() {
                                 { value: 400, label: 'Normal' },
                                 { value: 700, label: 'Bold' },
                                 { value: 900, label: 'Black' },
-                            ].map(({ value, label }) => (
-                                <Button
-                                    key={value}
-                                    onClick={() => updateTextOverlay(selectedOverlay.id, { fontWeight: value })}
-                                    variant={selectedOverlay.fontWeight === value ? 'default' : 'outline'}
-                                    size="sm"
-                                    className="h-9 text-[10px] px-1"
-                                >
-                                    {label}
-                                </Button>
-                            ))}
+                            ].map(({ value, label }) => {
+                                const isPremiumWeight = !FREE_FONT_WEIGHTS.includes(value as 400 | 700) && !isPro;
+                                return (
+                                    <Button
+                                        key={value}
+                                        onClick={() => updateTextOverlay(selectedOverlay.id, { fontWeight: value })}
+                                        variant={selectedOverlay.fontWeight === value ? 'default' : 'outline'}
+                                        size="sm"
+                                        className="h-9 text-[10px] px-1 relative"
+                                    >
+                                        {label}
+                                        {isPremiumWeight && (
+                                            <Crown className="w-2 h-2 absolute -top-0.5 -right-0.5 text-orange-500" />
+                                        )}
+                                    </Button>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

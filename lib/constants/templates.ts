@@ -14,11 +14,11 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
         settings: {
             backgroundType: 'solid',
             backgroundColor: '#ffffff',
-            padding: 140,
-            shadowBlur: 20,
-            shadowOpacity: 15,
-            borderRadius: 12,
-            imageScale: 0.75,
+            padding: 64,        // Free tier preset
+            shadowBlur: 20,     // Free tier default
+            shadowOpacity: 50,  // Free tier default
+            borderRadius: 12,   // Free tier preset
+            imageScale: 0.75,   // Within free range (50-150%)
         },
     },
     {
@@ -33,11 +33,11 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
         settings: {
             backgroundType: 'solid',
             backgroundColor: '#1e293b',
-            padding: 160,
-            shadowBlur: 30,
-            shadowOpacity: 40,
-            borderRadius: 16,
-            imageScale: 0.7,
+            padding: 64,        // Free tier preset
+            shadowBlur: 20,     // Free tier default
+            shadowOpacity: 50,  // Free tier default
+            borderRadius: 12,   // Free tier preset
+            imageScale: 0.7,    // Within free range (50-150%)
         },
     },
     {
@@ -52,11 +52,11 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
         settings: {
             backgroundType: 'solid',
             backgroundColor: '#18181b',
-            padding: 150,
-            shadowBlur: 35,
-            shadowOpacity: 50,
-            borderRadius: 20,
-            imageScale: 0.72,
+            padding: 150,         // Premium setting
+            shadowBlur: 35,       // Premium setting
+            shadowOpacity: 40,    // Premium setting
+            borderRadius: 20,     // Premium setting
+            imageScale: 0.72,     // Within range
         },
     },
     {
@@ -71,11 +71,11 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
         settings: {
             backgroundType: 'solid',
             backgroundColor: '#fefce8',
-            padding: 130,
-            shadowBlur: 18,
-            shadowOpacity: 12,
-            borderRadius: 10,
-            imageScale: 0.78,
+            padding: 130,         // Premium setting
+            shadowBlur: 18,       // Premium setting
+            shadowOpacity: 35,    // Premium setting
+            borderRadius: 10,     // Premium setting
+            imageScale: 0.78,     // Within range
         },
     },
     {
@@ -90,11 +90,11 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
         settings: {
             backgroundType: 'solid',
             backgroundColor: '#0f172a',
-            padding: 155,
-            shadowBlur: 32,
-            shadowOpacity: 45,
-            borderRadius: 14,
-            imageScale: 0.7,
+            padding: 155,         // Premium setting
+            shadowBlur: 32,       // Premium setting
+            shadowOpacity: 45,    // Premium setting
+            borderRadius: 14,     // Premium setting
+            imageScale: 0.7,      // Within range
         },
     },
     {
@@ -109,11 +109,11 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
         settings: {
             backgroundType: 'solid',
             backgroundColor: '#78716c',
-            padding: 145,
-            shadowBlur: 25,
-            shadowOpacity: 30,
-            borderRadius: 16,
-            imageScale: 0.73,
+            padding: 145,         // Premium setting
+            shadowBlur: 25,       // Premium setting
+            shadowOpacity: 30,    // Premium setting
+            borderRadius: 16,     // Premium setting
+            imageScale: 0.73,     // Within range
         },
     },
 
@@ -121,7 +121,7 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
     {
         id: 'vibrant-sunset',
         name: 'Sunset Glow',
-        description: 'Vibrant orange to pink gradient with bold text',
+        description: 'Vibrant orange to pink gradient',
         category: 'vibrant',
         preview: {
             backgroundType: 'gradient',
@@ -132,22 +132,12 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             backgroundType: 'gradient',
             gradientColors: ['#f97316', '#ec4899'],
             gradientAngle: 135,
-            padding: 170,
-            shadowBlur: 25,
-            shadowOpacity: 30,
-            borderRadius: 20,
-            imageScale: 0.7,
-            textOverlays: [
-                {
-                    text: 'NEW',
-                    x: 50,
-                    y: 88,
-                    color: '#ffffff',
-                    fontSize: 64,
-                    fontFamily: '"Bebas Neue", sans-serif',
-                    fontWeight: 400,
-                },
-            ],
+            padding: 64,          // Free tier preset
+            shadowBlur: 20,       // Free tier default
+            shadowOpacity: 50,    // Free tier default
+            borderRadius: 12,     // Free tier preset
+            imageScale: 0.75,     // Within free range (50-150%)
+            // Removed text overlay - free tier has limited text options
         },
     },
     {
@@ -164,11 +154,11 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             backgroundType: 'gradient',
             gradientColors: ['#0ea5e9', '#8b5cf6'],
             gradientAngle: 135,
-            padding: 160,
-            shadowBlur: 30,
-            shadowOpacity: 35,
-            borderRadius: 16,
-            imageScale: 0.75,
+            padding: 96,          // Free tier preset
+            shadowBlur: 20,       // Free tier default
+            shadowOpacity: 50,    // Free tier default
+            borderRadius: 24,     // Free tier preset
+            imageScale: 0.8,      // Within free range (50-150%)
         },
     },
     {
@@ -885,14 +875,14 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             textPatternColor: '#ffffff',
             textPatternOpacity: 0.1,
             textPatternPositions: ['center'],
-            textPatternFontFamily: '"Dancing Script", cursive',
+            textPatternFontFamily: '"Playfair Display", serif', // Free tier font
             textPatternFontSize: 0.35,
             textPatternFontWeight: 700,
-            padding: 160,
-            shadowBlur: 25,
-            shadowOpacity: 30,
-            borderRadius: 20,
-            imageScale: 0.7,
+            padding: 64,          // Free tier preset
+            shadowBlur: 20,       // Free tier default
+            shadowOpacity: 50,    // Free tier default
+            borderRadius: 12,     // Free tier preset
+            imageScale: 0.75,     // Within free range (50-150%)
         },
     },
     {
@@ -914,14 +904,14 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             textPatternColor: '#ffffff',
             textPatternOpacity: 0.09,
             textPatternPositions: ['center'],
-            textPatternFontFamily: '"Bebas Neue", sans-serif',
+            textPatternFontFamily: 'Montserrat, sans-serif', // Free tier font
             textPatternFontSize: 0.35,
-            textPatternFontWeight: 400,
-            padding: 150,
-            shadowBlur: 20,
-            shadowOpacity: 25,
-            borderRadius: 16,
-            imageScale: 0.75,
+            textPatternFontWeight: 700, // Changed to 700 (free tier weight)
+            padding: 96,          // Free tier preset
+            shadowBlur: 20,       // Free tier default
+            shadowOpacity: 50,    // Free tier default
+            borderRadius: 24,     // Free tier preset
+            imageScale: 0.8,      // Within free range (50-150%)
         },
     },
     {

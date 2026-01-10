@@ -160,13 +160,6 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
       }
 
       if (pricing.gateway === 'razorpay') {
-        // Razorpay checkout for India
-        if (planType === 'lifetime') {
-          // For lifetime, we need a different approach (one-time payment)
-          console.log('Lifetime deals for India - contact support');
-          return;
-        }
-
         const loaded = await loadRazorpayScript();
         if (!loaded) {
           console.error('Failed to load Razorpay');
@@ -174,7 +167,13 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         }
 
         try {
-          const response = await fetch('/api/razorpay/create-subscription', {
+          // Lifetime uses one-time Order, others use Subscription
+          const isLifetime = planType === 'lifetime';
+          const apiEndpoint = isLifetime
+            ? '/api/razorpay/create-order'
+            : '/api/razorpay/create-subscription';
+
+          const response = await fetch(apiEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -185,22 +184,32 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
           });
 
           if (!response.ok) {
-            throw new Error('Failed to create subscription');
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to create payment');
           }
 
           const data = await response.json();
 
           const options: RazorpayOptions = {
             key: data.razorpayKeyId,
-            subscription_id: data.subscriptionId,
+            ...(isLifetime
+              ? { order_id: data.orderId, amount: data.amount }
+              : { subscription_id: data.subscriptionId }
+            ),
             name: 'SnapBeautify Pro',
-            description: `${planType.charAt(0).toUpperCase() + planType.slice(1)} Subscription`,
+            description: isLifetime
+              ? 'Lifetime Access - One Time Payment'
+              : `${planType.charAt(0).toUpperCase() + planType.slice(1)} Subscription`,
             prefill: {
               email: user?.email || '',
             },
             handler: async (response: RazorpayPaymentResponse) => {
-              // Verify payment
-              const verifyResponse = await fetch('/api/razorpay/verify', {
+              // Verify payment - different endpoints for order vs subscription
+              const verifyEndpoint = isLifetime
+                ? '/api/razorpay/verify-order'
+                : '/api/razorpay/verify';
+
+              const verifyResponse = await fetch(verifyEndpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -219,6 +228,9 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
                 }));
               } else {
                 console.error('Payment verification failed');
+                window.dispatchEvent(new CustomEvent('subscription-error', {
+                  detail: { message: 'Payment verification failed. Please contact support.' }
+                }));
               }
             },
             theme: {
@@ -235,6 +247,9 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
           rzp.open();
         } catch (error) {
           console.error('Error initiating Razorpay checkout:', error);
+          window.dispatchEvent(new CustomEvent('subscription-error', {
+            detail: { message: 'Failed to initiate payment. Please try again.' }
+          }));
         }
       } else {
         // Stripe checkout for international

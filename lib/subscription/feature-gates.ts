@@ -1,4 +1,5 @@
 import type { FeatureId, SubscriptionPlan, FeatureAccess } from './types';
+import { SOLID_COLORS, PRESET_GRADIENTS, MESH_GRADIENTS } from '@/lib/constants/gradients';
 
 // Feature configuration: which features require which plan
 const FEATURE_CONFIG: Record<FeatureId, {
@@ -366,18 +367,44 @@ export function isAspectRatioAvailable(ratio: string, userPlan: SubscriptionPlan
 
 export interface EditorStateForCheck {
   backgroundType: string;
+  backgroundColor: string;
+  gradientColors: [string, string];
+  meshGradientCSS: string;
   frameType: string;
   textPatternPositions: string[];
   textPatternRows: number;
-  textOverlays: Array<{ fontFamily?: string; fontSize?: number; fontWeight?: number }>;
+  textPatternFontFamily: string;
+  textPatternFontWeight: number;
+  textOverlays: Array<{
+    fontFamily?: string;
+    fontSize?: number;
+    fontWeight?: number;
+    useGradient?: boolean;
+  }>;
   padding: number;
   shadowBlur: number;
   shadowOpacity: number;
+  shadowColor: string;
   borderRadius: number;
   imageScale: number;
   exportFormat: string;
   exportScale: number;
 }
+
+// Default shadow color (free tier) - HEX format
+export const DEFAULT_SHADOW_COLOR = '#000000';
+
+// Free fonts list (first 10 from popular category)
+export const FREE_FONTS: string[] = [
+  'system-ui, -apple-system, sans-serif',
+  'Roboto, sans-serif',
+  '"Open Sans", sans-serif',
+  'Montserrat, sans-serif',
+  'Lato, sans-serif',
+  'Poppins, sans-serif',
+  'Inter, sans-serif',
+  '"Playfair Display", serif',
+];
 
 export interface PremiumUsageResult {
   isPremiumUsed: boolean;
@@ -399,6 +426,32 @@ export function checkPremiumFeaturesUsed(state: EditorStateForCheck): PremiumUsa
     premiumFeatures.push('Logo Pattern background');
   }
 
+  // 1b. Premium solid colors (beyond first 24)
+  if (state.backgroundType === 'solid' && state.backgroundColor) {
+    const colorIndex = SOLID_COLORS.indexOf(state.backgroundColor);
+    if (colorIndex >= FREE_TIER_LIMITS.solidColorCount) {
+      premiumFeatures.push('Premium solid color');
+    }
+  }
+
+  // 1c. Premium gradient presets (beyond first 20)
+  if (state.backgroundType === 'gradient' && state.gradientColors) {
+    const gradientIndex = PRESET_GRADIENTS.findIndex(
+      g => g.colors[0] === state.gradientColors[0] && g.colors[1] === state.gradientColors[1]
+    );
+    if (gradientIndex >= FREE_TIER_LIMITS.gradientPresetCount) {
+      premiumFeatures.push('Premium gradient');
+    }
+  }
+
+  // 1d. Premium mesh gradients (beyond first 5)
+  if (state.backgroundType === 'mesh' && state.meshGradientCSS) {
+    const meshIndex = MESH_GRADIENTS.findIndex(m => m.css === state.meshGradientCSS);
+    if (meshIndex >= FREE_TIER_LIMITS.meshGradientCount) {
+      premiumFeatures.push('Premium mesh gradient');
+    }
+  }
+
   // 2. Text pattern premium features
   if (state.backgroundType === 'textPattern') {
     // Non-center positions are premium
@@ -409,6 +462,14 @@ export function checkPremiumFeaturesUsed(state: EditorStateForCheck): PremiumUsa
     // Repeat mode (rows > 1) is premium
     if (state.textPatternRows > 1) {
       premiumFeatures.push('Text pattern repeat mode');
+    }
+    // Premium font family for text pattern (not in free fonts list)
+    if (state.textPatternFontFamily && !FREE_FONTS.includes(state.textPatternFontFamily)) {
+      premiumFeatures.push('Premium text pattern font');
+    }
+    // Premium font weight for text pattern (not 400 or 700)
+    if (state.textPatternFontWeight && !(FREE_TIER_LIMITS.freeFontWeights as readonly number[]).includes(state.textPatternFontWeight)) {
+      premiumFeatures.push('Premium text pattern font weight');
     }
   }
 
@@ -424,7 +485,7 @@ export function checkPremiumFeaturesUsed(state: EditorStateForCheck): PremiumUsa
 
   // 5. Check text overlay premium settings
   for (const overlay of state.textOverlays) {
-    // Premium font sizes (not in free presets)
+    // Premium font sizes (not in free presets: 24, 36, 48)
     if (overlay.fontSize && !(FREE_TIER_LIMITS.freeFontSizes as readonly number[]).includes(overlay.fontSize)) {
       if (!premiumFeatures.includes('Custom font sizes')) {
         premiumFeatures.push('Custom font sizes');
@@ -436,6 +497,18 @@ export function checkPremiumFeaturesUsed(state: EditorStateForCheck): PremiumUsa
         premiumFeatures.push('Premium font weights');
       }
     }
+    // Gradient text (premium feature)
+    if (overlay.useGradient) {
+      if (!premiumFeatures.includes('Gradient text')) {
+        premiumFeatures.push('Gradient text');
+      }
+    }
+    // Premium font family (not in free fonts list)
+    if (overlay.fontFamily && !FREE_FONTS.includes(overlay.fontFamily)) {
+      if (!premiumFeatures.includes('Premium fonts')) {
+        premiumFeatures.push('Premium fonts');
+      }
+    }
   }
 
   // 6. Premium padding (not in free presets)
@@ -443,12 +516,18 @@ export function checkPremiumFeaturesUsed(state: EditorStateForCheck): PremiumUsa
     premiumFeatures.push('Custom padding');
   }
 
-  // 7. Custom shadow settings
-  if (state.shadowBlur !== FREE_TIER_LIMITS.fixedShadowBlur) {
-    premiumFeatures.push('Custom shadow blur');
-  }
-  if (state.shadowOpacity !== FREE_TIER_LIMITS.fixedShadowOpacity * 100) {
-    premiumFeatures.push('Custom shadow opacity');
+  // 7. Custom shadow settings - ONLY check if shadow is enabled (blur > 0)
+  if (state.shadowBlur > 0) {
+    if (state.shadowBlur !== FREE_TIER_LIMITS.fixedShadowBlur) {
+      premiumFeatures.push('Custom shadow blur');
+    }
+    if (state.shadowOpacity !== FREE_TIER_LIMITS.fixedShadowOpacity * 100) {
+      premiumFeatures.push('Custom shadow opacity');
+    }
+    // Custom shadow color (not default black)
+    if (state.shadowColor && state.shadowColor !== DEFAULT_SHADOW_COLOR) {
+      premiumFeatures.push('Custom shadow color');
+    }
   }
 
   // 8. Premium border radius (not in free presets)

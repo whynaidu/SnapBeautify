@@ -20,8 +20,8 @@ const DEFAULT_STATE: EditorState = {
     uncroppedImage: null,
     uncroppedImageDataUrl: null,
     backgroundType: 'gradient',
-    backgroundColor: '#6366f1',
-    gradientColors: ['#6366f1', '#8b5cf6'],
+    backgroundColor: '#0ea5e9',
+    gradientColors: ['#0ea5e9', '#8b5cf6'], // "Ocean" - Free tier gradient (index 1)
     gradientAngle: 135,
     meshGradientCSS: '',
     backgroundImage: null,
@@ -38,14 +38,14 @@ const DEFAULT_STATE: EditorState = {
     logoPatternOpacity: 0.3,
     logoPatternSize: 0.3, // 30% of canvas dimension
     logoPatternSpacing: 1.5, // 1.5x spacing between logos
-    padding: 160,
-    shadowBlur: 20, // Default blur
-    shadowOpacity: 50, // Default opacity %
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 12,
-    imageScale: 0.75,
+    padding: 64, // Free tier preset
+    shadowBlur: 20, // Free tier default (fixedShadowBlur)
+    shadowOpacity: 50, // Free tier default (fixedShadowOpacity * 100)
+    shadowColor: '#000000', // Default black (free tier)
+    borderRadius: 12, // Free tier preset
+    imageScale: 1.0, // Free tier: 100% is within 50-150% range
     rotation: 0,
-    frameType: 'none',
+    frameType: 'none', // Free tier
     frameColor: '#1f2937',
     aspectRatio: null,
     canvasWidth: 1600,
@@ -54,8 +54,8 @@ const DEFAULT_STATE: EditorState = {
     selectedTextOverlayId: null,
     isCropping: false,
     cropArea: null,
-    exportFormat: 'png',
-    exportScale: 2,
+    exportFormat: 'png', // Free tier
+    exportScale: 2, // Free tier (1x or 2x)
 };
 
 /**
