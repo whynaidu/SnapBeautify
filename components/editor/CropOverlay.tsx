@@ -109,16 +109,22 @@ export function CropOverlay({ canvasWidth, canvasHeight, displayScale }: CropOve
         }
     }, [isDragging, handleMouseMove, handleMouseUp]);
 
+    // The overlay needs to exactly match the canvas position and size
+    // Since the canvas is in normal flow and scales from center,
+    // the overlay must be positioned to overlay it exactly
     return (
         <>
             <div
                 ref={overlayRef}
-                className="absolute top-0 left-0 z-10 pointer-events-none"
+                className="absolute z-10 pointer-events-none"
                 style={{
                     width: `${canvasWidth}px`,
                     height: `${canvasHeight}px`,
+                    // Position at top-left, same as the canvas in the relative container
+                    top: 0,
+                    left: 0,
                     transform: `scale(${displayScale})`,
-                    transformOrigin: 'center center',
+                    transformOrigin: 'top left',
                 }}
             >
                 {/* Darkened overlay */}

@@ -17,7 +17,7 @@ import {
   CreditCard,
   RefreshCcw,
   Star,
-  Infinity
+  Infinity as InfinityIcon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -160,7 +160,7 @@ export function PricingSection() {
                         plan.color
                       )}
                       animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
+                      transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                     >
                       <Star className="w-3 h-3 fill-white" />
                       {plan.highlight}
@@ -306,7 +306,7 @@ export function PricingSection() {
                   {plan.id === 'lifetime' && (
                     <div className="mt-6 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
                       <div className="flex items-center gap-2">
-                        <Infinity className="w-4 h-4 text-amber-500" />
+                        <InfinityIcon className="w-4 h-4 text-amber-500" />
                         <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
                           One payment, lifetime access. Never pay again.
                         </span>

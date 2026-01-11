@@ -438,15 +438,15 @@ export function ExportBar() {
     });
 
     return (
-        <div className="h-16 bg-background border-t border-border px-2 sm:px-4 flex items-center justify-between z-50">
-            <div className="flex items-center gap-1 sm:gap-3">
+        <div className="h-16 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border-t border-zinc-200/50 dark:border-zinc-800/50 px-3 sm:px-6 flex items-center justify-between z-50">
+            <div className="flex items-center gap-2 sm:gap-3">
                 {/* Format Selector */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button
                             variant="outline"
                             size="sm"
-                            className="w-16 sm:w-24 justify-between text-xs sm:text-sm"
+                            className="w-16 sm:w-24 justify-between text-xs sm:text-sm rounded-full border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 bg-white dark:bg-zinc-800"
                             disabled={isExporting}
                             aria-label={`Export format: ${exportFormat.toUpperCase()}. Click to change format`}
                         >
@@ -454,20 +454,20 @@ export function ExportBar() {
                             <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
+                    <DropdownMenuContent align="start" className="rounded-xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
                         {(['png', 'jpeg', 'webp'] as ExportFormat[]).map((format) => (
                             <DropdownMenuItem
                                 key={format}
                                 onClick={() => handleFormatChange(format)}
-                                className="flex items-center justify-between"
+                                className="flex items-center justify-between rounded-lg cursor-pointer"
                             >
                                 <span className="flex items-center gap-2">
                                     {format.toUpperCase()}
                                     {isPremiumFormat(format) && (
-                                        <Crown className="w-3 h-3 text-orange-500" />
+                                        <Crown className="w-3 h-3 text-amber-500" />
                                     )}
                                 </span>
-                                {exportFormat === format && <Check className="w-4 h-4" />}
+                                {exportFormat === format && <Check className="w-4 h-4 text-zinc-500" />}
                             </DropdownMenuItem>
                         ))}
                     </DropdownMenuContent>
@@ -479,7 +479,7 @@ export function ExportBar() {
                         <Button
                             variant="outline"
                             size="sm"
-                            className="w-12 sm:w-24 justify-between text-xs sm:text-sm border-border hover:bg-accent hover:text-accent-foreground"
+                            className="w-14 sm:w-24 justify-between text-xs sm:text-sm rounded-full border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 bg-white dark:bg-zinc-800"
                             disabled={isExporting}
                             aria-label={`Export scale: ${exportScale}x. Click to change scale`}
                         >
@@ -487,56 +487,58 @@ export function ExportBar() {
                             <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50 hidden sm:block" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
+                    <DropdownMenuContent align="start" className="rounded-xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
                         {([1, 2, 3, 4] as ExportScale[]).map((scale) => (
                             <DropdownMenuItem
                                 key={scale}
                                 onClick={() => handleScaleChange(scale)}
-                                className="flex items-center justify-between"
+                                className="flex items-center justify-between rounded-lg cursor-pointer"
                             >
                                 <span className="flex items-center gap-2">
                                     {scale}x {scale === 2 && '(Retina)'}
                                     {scale === 3 && '(3K)'}
                                     {scale === 4 && '(4K)'}
                                     {isPremiumScale(scale) && (
-                                        <Crown className="w-3 h-3 text-orange-500" />
+                                        <Crown className="w-3 h-3 text-amber-500" />
                                     )}
                                 </span>
-                                {exportScale === scale && <Check className="w-4 h-4" />}
+                                {exportScale === scale && <Check className="w-4 h-4 text-zinc-500" />}
                             </DropdownMenuItem>
                         ))}
                     </DropdownMenuContent>
                 </DropdownMenu>
 
                 {/* Current dimensions display - hide on small screens */}
-                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">
-                    {canvasWidth * exportScale}×{canvasHeight * exportScale}px
+                <div className="hidden sm:flex items-center gap-2">
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+                        {canvasWidth * exportScale}×{canvasHeight * exportScale}px
+                    </span>
                     {exportScale > 1 && (
-                        <span className="text-zinc-500 ml-1 hidden md:inline">
+                        <span className="text-[10px] text-zinc-400 dark:text-zinc-500 hidden md:inline">
                             ({canvasWidth}×{canvasHeight} @{exportScale}x)
                         </span>
                     )}
-                </span>
+                </div>
 
                 {/* Exports remaining for free users */}
                 {!hasUnlimitedExports && (
-                    <span className={`text-[10px] sm:text-xs hidden sm:inline ml-2 px-2 py-0.5 rounded ${
+                    <span className={`text-[10px] sm:text-xs hidden sm:inline px-2.5 py-1 rounded-full font-medium ${
                         exportsRemaining <= 1
-                            ? 'bg-red-500/20 text-red-400'
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
                             : exportsRemaining <= 3
-                                ? 'bg-orange-500/20 text-orange-400'
-                                : 'bg-muted text-muted-foreground'
+                                ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'
                     }`}>
                         {exportsRemaining} export{exportsRemaining !== 1 ? 's' : ''} left
                     </span>
                 )}
             </div>
 
-            <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex items-center gap-2 sm:gap-3">
                 {/* Premium features warning badge */}
                 {!canExport && (
-                    <div className="hidden sm:flex items-center gap-1 text-xs text-orange-500 bg-orange-500/10 px-2 py-1 rounded">
-                        <Lock className="w-3 h-3" />
+                    <div className="hidden sm:flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-3 py-1.5 rounded-full font-medium">
+                        <Lock className="w-3.5 h-3.5" />
                         <span>Premium features in use</span>
                     </div>
                 )}
@@ -549,10 +551,10 @@ export function ExportBar() {
                             size="sm"
                             onClick={handleShare}
                             disabled={!originalImage || isExporting}
-                            className={`gap-1 sm:gap-2 px-2 sm:px-4 border-border hover:bg-accent hover:text-accent-foreground ${!canExport ? 'border-orange-500/50' : ''}`}
+                            className={`gap-1.5 sm:gap-2 px-3 sm:px-4 rounded-full border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${!canExport ? 'border-amber-400 dark:border-amber-600' : ''}`}
                         >
-                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : !canExport ? <Lock className="w-4 h-4 text-orange-500" /> : <Share2 className="w-4 h-4" />}
-                            <span className="hidden sm:inline">Share</span>
+                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : !canExport ? <Lock className="w-4 h-4 text-amber-500" /> : <Share2 className="w-4 h-4" />}
+                            <span className="hidden sm:inline text-sm font-medium">Share</span>
                         </Button>
                     )
                 ) : (
@@ -562,10 +564,10 @@ export function ExportBar() {
                             size="sm"
                             onClick={handleCopy}
                             disabled={!originalImage || isExporting}
-                            className={`gap-1 sm:gap-2 px-2 sm:px-4 border-border hover:bg-accent hover:text-accent-foreground ${!canExport ? 'border-orange-500/50' : ''}`}
+                            className={`gap-1.5 sm:gap-2 px-3 sm:px-4 rounded-full border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${!canExport ? 'border-amber-400 dark:border-amber-600' : ''}`}
                         >
-                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : !canExport ? <Lock className="w-4 h-4 text-orange-500" /> : <Copy className="w-4 h-4" />}
-                            <span className="hidden sm:inline">Copy</span>
+                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : !canExport ? <Lock className="w-4 h-4 text-amber-500" /> : <Copy className="w-4 h-4" />}
+                            <span className="hidden sm:inline text-sm font-medium">Copy</span>
                         </Button>
                     )
                 )}
@@ -574,13 +576,15 @@ export function ExportBar() {
                     size="sm"
                     onClick={handleDownload}
                     disabled={!originalImage || isExporting}
-                    className={`gap-1 sm:gap-2 px-2 sm:px-4 shadow-sm ${!canExport ? 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600' : ''}`}
+                    className={`gap-1.5 sm:gap-2 px-4 sm:px-6 rounded-full font-semibold text-sm shadow-lg ${
+                        !canExport
+                            ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-amber-500/25'
+                            : 'bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 shadow-black/10 dark:shadow-white/10'
+                    }`}
                 >
                     {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : !canExport ? <Crown className="w-4 h-4" /> : <Download className="w-4 h-4" />}
-                    <span className="sm:inline">{!canExport ? 'Upgrade' : 'Save'}</span>
+                    <span>{!canExport ? 'Upgrade' : 'Save'}</span>
                 </Button>
-
-                <div className="h-6 w-px bg-border mx-1" />
             </div>
         </div>
     );

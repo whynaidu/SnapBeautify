@@ -451,19 +451,26 @@ export function Canvas() {
             ref={containerRef}
             className={cn(
                 'flex-1 flex items-center justify-center',
-                'bg-muted/30 overflow-hidden',
+                'overflow-hidden',
                 'relative',
                 // Increase bottom padding on mobile to prevent overlap with controls
                 // pt-20 for top spacing, pb-32 for bottom controls, on mobile
-                originalImage ? 'p-4 pt-20 pb-32 md:p-6' : 'p-6'
+                originalImage ? 'p-4 pt-20 pb-32 md:p-8' : 'p-6'
             )}
-            style={{
-                backgroundImage: `radial-gradient(var(--border) 1px, transparent 1px)`,
-                backgroundSize: '24px 24px',
-            }}
         >
             {originalImage ? (
-                <div className="relative">
+                <div
+                    className="relative"
+                    style={{
+                        // Set explicit dimensions based on scaled size to prevent layout overflow
+                        width: isCropping
+                            ? originalImage.width * displayScale
+                            : canvasWidth * displayScale,
+                        height: isCropping
+                            ? originalImage.height * displayScale
+                            : canvasHeight * displayScale,
+                    }}
+                >
                     <canvas
                         ref={canvasRef}
                         onMouseDown={handleCanvasMouseDown}
@@ -475,26 +482,28 @@ export function Canvas() {
                         onTouchEnd={handleCanvasTouchEnd}
                         style={{
                             transform: `scale(${displayScale})`,
-                            transformOrigin: 'center center',
+                            transformOrigin: 'top left',
                             touchAction: isCropping ? 'none' : 'auto', // Prevent default touch behaviors during crop
                         }}
-                        className="rounded-lg shadow-2xl"
+                        className="rounded-2xl shadow-2xl shadow-black/20 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/5"
                     />
 
                     {/* Premium Watermark Overlay */}
                     {showWatermark && (
                         <div
-                            className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg"
+                            className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl"
                             style={{
+                                width: canvasWidth,
+                                height: canvasHeight,
                                 transform: `scale(${displayScale})`,
-                                transformOrigin: 'center center',
+                                transformOrigin: 'top left',
                             }}
                         >
                             {/* Diagonal watermark pattern */}
                             <div
                                 className="absolute inset-0"
                                 style={{
-                                    background: 'repeating-linear-gradient(45deg, transparent, transparent 80px, rgba(99, 102, 241, 0.15) 80px, rgba(99, 102, 241, 0.15) 160px)',
+                                    background: 'repeating-linear-gradient(45deg, transparent, transparent 80px, rgba(0, 0, 0, 0.08) 80px, rgba(0, 0, 0, 0.08) 160px)',
                                 }}
                             />
 
@@ -509,8 +518,7 @@ export function Canvas() {
                                     {Array.from({ length: 25 }).map((_, i) => (
                                         <div
                                             key={i}
-                                            className="text-2xl font-bold text-indigo-500/30 whitespace-nowrap select-none"
-                                            style={{ textShadow: '0 0 10px rgba(99, 102, 241, 0.3)' }}
+                                            className="text-2xl font-bold text-zinc-900/20 dark:text-white/20 whitespace-nowrap select-none"
                                         >
                                             SNAPBEAUTIFY PRO
                                         </div>
@@ -520,11 +528,11 @@ export function Canvas() {
 
                             {/* Premium features badge at bottom */}
                             <div className="absolute bottom-4 left-4 right-4 flex justify-center">
-                                <div className="bg-black/80 backdrop-blur-sm text-white px-4 py-2 rounded-lg max-w-md">
-                                    <div className="text-xs font-semibold text-orange-400 mb-1">Premium Features Used:</div>
-                                    <div className="text-[10px] text-white/80 flex flex-wrap gap-1">
+                                <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white px-4 py-3 rounded-2xl max-w-md shadow-xl">
+                                    <div className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-2">Premium Features Used:</div>
+                                    <div className="text-[10px] text-zinc-600 dark:text-zinc-400 flex flex-wrap gap-1.5">
                                         {premiumUsage.premiumFeatures.map((feature, i) => (
-                                            <span key={i} className="bg-white/10 px-2 py-0.5 rounded">
+                                            <span key={i} className="bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-full font-medium">
                                                 {feature}
                                             </span>
                                         ))}
@@ -537,22 +545,22 @@ export function Canvas() {
                     {/* Alignment Guides */}
                     {alignmentGuides.showCenterX && (
                         <div
-                            className="absolute top-0 bottom-0 w-0.5 bg-pink-500 pointer-events-none z-10"
+                            className="absolute w-0.5 bg-pink-500 pointer-events-none z-10"
                             style={{
-                                left: '50%',
-                                transform: `translateX(-50%) scale(${displayScale})`,
-                                transformOrigin: 'center center',
+                                left: (canvasWidth * displayScale) / 2,
+                                top: 0,
+                                height: canvasHeight * displayScale,
                                 opacity: 0.8,
                             }}
                         />
                     )}
                     {alignmentGuides.showCenterY && (
                         <div
-                            className="absolute left-0 right-0 h-0.5 bg-pink-500 pointer-events-none z-10"
+                            className="absolute h-0.5 bg-pink-500 pointer-events-none z-10"
                             style={{
-                                top: '50%',
-                                transform: `translateY(-50%) scale(${displayScale})`,
-                                transformOrigin: 'center center',
+                                top: (canvasHeight * displayScale) / 2,
+                                left: 0,
+                                width: canvasWidth * displayScale,
                                 opacity: 0.8,
                             }}
                         />

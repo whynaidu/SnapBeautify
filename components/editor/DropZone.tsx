@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload, Image as ImageIcon, Clipboard } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Upload, Image as ImageIcon, Clipboard, Sparkles, ArrowUpFromLine } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { loadImageFromFile } from '@/lib/utils/image';
 import { cn } from '@/lib/utils';
@@ -132,64 +133,127 @@ export function DropZone() {
     if (originalImage) return null;
 
     return (
-        <div
-            {...getRootProps()}
-            role="button"
-            aria-label="Upload screenshot - drag and drop or click to select file"
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    // Trigger file dialog by clicking the input
-                    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
-                    input?.click();
-                }
-            }}
-            className={cn(
-                'flex flex-col items-center justify-center',
-                'w-full h-full min-h-[200px] sm:min-h-[400px]',
-                'm-4 sm:m-6',
-                'border-2 border-dashed rounded-xl',
-                'cursor-pointer transition-all duration-200',
-                'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-background',
-                isDragActive
-                    ? 'border-indigo-500 bg-indigo-500/10'
-                    : 'border-zinc-700 hover:border-zinc-500 bg-zinc-900/50'
-            )}
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-2xl mx-auto p-4 sm:p-6"
         >
-            <input
-                {...getInputProps()}
-                aria-label="File input for screenshot upload"
-            />
+            <div
+                {...getRootProps()}
+                role="button"
+                aria-label="Upload screenshot - drag and drop or click to select file"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+                        input?.click();
+                    }
+                }}
+                className={cn(
+                    'relative flex flex-col items-center justify-center',
+                    'w-full min-h-[280px] sm:min-h-[360px]',
+                    'rounded-3xl',
+                    'cursor-pointer transition-all duration-300',
+                    'focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:ring-offset-4 focus:ring-offset-zinc-50 dark:focus:ring-offset-zinc-950',
+                    isDragActive
+                        ? 'bg-black dark:bg-white scale-[1.02]'
+                        : 'bg-white dark:bg-zinc-900 border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xl hover:shadow-black/5 dark:hover:shadow-white/5'
+                )}
+            >
+                <input
+                    {...getInputProps()}
+                    aria-label="File input for screenshot upload"
+                />
 
-            <div className="flex flex-col items-center gap-3 sm:gap-4 p-4 sm:p-8 text-center">
-                <div
-                    className={cn(
-                        'p-3 sm:p-4 rounded-full',
-                        isDragActive ? 'bg-indigo-500/20' : 'bg-zinc-800'
-                    )}
-                >
-                    {isDragActive ? (
-                        <ImageIcon className="w-6 h-6 sm:w-8 sm:h-8 text-indigo-500" />
-                    ) : (
-                        <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-zinc-400" />
-                    )}
+                <div className="flex flex-col items-center gap-4 sm:gap-6 p-6 sm:p-10 text-center">
+                    {/* Icon container */}
+                    <motion.div
+                        animate={isDragActive ? { scale: 1.1, rotate: 5 } : { scale: 1, rotate: 0 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                        className={cn(
+                            'w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shadow-lg',
+                            isDragActive
+                                ? 'bg-white dark:bg-black shadow-white/20'
+                                : 'bg-black dark:bg-white shadow-black/10 dark:shadow-white/10'
+                        )}
+                    >
+                        {isDragActive ? (
+                            <Sparkles className="w-8 h-8 sm:w-10 sm:h-10 text-black dark:text-white" />
+                        ) : (
+                            <ArrowUpFromLine className="w-8 h-8 sm:w-10 sm:h-10 text-white dark:text-black" />
+                        )}
+                    </motion.div>
+
+                    {/* Text content */}
+                    <div>
+                        <p className={cn(
+                            'text-lg sm:text-xl font-semibold',
+                            isDragActive
+                                ? 'text-white dark:text-black'
+                                : 'text-zinc-900 dark:text-white'
+                        )}>
+                            {isDragActive ? 'Release to upload' : 'Drop your image here'}
+                        </p>
+                        <p className={cn(
+                            'text-sm sm:text-base mt-1',
+                            isDragActive
+                                ? 'text-white/70 dark:text-black/70'
+                                : 'text-zinc-500 dark:text-zinc-400'
+                        )}>
+                            or click to browse files
+                        </p>
+                    </div>
+
+                    {/* Clipboard hint */}
+                    <div className={cn(
+                        'hidden sm:flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium',
+                        isDragActive
+                            ? 'bg-white/20 text-white dark:bg-black/20 dark:text-black'
+                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+                    )}>
+                        <Clipboard className="w-3.5 h-3.5" />
+                        <span>Paste from clipboard (⌘V / Ctrl+V)</span>
+                    </div>
+
+                    {/* Supported formats */}
+                    <div className={cn(
+                        'flex items-center gap-2',
+                        isDragActive
+                            ? 'text-white/60 dark:text-black/60'
+                            : 'text-zinc-400 dark:text-zinc-500'
+                    )}>
+                        <span className="text-xs font-medium">Supports:</span>
+                        <div className="flex gap-1.5">
+                            {['PNG', 'JPG', 'WebP', 'GIF'].map((format) => (
+                                <span
+                                    key={format}
+                                    className={cn(
+                                        'text-[10px] px-2 py-0.5 rounded-full font-medium',
+                                        isDragActive
+                                            ? 'bg-white/20 dark:bg-black/20'
+                                            : 'bg-zinc-100 dark:bg-zinc-800'
+                                    )}
+                                >
+                                    {format}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
-                <div>
-                    <p className="text-base sm:text-lg font-medium text-zinc-200">
-                        {isDragActive ? 'Drop your image here' : 'Tap to select screenshot'}
-                    </p>
-                    <p className="text-xs sm:text-sm text-zinc-500 mt-1">or drag & drop</p>
-                </div>
-
-                <div className="hidden sm:flex items-center gap-2 text-xs text-zinc-600">
-                    <Clipboard className="w-3 h-3" />
-                    <span>You can also paste from clipboard (⌘V)</span>
-                </div>
-
-                <p className="text-[10px] sm:text-xs text-zinc-600">PNG, JPG, WebP, GIF</p>
+                {/* Decorative gradient when active */}
+                {isDragActive && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="absolute inset-0 rounded-3xl pointer-events-none overflow-hidden"
+                    >
+                        <div className="absolute -inset-4 bg-gradient-to-r from-violet-500/20 via-transparent to-pink-500/20 blur-2xl" />
+                    </motion.div>
+                )}
             </div>
-        </div>
+        </motion.div>
     );
 }

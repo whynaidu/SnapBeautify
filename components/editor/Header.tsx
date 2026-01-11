@@ -2,16 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Sparkles, RotateCcw, Settings, Moon, Sun, Laptop, Crop, Undo, FileText, Shield, RefreshCcw, Mail, Truck } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Sparkles, RotateCcw, Crop, Undo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-    DropdownMenuSeparator,
-    DropdownMenuLabel,
-} from '@/components/ui/dropdown-menu';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -23,13 +16,11 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useEditorStore } from '@/lib/store/editor-store';
-import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
 import { UserMenu } from '@/components/auth/UserMenu';
 
 export function Header() {
     const { resetToDefaults, originalImage, enterCropMode, isCropping, uncroppedImage, revertCrop } = useEditorStore();
-    const { setTheme, theme } = useTheme();
     const [showResetDialog, setShowResetDialog] = useState(false);
 
     const handleResetConfirm = () => {
@@ -49,131 +40,89 @@ export function Header() {
     };
 
     return (
-        <header className="h-14 bg-background/80 backdrop-blur-md border-b border-border px-4 flex items-center justify-between sticky top-0 z-50">
-            <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                        <Sparkles className="w-4 h-4 text-white" />
+        <header className="h-16 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50">
+            {/* Logo and brand */}
+            <div className="flex items-center gap-4">
+                <Link href="/" className="flex items-center gap-3 group">
+                    <motion.div
+                        whileHover={{ scale: 1.05, rotate: 5 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="w-10 h-10 rounded-xl bg-black dark:bg-white flex items-center justify-center shadow-lg shadow-black/10 dark:shadow-white/10"
+                    >
+                        <Sparkles className="w-5 h-5 text-white dark:text-black" />
+                    </motion.div>
+                    <div className="hidden sm:block">
+                        <span className="text-lg font-bold text-zinc-900 dark:text-white">SnapBeautify</span>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 -mt-0.5">Transform your photos</p>
                     </div>
-                    <span className="text-lg font-semibold text-foreground">SnapBeautify</span>
-                </div>
-                <span className="text-xs text-muted-foreground hidden sm:inline-block">
-                    Beautiful screenshots instantly
-                </span>
+                </Link>
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* Action buttons - center */}
+            <div className="flex items-center gap-1 sm:gap-2">
                 {originalImage && (
-                    <>
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-center gap-1 sm:gap-2 bg-zinc-100 dark:bg-zinc-800 rounded-full p-1"
+                    >
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={handleCrop}
                             disabled={isCropping}
-                            className="text-muted-foreground hover:text-foreground"
+                            className="rounded-full text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 h-8 px-3"
                         >
-                            <Crop className="w-4 h-4 mr-1" />
-                            Crop
+                            <Crop className="w-4 h-4 sm:mr-1.5" />
+                            <span className="hidden sm:inline text-xs font-medium">Crop</span>
                         </Button>
                         {uncroppedImage && (
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={handleRevertCrop}
-                                className="text-muted-foreground hover:text-foreground"
+                                className="rounded-full text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 h-8 px-3"
                             >
-                                <Undo className="w-4 h-4 mr-1" />
-                                Revert Crop
+                                <Undo className="w-4 h-4 sm:mr-1.5" />
+                                <span className="hidden sm:inline text-xs font-medium">Revert</span>
                             </Button>
                         )}
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setShowResetDialog(true)}
-                            className="text-muted-foreground hover:text-foreground"
+                            className="rounded-full text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 h-8 px-3"
                         >
-                            <RotateCcw className="w-4 h-4 mr-1" />
-                            Reset All
+                            <RotateCcw className="w-4 h-4 sm:mr-1.5" />
+                            <span className="hidden sm:inline text-xs font-medium">Reset</span>
                         </Button>
-                    </>
+                    </motion.div>
                 )}
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-muted-foreground hover:text-foreground"
-                        >
-                            <Settings className="w-4 h-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Theme</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => setTheme("light")}>
-                            <Sun className="mr-2 h-4 w-4" />
-                            <span>Light</span>
-                            {theme === 'light' && <span className="ml-auto text-xs opacity-50">✓</span>}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setTheme("dark")}>
-                            <Moon className="mr-2 h-4 w-4" />
-                            <span>Dark</span>
-                            {theme === 'dark' && <span className="ml-auto text-xs opacity-50">✓</span>}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setTheme("system")}>
-                            <Laptop className="mr-2 h-4 w-4" />
-                            <span>System</span>
-                            {theme === 'system' && <span className="ml-auto text-xs opacity-50">✓</span>}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel>Legal</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
-                            <Link href="/terms">
-                                <FileText className="mr-2 h-4 w-4" />
-                                <span>Terms & Conditions</span>
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href="/privacy">
-                                <Shield className="mr-2 h-4 w-4" />
-                                <span>Privacy Policy</span>
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href="/refund">
-                                <RefreshCcw className="mr-2 h-4 w-4" />
-                                <span>Refund Policy</span>
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href="/shipping">
-                                <Truck className="mr-2 h-4 w-4" />
-                                <span>Delivery Policy</span>
-                            </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href="/contact">
-                                <Mail className="mr-2 h-4 w-4" />
-                                <span>Contact Us</span>
-                            </Link>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+            </div>
 
+            {/* Right side controls */}
+            <div className="flex items-center gap-2">
                 {/* User Menu */}
                 <UserMenu />
             </div>
 
+            {/* Reset confirmation dialog */}
             <AlertDialog open={showResetDialog} onOpenChange={setShowResetDialog}>
-                <AlertDialogContent>
+                <AlertDialogContent className="rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Reset all settings?</AlertDialogTitle>
-                        <AlertDialogDescription>
+                        <AlertDialogTitle className="text-zinc-900 dark:text-white">Reset all settings?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-zinc-500 dark:text-zinc-400">
                             This will reset all adjustments to their default values. This action cannot be undone.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleResetConfirm}>
+                        <AlertDialogCancel className="rounded-full border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                            Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleResetConfirm}
+                            className="rounded-full bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200"
+                        >
                             Reset All
                         </AlertDialogAction>
                     </AlertDialogFooter>

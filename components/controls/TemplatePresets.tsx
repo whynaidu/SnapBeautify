@@ -115,16 +115,16 @@ export function TemplatePresets() {
                                 )}
                             >
                                 {/* Preview */}
-                                <div className="relative aspect-video">
+                                <div className="relative aspect-video bg-zinc-800">
                                     {/* Background Preview */}
                                     <div
-                                        className="absolute inset-0"
+                                        className="absolute inset-0 z-0"
                                         style={getPreviewStyle(template.preview)}
                                     />
 
                                     {/* Text Pattern Preview Overlay */}
                                     {template.preview.backgroundType === 'textPattern' && template.preview.textPatternText && (
-                                        <div className="absolute inset-0 flex items-center justify-center overflow-hidden pointer-events-none">
+                                        <div className="absolute inset-0 z-[1] flex items-center justify-center overflow-hidden pointer-events-none">
                                             <div
                                                 className="text-3xl font-black uppercase whitespace-nowrap"
                                                 style={{
@@ -138,10 +138,10 @@ export function TemplatePresets() {
                                     )}
 
                                     {/* Mock Image */}
-                                    <div className="absolute inset-0 flex items-center justify-center p-4">
-                                        <div className="w-full h-full bg-white/5 backdrop-blur-[2px] rounded-md border border-white/20 flex items-center justify-center">
-                                            <div className="text-white/70 text-xs font-medium">
-                                                Image
+                                    <div className="absolute inset-0 z-[2] flex items-center justify-center p-3">
+                                        <div className="w-full h-full bg-white/10 rounded-md border border-white/20 flex items-center justify-center shadow-sm">
+                                            <div className="text-white/60 text-[10px] font-medium">
+                                                Preview
                                             </div>
                                         </div>
                                     </div>
@@ -194,27 +194,34 @@ function getPreviewStyle(preview: TemplatePreset['preview']): React.CSSPropertie
 
     if (backgroundType === 'solid') {
         return {
-            backgroundColor: preview.backgroundColor,
+            backgroundColor: preview.backgroundColor || '#6366f1',
         };
     }
 
     if (backgroundType === 'gradient') {
+        const color1 = preview.gradientColors?.[0] || '#6366f1';
+        const color2 = preview.gradientColors?.[1] || '#8b5cf6';
+        const angle = preview.gradientAngle || 135;
         return {
-            background: `linear-gradient(${preview.gradientAngle || 135}deg, ${preview.gradientColors?.[0]}, ${preview.gradientColors?.[1]})`,
+            background: `linear-gradient(${angle}deg, ${color1}, ${color2})`,
+            backgroundColor: color1, // Fallback
         };
     }
 
     if (backgroundType === 'mesh') {
         return {
-            background: preview.meshGradientCSS,
+            background: preview.meshGradientCSS || 'radial-gradient(at 50% 50%, #6366f1 0px, transparent 50%)',
             backgroundColor: '#0f172a',
         };
     }
 
     if (backgroundType === 'textPattern') {
+        const color1 = preview.gradientColors?.[0] || '#f472b6';
+        const color2 = preview.gradientColors?.[1] || '#c084fc';
+        const angle = preview.gradientAngle || 135;
         return {
-            background: `linear-gradient(${preview.gradientAngle || 135}deg, ${preview.gradientColors?.[0]}, ${preview.gradientColors?.[1]})`,
-            position: 'relative' as const,
+            background: `linear-gradient(${angle}deg, ${color1}, ${color2})`,
+            backgroundColor: color1, // Fallback
         };
     }
 
@@ -228,6 +235,7 @@ function getPreviewStyle(preview: TemplatePreset['preview']): React.CSSPropertie
             background: flipped
                 ? `linear-gradient(to top, ${gradientStart}, ${gradientEnd} 50%, ${solidColor} 50%)`
                 : `linear-gradient(to bottom, ${gradientStart}, ${gradientEnd} 50%, ${solidColor} 50%)`,
+            backgroundColor: gradientStart, // Fallback
         };
     }
 
