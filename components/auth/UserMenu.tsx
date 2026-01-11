@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useAuth } from '@/lib/auth/context';
 import { useSubscription } from '@/lib/subscription/context';
 import { showAuthModal, showUpgradeModal } from '@/lib/events';
@@ -19,6 +20,39 @@ import {
   DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
 import { User, LogOut, Crown, Sun, Moon, Laptop, FileText, Shield, RefreshCcw, Mail, Truck, Check } from 'lucide-react';
+
+// Avatar component with fallback
+function UserAvatar({ src, name, size = 'sm' }: { src?: string | null; name?: string; size?: 'sm' | 'md' }) {
+  const sizeClasses = size === 'sm' ? 'w-6 h-6' : 'w-10 h-10';
+  const iconSize = size === 'sm' ? 'w-3.5 h-3.5' : 'w-5 h-5';
+
+  if (src) {
+    return (
+      <div className={`${sizeClasses} rounded-full overflow-hidden ring-2 ring-zinc-200 dark:ring-zinc-700`}>
+        <Image
+          src={src}
+          alt={name || 'User avatar'}
+          width={size === 'sm' ? 24 : 40}
+          height={size === 'sm' ? 24 : 40}
+          className="w-full h-full object-cover"
+          referrerPolicy="no-referrer"
+        />
+      </div>
+    );
+  }
+
+  // Fallback to initials or icon
+  const initial = name?.charAt(0).toUpperCase();
+  return (
+    <div className={`${sizeClasses} rounded-full bg-primary/20 flex items-center justify-center`}>
+      {initial ? (
+        <span className={`${size === 'sm' ? 'text-xs' : 'text-sm'} font-medium`}>{initial}</span>
+      ) : (
+        <User className={iconSize} />
+      )}
+    </div>
+  );
+}
 
 // Extracted outside to avoid recreating on each render
 function SettingsMenuContent({
@@ -98,6 +132,10 @@ export function UserMenu() {
   const { isPro, plan } = useSubscription();
   const { setTheme, theme } = useTheme();
 
+  // Get avatar URL and display name from user metadata
+  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+  const displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0];
+
   const handleSignOut = async () => {
     await signOut();
     // Redirect with flag to skip loading animation
@@ -132,30 +170,32 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2 rounded-full">
-          <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-            <User className="w-3.5 h-3.5" />
-          </div>
+        <Button variant="outline" size="sm" className="gap-2 rounded-full pl-1.5">
+          <UserAvatar src={avatarUrl} name={displayName} size="sm" />
           <span className="max-w-[100px] truncate text-xs hidden sm:inline">
-            {user?.email?.split('@')[0]}
+            {displayName}
           </span>
           {isPro && <Crown className="w-3.5 h-3.5 text-orange-500" />}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 rounded-xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
+      <DropdownMenuContent align="end" className="w-64 rounded-xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
         <DropdownMenuLabel>
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium">{user?.email}</p>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              {isPro ? (
-                <>
-                  <Crown className="w-3 h-3 text-orange-500" />
-                  Pro ({plan})
-                </>
-              ) : (
-                'Free Plan'
-              )}
-            </p>
+          <div className="flex items-center gap-3">
+            <UserAvatar src={avatarUrl} name={displayName} size="md" />
+            <div className="flex flex-col min-w-0">
+              <p className="text-sm font-medium truncate">{displayName}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                {isPro ? (
+                  <>
+                    <Crown className="w-3 h-3 text-orange-500" />
+                    Pro ({plan})
+                  </>
+                ) : (
+                  'Free Plan'
+                )}
+              </p>
+            </div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

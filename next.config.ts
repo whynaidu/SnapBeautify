@@ -24,6 +24,19 @@ const nextConfig: NextConfig = {
   trailingSlash: isStatic,
   images: {
     unoptimized: isStatic,
+    // Allow avatar images from OAuth providers
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com', // Google avatars
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com', // GitHub avatars
+        pathname: '/**',
+      },
+    ],
   },
 
   // Production optimizations
