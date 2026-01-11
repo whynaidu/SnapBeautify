@@ -1,201 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { Container } from '../layout/container'
 import { Button } from '@/components/ui/button'
 import { FadeIn } from '../animations/fade-in'
 import { ArrowRight } from 'lucide-react'
-
-// Large animated circles with thick borders - Desktop
-const floatingCircles = [
-  { size: 500, x: '-5%', y: '-10%', duration: 20, borderWidth: 2 },
-  { size: 400, x: '70%', y: '-5%', duration: 18, borderWidth: 2 },
-  { size: 350, x: '80%', y: '50%', duration: 22, borderWidth: 1.5 },
-  { size: 450, x: '-10%', y: '60%', duration: 25, borderWidth: 2 },
-]
-
-// Smaller circles for mobile
-const mobileFloatingCircles = [
-  { size: 200, x: '-10%', y: '10%', duration: 15, borderWidth: 1.5 },
-  { size: 150, x: '80%', y: '5%', duration: 18, borderWidth: 1 },
-  { size: 180, x: '85%', y: '60%', duration: 20, borderWidth: 1.5 },
-]
-
-// Visible animated dots - Desktop
-const animatedDots = [
-  { size: 12, x: '15%', y: '20%', duration: 3 },
-  { size: 10, x: '30%', y: '15%', duration: 4 },
-  { size: 14, x: '85%', y: '25%', duration: 3.5 },
-  { size: 11, x: '75%', y: '70%', duration: 4.5 },
-  { size: 13, x: '20%', y: '75%', duration: 3.8 },
-  { size: 9, x: '60%', y: '20%', duration: 4.2 },
-  { size: 12, x: '45%', y: '80%', duration: 3.2 },
-  { size: 10, x: '90%', y: '50%', duration: 4 },
-  { size: 11, x: '10%', y: '45%', duration: 3.6 },
-  { size: 14, x: '50%', y: '10%', duration: 4.8 },
-  { size: 8, x: '65%', y: '85%', duration: 3.4 },
-  { size: 12, x: '35%', y: '55%', duration: 4.1 },
-]
-
-// Fewer dots for mobile
-const mobileAnimatedDots = [
-  { size: 8, x: '10%', y: '15%', duration: 3 },
-  { size: 10, x: '90%', y: '20%', duration: 4 },
-  { size: 9, x: '85%', y: '75%', duration: 3.5 },
-  { size: 8, x: '15%', y: '80%', duration: 4.5 },
-  { size: 10, x: '50%', y: '10%', duration: 3.8 },
-]
-
-// Pulsing rings - ripple effect - Desktop
-const pulsingRings = [
-  { size: 300, x: '15%', y: '20%', duration: 3, delay: 0 },
-  { size: 250, x: '80%', y: '30%', duration: 3.5, delay: 0.5 },
-  { size: 280, x: '75%', y: '65%', duration: 3.2, delay: 1 },
-  { size: 220, x: '20%', y: '70%', duration: 4, delay: 1.5 },
-  { size: 200, x: '50%', y: '50%', duration: 3.8, delay: 0.8 },
-]
-
-// Smaller pulsing rings for mobile
-const mobilePulsingRings = [
-  { size: 120, x: '10%', y: '20%', duration: 3, delay: 0 },
-  { size: 100, x: '80%', y: '70%', duration: 3.5, delay: 0.5 },
-]
-
-// Floating crosses/plus signs - Desktop
-const floatingCrosses = [
-  { size: 30, x: '25%', y: '30%', duration: 6, rotation: 45 },
-  { size: 24, x: '70%', y: '20%', duration: 7, rotation: 0 },
-  { size: 28, x: '80%', y: '75%', duration: 5.5, rotation: 15 },
-  { size: 22, x: '15%', y: '65%', duration: 6.5, rotation: -15 },
-  { size: 26, x: '55%', y: '85%', duration: 5, rotation: 30 },
-]
-
-// Smaller crosses for mobile
-const mobileFloatingCrosses = [
-  { size: 18, x: '15%', y: '25%', duration: 6, rotation: 45 },
-  { size: 16, x: '85%', y: '70%', duration: 7, rotation: 0 },
-]
-
-function FloatingCircle({ size, x, y, duration, borderWidth }: typeof floatingCircles[0]) {
-  return (
-    <motion.div
-      className="absolute rounded-full border-zinc-400 dark:border-zinc-500"
-      style={{
-        width: size,
-        height: size,
-        left: x,
-        top: y,
-        borderWidth: borderWidth,
-        borderStyle: 'solid',
-      }}
-      animate={{
-        x: [0, 30, -20, 15, 0],
-        y: [0, -20, 25, -15, 0],
-        rotate: [0, 8, -8, 5, 0],
-      }}
-      transition={{
-        duration,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      }}
-    />
-  )
-}
-
-function AnimatedDot({ size, x, y, duration }: typeof animatedDots[0]) {
-  return (
-    <motion.div
-      className="absolute rounded-full bg-zinc-500 dark:bg-zinc-400"
-      style={{
-        width: size,
-        height: size,
-        left: x,
-        top: y,
-      }}
-      animate={{
-        y: [0, -25, 0],
-        scale: [1, 1.5, 1],
-        opacity: [0.6, 1, 0.6],
-      }}
-      transition={{
-        duration,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      }}
-    />
-  )
-}
-
-function PulsingRing({ size, x, y, duration, delay }: typeof pulsingRings[0]) {
-  return (
-    <motion.div
-      className="absolute rounded-full border-2 border-zinc-500 dark:border-zinc-400"
-      style={{
-        width: size,
-        height: size,
-        left: x,
-        top: y,
-      }}
-      animate={{
-        scale: [0.8, 2, 0.8],
-        opacity: [0.8, 0, 0.8],
-      }}
-      transition={{
-        duration,
-        delay,
-        repeat: Infinity,
-        ease: 'easeOut',
-      }}
-    />
-  )
-}
-
-function FloatingCross({ size, x, y, duration, rotation }: typeof floatingCrosses[0]) {
-  return (
-    <motion.div
-      className="absolute"
-      style={{
-        left: x,
-        top: y,
-        rotate: rotation,
-      }}
-      animate={{
-        y: [0, -15, 0],
-        rotate: [rotation, rotation + 90, rotation],
-        opacity: [0.5, 0.9, 0.5],
-      }}
-      transition={{
-        duration,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      }}
-    >
-      {/* Horizontal line */}
-      <div
-        className="absolute bg-zinc-500 dark:bg-zinc-400 rounded-full"
-        style={{
-          width: size,
-          height: 3,
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      />
-      {/* Vertical line */}
-      <div
-        className="absolute bg-zinc-500 dark:bg-zinc-400 rounded-full"
-        style={{
-          width: 3,
-          height: size,
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      />
-    </motion.div>
-  )
-}
 
 export function CTAFinalSection() {
   return (
@@ -205,63 +14,141 @@ export function CTAFinalSection() {
 
       {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Grid pattern - more visible */}
+        {/* Grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#a1a1aa_1px,transparent_1px),linear-gradient(to_bottom,#a1a1aa_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#3f3f46_1px,transparent_1px),linear-gradient(to_bottom,#3f3f46_1px,transparent_1px)] bg-[size:3rem_3rem] sm:bg-[size:4rem_4rem] opacity-60" />
 
-        {/* Floating circles - Mobile version */}
-        <div className="sm:hidden">
-          {mobileFloatingCircles.map((circle, index) => (
-            <FloatingCircle key={`mobile-circle-${index}`} {...circle} />
-          ))}
-        </div>
+        {/* Floating circles - Mobile: smaller, Desktop: larger */}
+        {/* Top left circle */}
+        <div
+          className="absolute rounded-full border border-zinc-400/40 dark:border-zinc-500/40 w-32 h-32 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px] -left-8 -top-8 sm:-left-[5%] sm:-top-[10%]"
+          style={{
+            animation: 'cta-float-slow 8s ease-in-out infinite',
+            willChange: 'transform'
+          }}
+        />
+        {/* Top right circle */}
+        <div
+          className="absolute rounded-full border border-zinc-400/30 dark:border-zinc-500/30 w-24 h-24 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-[300px] lg:h-[300px] -right-6 -top-4 sm:right-[5%] sm:top-0"
+          style={{
+            animation: 'cta-float-medium 6s ease-in-out infinite',
+            willChange: 'transform'
+          }}
+        />
+        {/* Bottom right circle - hidden on mobile */}
+        <div
+          className="absolute rounded-full border border-zinc-400/30 dark:border-zinc-500/30 hidden sm:block sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[350px] lg:h-[350px] sm:-right-[5%] sm:bottom-[10%]"
+          style={{
+            animation: 'cta-float-slow-reverse 9s ease-in-out infinite',
+            willChange: 'transform'
+          }}
+        />
+        {/* Bottom left circle - hidden on mobile/tablet */}
+        <div
+          className="absolute rounded-full border border-zinc-400/40 dark:border-zinc-500/40 hidden lg:block lg:w-[280px] lg:h-[280px] lg:-left-[8%] lg:bottom-[20%]"
+          style={{
+            animation: 'cta-float-medium-reverse 7s ease-in-out infinite',
+            willChange: 'transform'
+          }}
+        />
 
-        {/* Floating circles - Desktop version */}
-        <div className="hidden sm:block">
-          {floatingCircles.map((circle, index) => (
-            <FloatingCircle key={`circle-${index}`} {...circle} />
-          ))}
-        </div>
+        {/* Animated dots */}
+        <div
+          className="absolute w-3 h-3 rounded-full bg-zinc-500/60 dark:bg-zinc-400/60"
+          style={{ left: '15%', top: '20%', animation: 'cta-pulse-float 3s ease-in-out infinite', willChange: 'transform, opacity' }}
+        />
+        <div
+          className="absolute w-2.5 h-2.5 rounded-full bg-zinc-500/50 dark:bg-zinc-400/50"
+          style={{ left: '85%', top: '25%', animation: 'cta-pulse-float 3.5s ease-in-out infinite 0.5s', willChange: 'transform, opacity' }}
+        />
+        <div
+          className="absolute w-3.5 h-3.5 rounded-full bg-zinc-500/60 dark:bg-zinc-400/60 hidden sm:block"
+          style={{ left: '75%', top: '70%', animation: 'cta-pulse-float 3s ease-in-out infinite', willChange: 'transform, opacity' }}
+        />
+        <div
+          className="absolute w-2.5 h-2.5 rounded-full bg-zinc-500/50 dark:bg-zinc-400/50 hidden sm:block"
+          style={{ left: '20%', top: '75%', animation: 'cta-pulse-float 3.5s ease-in-out infinite 0.5s', willChange: 'transform, opacity' }}
+        />
+        <div
+          className="absolute w-3 h-3 rounded-full bg-zinc-500/60 dark:bg-zinc-400/60 hidden md:block"
+          style={{ left: '50%', top: '10%', animation: 'cta-pulse-float 3s ease-in-out infinite', willChange: 'transform, opacity' }}
+        />
+        <div
+          className="absolute w-2 h-2 rounded-full bg-zinc-500/40 dark:bg-zinc-400/40 hidden md:block"
+          style={{ left: '60%', top: '85%', animation: 'cta-pulse-float 3.5s ease-in-out infinite 0.5s', willChange: 'transform, opacity' }}
+        />
+        <div
+          className="absolute w-2.5 h-2.5 rounded-full bg-zinc-500/50 dark:bg-zinc-400/50 hidden lg:block"
+          style={{ left: '35%', top: '55%', animation: 'cta-pulse-float 3s ease-in-out infinite', willChange: 'transform, opacity' }}
+        />
+        <div
+          className="absolute w-3 h-3 rounded-full bg-zinc-500/60 dark:bg-zinc-400/60 hidden lg:block"
+          style={{ left: '90%', top: '50%', animation: 'cta-pulse-float 3.5s ease-in-out infinite 0.5s', willChange: 'transform, opacity' }}
+        />
 
-        {/* Animated dots - Mobile version */}
-        <div className="md:hidden">
-          {mobileAnimatedDots.map((dot, index) => (
-            <AnimatedDot key={`mobile-dot-${index}`} {...dot} />
-          ))}
-        </div>
+        {/* Pulsing rings */}
+        <div
+          className="absolute rounded-full border-2 border-zinc-500/30 dark:border-zinc-400/30"
+          style={{
+            width: 200,
+            height: 200,
+            left: '15%',
+            top: '20%',
+            animation: 'cta-ring-pulse 4s ease-out infinite',
+            willChange: 'transform, opacity'
+          }}
+        />
+        <div
+          className="absolute rounded-full border-2 border-zinc-500/30 dark:border-zinc-400/30 hidden sm:block"
+          style={{
+            width: 180,
+            height: 180,
+            right: '10%',
+            top: '30%',
+            animation: 'cta-ring-pulse 4s ease-out infinite 1s',
+            willChange: 'transform, opacity'
+          }}
+        />
+        <div
+          className="absolute rounded-full border border-zinc-500/20 dark:border-zinc-400/20 hidden lg:block"
+          style={{
+            width: 150,
+            height: 150,
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            animation: 'cta-ring-pulse 4s ease-out infinite 0.5s',
+            willChange: 'transform, opacity'
+          }}
+        />
 
-        {/* Animated dots - Desktop version */}
-        <div className="hidden md:block">
-          {animatedDots.map((dot, index) => (
-            <AnimatedDot key={`dot-${index}`} {...dot} />
-          ))}
+        {/* Plus signs */}
+        <div
+          className="absolute"
+          style={{ left: '25%', top: '30%', animation: 'cta-cross-float 5s ease-in-out infinite', willChange: 'transform, opacity' }}
+        >
+          <div className="w-6 h-0.5 bg-zinc-500/50 dark:bg-zinc-400/50 rounded-full" />
+          <div className="w-0.5 h-6 bg-zinc-500/50 dark:bg-zinc-400/50 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
         </div>
-
-        {/* Pulsing rings - Mobile version */}
-        <div className="lg:hidden">
-          {mobilePulsingRings.map((ring, index) => (
-            <PulsingRing key={`mobile-ring-${index}`} {...ring} />
-          ))}
+        <div
+          className="absolute hidden sm:block"
+          style={{ left: '70%', top: '20%', animation: 'cta-cross-float 6s ease-in-out infinite 0.8s', willChange: 'transform, opacity' }}
+        >
+          <div className="w-5 h-0.5 bg-zinc-500/40 dark:bg-zinc-400/40 rounded-full" />
+          <div className="w-0.5 h-5 bg-zinc-500/40 dark:bg-zinc-400/40 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
         </div>
-
-        {/* Pulsing rings - Desktop version */}
-        <div className="hidden lg:block">
-          {pulsingRings.map((ring, index) => (
-            <PulsingRing key={`ring-${index}`} {...ring} />
-          ))}
+        <div
+          className="absolute hidden md:block"
+          style={{ right: '15%', bottom: '25%', animation: 'cta-cross-float 5s ease-in-out infinite', willChange: 'transform, opacity' }}
+        >
+          <div className="w-7 h-0.5 bg-zinc-500/50 dark:bg-zinc-400/50 rounded-full" />
+          <div className="w-0.5 h-7 bg-zinc-500/50 dark:bg-zinc-400/50 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
         </div>
-
-        {/* Floating crosses - Mobile version */}
-        <div className="md:hidden">
-          {mobileFloatingCrosses.map((cross, index) => (
-            <FloatingCross key={`mobile-cross-${index}`} {...cross} />
-          ))}
-        </div>
-
-        {/* Floating crosses - Desktop version */}
-        <div className="hidden md:block">
-          {floatingCrosses.map((cross, index) => (
-            <FloatingCross key={`cross-${index}`} {...cross} />
-          ))}
+        <div
+          className="absolute hidden lg:block"
+          style={{ left: '15%', bottom: '30%', animation: 'cta-cross-float 6s ease-in-out infinite 0.8s', willChange: 'transform, opacity' }}
+        >
+          <div className="w-5 h-0.5 bg-zinc-500/40 dark:bg-zinc-400/40 rounded-full" />
+          <div className="w-0.5 h-5 bg-zinc-500/40 dark:bg-zinc-400/40 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
         </div>
       </div>
 

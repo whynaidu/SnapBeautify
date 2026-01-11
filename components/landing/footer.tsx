@@ -7,7 +7,6 @@ import { Container } from './layout/container'
 import { Logo } from './shared/logo'
 import {
   Instagram,
-  Twitter,
   Youtube,
   Linkedin,
   Mail,
@@ -21,6 +20,13 @@ import {
   Loader2,
   AlertCircle
 } from 'lucide-react'
+
+// Custom X (formerly Twitter) icon
+const XIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
 
 const footerLinks = {
   product: {
@@ -47,10 +53,10 @@ const footerLinks = {
 
 const socialLinks = [
   {
-    icon: Twitter,
-    href: 'https://twitter.com/snapbeautify',
-    label: 'Twitter',
-    color: 'hover:bg-blue-500 hover:border-blue-500',
+    icon: XIcon,
+    href: 'https://x.com/snapbeautify',
+    label: 'X',
+    color: 'hover:bg-black hover:border-black dark:hover:bg-white dark:hover:border-white',
   },
   {
     icon: Instagram,
