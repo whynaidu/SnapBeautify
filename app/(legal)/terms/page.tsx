@@ -1,28 +1,23 @@
-import { Metadata } from 'next';
-import { FileText, CheckCircle2, AlertCircle, Scale, Globe, Shield, CreditCard, Users, Ban, Edit3, Gavel } from 'lucide-react';
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Terms and Conditions | SnapBeautify',
-  description: 'Terms and Conditions for using SnapBeautify services',
-};
+import { Metadata } from 'next';
+import { motion } from 'framer-motion';
+import { FileText, CheckCircle2, AlertCircle, Scale, Globe, Shield, CreditCard, Users, Ban, Edit3, Gavel, ArrowRight } from 'lucide-react';
 
 const sections = [
   {
     icon: CheckCircle2,
     title: 'Acceptance of Terms',
-    color: 'from-green-500 to-emerald-500',
     content: 'By accessing and using SnapBeautify ("the Service"), you accept and agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our Service.',
   },
   {
     icon: Globe,
     title: 'Description of Service',
-    color: 'from-blue-500 to-cyan-500',
     content: 'SnapBeautify is a web-based image beautification and screenshot enhancement tool that allows users to create professional-looking images with backgrounds, frames, and text overlays. The Service is provided on both free and premium subscription tiers.',
   },
   {
     icon: Users,
     title: 'User Accounts',
-    color: 'from-purple-500 to-pink-500',
     content: 'To access certain features, you must create an account.',
     list: [
       'Maintaining the confidentiality of your account credentials',
@@ -33,7 +28,6 @@ const sections = [
   {
     icon: CreditCard,
     title: 'Subscription and Payments',
-    color: 'from-orange-500 to-amber-500',
     content: 'Premium features require a paid subscription. By subscribing, you agree to:',
     list: [
       'Pay all applicable fees as per the chosen plan',
@@ -45,13 +39,11 @@ const sections = [
   {
     icon: Shield,
     title: 'Intellectual Property',
-    color: 'from-indigo-500 to-violet-500',
     content: 'The Service and its original content, features, and functionality are owned by SnapBeautify and are protected by international copyright, trademark, and other intellectual property laws. You retain ownership of images you upload and create using our Service.',
   },
   {
     icon: Ban,
     title: 'Acceptable Use',
-    color: 'from-red-500 to-rose-500',
     content: 'You agree not to use the Service to:',
     list: [
       'Upload or create illegal, harmful, or offensive content',
@@ -63,95 +55,131 @@ const sections = [
   {
     icon: AlertCircle,
     title: 'Limitation of Liability',
-    color: 'from-yellow-500 to-orange-500',
     content: 'SnapBeautify shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of the Service. Our total liability shall not exceed the amount paid by you for the Service in the past 12 months.',
   },
   {
     icon: Edit3,
     title: 'Modifications to Service',
-    color: 'from-teal-500 to-cyan-500',
     content: 'We reserve the right to modify or discontinue the Service at any time, with or without notice. We shall not be liable to you or any third party for any modification, suspension, or discontinuance of the Service.',
   },
   {
     icon: Gavel,
     title: 'Governing Law',
-    color: 'from-slate-500 to-zinc-500',
     content: 'These Terms shall be governed by and construed in accordance with the laws of India. Any disputes arising from these Terms shall be subject to the exclusive jurisdiction of the courts in Bangalore, Karnataka, India.',
   },
 ];
 
 export default function TermsPage() {
   return (
-    <div className="py-12 px-4">
+    <div className="relative py-12 px-4">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#27272a_1px,transparent_1px),linear-gradient(to_bottom,#27272a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
+      </div>
+
       <div className="max-w-4xl mx-auto">
         {/* Hero Section */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-2xl shadow-purple-500/25 mb-6">
-            <FileText className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent mb-4">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div
+            className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-black dark:bg-white mb-6"
+            whileHover={{ scale: 1.05, rotate: 5 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
+            <FileText className="w-10 h-10 text-white dark:text-black" />
+          </motion.div>
+          <h1 className="text-4xl md:text-5xl font-bold text-black dark:text-white mb-4">
             Terms & Conditions
           </h1>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-zinc-600 dark:text-zinc-400 text-lg">
             Last updated: January 2025
           </p>
-        </div>
+        </motion.div>
 
         {/* Content Sections */}
         <div className="space-y-6">
           {sections.map((section, index) => (
-            <div
+            <motion.div
               key={index}
-              className="group relative bg-card hover:bg-card/80 border border-border/50 hover:border-border rounded-2xl p-6 transition-all duration-300 hover:shadow-lg"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.5, delay: index * 0.05 }}
+              whileHover={{ y: -2 }}
+              className="group relative bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-2xl p-6 transition-all duration-300 hover:shadow-lg"
             >
               <div className="flex gap-4">
-                <div className={`flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${section.color} flex items-center justify-center shadow-lg`}>
-                  <section.icon className="w-6 h-6 text-white" />
-                </div>
+                <motion.div
+                  className="flex-shrink-0 w-12 h-12 rounded-xl bg-black dark:bg-white flex items-center justify-center"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: 'spring', stiffness: 300 }}
+                >
+                  <section.icon className="w-6 h-6 text-white dark:text-black" />
+                </motion.div>
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-xl font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <span className="text-muted-foreground text-sm font-normal">
+                  <h2 className="text-xl font-semibold text-black dark:text-white mb-3 flex items-center gap-2">
+                    <span className="text-zinc-400 dark:text-zinc-600 text-sm font-normal">
                       {String(index + 1).padStart(2, '0')}
                     </span>
                     {section.title}
                   </h2>
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
                     {section.content}
                   </p>
                   {section.list && (
                     <ul className="mt-4 space-y-2">
                       {section.list.map((item, i) => (
-                        <li key={i} className="flex items-start gap-3 text-muted-foreground">
-                          <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                        <motion.li
+                          key={i}
+                          className="flex items-start gap-3 text-zinc-600 dark:text-zinc-400"
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.1 * i }}
+                        >
+                          <CheckCircle2 className="w-5 h-5 text-black dark:text-white flex-shrink-0 mt-0.5" />
                           <span>{item}</span>
-                        </li>
+                        </motion.li>
                       ))}
                     </ul>
                   )}
                   {section.note && (
-                    <div className="mt-4 p-4 rounded-xl bg-muted/50 border border-border/50">
-                      <p className="text-sm text-muted-foreground">{section.note}</p>
+                    <div className="mt-4 p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">{section.note}</p>
                     </div>
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* Contact Section */}
-        <div className="mt-12 p-8 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20">
+        <motion.div
+          className="mt-12 p-8 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="text-center">
-            <h3 className="text-xl font-semibold text-foreground mb-2">Questions about our Terms?</h3>
-            <p className="text-muted-foreground mb-4">We&apos;re here to help clarify anything.</p>
-            <a
+            <h3 className="text-xl font-semibold text-black dark:text-white mb-2">Questions about our Terms?</h3>
+            <p className="text-zinc-600 dark:text-zinc-400 mb-6">We&apos;re here to help clarify anything.</p>
+            <motion.a
               href="mailto:support@snapbeautify.com"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-black dark:bg-white text-white dark:text-black font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               Contact Support
-            </a>
+              <ArrowRight className="w-4 h-4" />
+            </motion.a>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

@@ -1,0 +1,6 @@
+export { Logo } from './logo'
+export { FeatureCard } from './feature-card'
+export { PricingCard } from './pricing-card'
+export { ComparisonSlider } from './comparison-slider'
+export { TestimonialCard } from './testimonial-card'
+export { Badge, badgeVariants, type BadgeProps } from './badge'

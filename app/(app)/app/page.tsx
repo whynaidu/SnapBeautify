@@ -1,7 +1,7 @@
-import { Editor } from '@/components/editor/Editor';
-import { Toaster } from 'sonner';
+import { Editor } from '@/components/editor/Editor'
+import { Toaster } from 'sonner'
 
-export default function Home() {
+export default function EditorPage() {
   return (
     <>
       <Editor />
@@ -13,5 +13,5 @@ export default function Home() {
         }}
       />
     </>
-  );
+  )
 }

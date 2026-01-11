@@ -6,12 +6,11 @@ import { AuthProvider } from '@/lib/auth/context';
 import { SubscriptionProvider } from '@/lib/subscription/context';
 import { UpgradeModal } from '@/components/subscription/UpgradeModal';
 import { GlobalAuthModal } from '@/components/auth/GlobalAuthModal';
-import { AuthGate } from '@/components/auth/AuthGate';
 
 export const metadata: Metadata = {
-  title: 'SnapBeautify - Beautiful Screenshots Instantly',
+  title: 'SnapBeautify - Transform Your Photos Instantly',
   description:
-    'Transform plain screenshots into stunning visuals with beautiful backgrounds, shadows, and frames. Free online screenshot beautifier tool.',
+    'Professional-quality image enhancement that works entirely in your browser. AI-powered background removal, smart enhancement, and more.',
   keywords: [
     'screenshot',
     'beautify',
@@ -20,12 +19,14 @@ export const metadata: Metadata = {
     'social media',
     'image editor',
     'screenshot tool',
+    'photo enhancement',
+    'AI photo editor',
   ],
   authors: [{ name: 'SnapBeautify' }],
   openGraph: {
-    title: 'SnapBeautify - Beautiful Screenshots Instantly',
+    title: 'SnapBeautify - Transform Your Photos Instantly',
     description:
-      'Transform plain screenshots into stunning visuals with beautiful backgrounds, shadows, and frames.',
+      'Professional-quality image enhancement that works entirely in your browser.',
     type: 'website',
   },
 };
@@ -52,15 +53,13 @@ export default function RootLayout({
         <ErrorBoundary>
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
-            enableSystem
+            defaultTheme="system"
+            enableSystem={true}
             disableTransitionOnChange
           >
             <AuthProvider>
               <SubscriptionProvider>
-                <AuthGate>
-                  {children}
-                </AuthGate>
+                {children}
                 <UpgradeModal />
                 <GlobalAuthModal />
               </SubscriptionProvider>

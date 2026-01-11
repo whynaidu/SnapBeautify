@@ -126,6 +126,20 @@
 }
 
 @layer utilities {
+  /* Text balance */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   /* Modern Custom Scrollbar Styles */
   .scrollbar-thin {
     scrollbar-width: thin;
