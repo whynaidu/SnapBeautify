@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, RotateCcw, Settings, Moon, Sun, Laptop, Crop, Undo } from 'lucide-react';
+import Link from 'next/link';
+import { Sparkles, RotateCcw, Settings, Moon, Sun, Laptop, Crop, Undo, FileText, Shield, RefreshCcw, Mail, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -122,6 +123,38 @@ export function Header() {
                             <Laptop className="mr-2 h-4 w-4" />
                             <span>System</span>
                             {theme === 'system' && <span className="ml-auto text-xs opacity-50">✓</span>}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Legal</DropdownMenuLabel>
+                        <DropdownMenuItem asChild>
+                            <Link href="/terms">
+                                <FileText className="mr-2 h-4 w-4" />
+                                <span>Terms & Conditions</span>
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href="/privacy">
+                                <Shield className="mr-2 h-4 w-4" />
+                                <span>Privacy Policy</span>
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href="/refund">
+                                <RefreshCcw className="mr-2 h-4 w-4" />
+                                <span>Refund Policy</span>
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href="/shipping">
+                                <Truck className="mr-2 h-4 w-4" />
+                                <span>Delivery Policy</span>
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href="/contact">
+                                <Mail className="mr-2 h-4 w-4" />
+                                <span>Contact Us</span>
+                            </Link>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
