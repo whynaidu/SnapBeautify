@@ -1,165 +1,227 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
+import { Shield, User, Database, Share2, Lock, Cookie, UserCheck, Clock, Baby, Bell, Mail } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | SnapBeautify',
   description: 'Privacy Policy for SnapBeautify - How we collect, use, and protect your data',
 };
 
+const dataTypes = [
+  {
+    title: 'Personal Information',
+    description: 'When you create an account or subscribe',
+    items: ['Email address', 'Name (optional)', 'Payment info (via Razorpay)'],
+    icon: User,
+    color: 'bg-blue-500',
+  },
+  {
+    title: 'Usage Data',
+    description: 'Automatically collected',
+    items: ['Browser type', 'Device info', 'IP address', 'Pages visited'],
+    icon: Database,
+    color: 'bg-purple-500',
+  },
+  {
+    title: 'Images',
+    description: 'Your privacy is protected',
+    items: ['Processed in browser', 'NOT stored on servers', 'You retain full ownership'],
+    icon: Shield,
+    color: 'bg-green-500',
+  },
+];
+
+const sections = [
+  {
+    icon: Share2,
+    title: 'Data Sharing',
+    color: 'from-orange-500 to-amber-500',
+    content: 'We do not sell your personal information. We may share data with:',
+    list: [
+      { label: 'Payment Processors', desc: 'Razorpay for secure transactions' },
+      { label: 'Authentication', desc: 'For secure login (e.g., Google OAuth)' },
+      { label: 'Analytics', desc: 'To understand usage patterns' },
+      { label: 'Legal Requirements', desc: 'When required by law' },
+    ],
+  },
+  {
+    icon: Lock,
+    title: 'Data Security',
+    color: 'from-green-500 to-emerald-500',
+    content: 'We implement robust security measures:',
+    list: [
+      { label: 'SSL/TLS Encryption', desc: 'For all data transmission' },
+      { label: 'Secure Auth', desc: 'Industry-standard authentication' },
+      { label: 'Regular Audits', desc: 'Security assessments' },
+      { label: 'Limited Access', desc: 'Strict data access controls' },
+    ],
+  },
+  {
+    icon: Cookie,
+    title: 'Cookies & Tracking',
+    color: 'from-amber-500 to-yellow-500',
+    content: 'We use cookies to:',
+    simpleList: ['Keep you signed in', 'Remember preferences', 'Analyze site traffic'],
+    note: 'You can control cookies through your browser settings.',
+  },
+  {
+    icon: UserCheck,
+    title: 'Your Rights',
+    color: 'from-indigo-500 to-purple-500',
+    content: 'You have the right to:',
+    simpleList: [
+      'Access your personal data',
+      'Correct inaccurate data',
+      'Request data deletion',
+      'Object to processing',
+      'Export your data',
+      'Withdraw consent',
+    ],
+  },
+  {
+    icon: Clock,
+    title: 'Data Retention',
+    color: 'from-cyan-500 to-blue-500',
+    content: 'We retain your personal information for as long as your account is active or as needed to provide services. You may request deletion of your account and data at any time.',
+  },
+  {
+    icon: Baby,
+    title: "Children's Privacy",
+    color: 'from-pink-500 to-rose-500',
+    content: 'Our Service is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13.',
+  },
+  {
+    icon: Bell,
+    title: 'Policy Changes',
+    color: 'from-violet-500 to-purple-500',
+    content: 'We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.',
+  },
+];
+
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-foreground mb-8">Privacy Policy</h1>
-        <p className="text-muted-foreground mb-4">Last updated: January 2025</p>
-
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">1. Introduction</h2>
-            <p className="text-muted-foreground">
-              SnapBeautify (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our image beautification service.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">2. Information We Collect</h2>
-
-            <h3 className="text-lg font-medium text-foreground mt-6 mb-3">2.1 Personal Information</h3>
-            <p className="text-muted-foreground">
-              When you create an account or subscribe, we collect:
-            </p>
-            <ul className="list-disc pl-6 text-muted-foreground mt-2">
-              <li>Email address</li>
-              <li>Name (optional)</li>
-              <li>Payment information (processed securely by Razorpay)</li>
-            </ul>
-
-            <h3 className="text-lg font-medium text-foreground mt-6 mb-3">2.2 Usage Data</h3>
-            <p className="text-muted-foreground">
-              We automatically collect:
-            </p>
-            <ul className="list-disc pl-6 text-muted-foreground mt-2">
-              <li>Browser type and version</li>
-              <li>Device information</li>
-              <li>IP address</li>
-              <li>Pages visited and features used</li>
-              <li>Time and date of visits</li>
-            </ul>
-
-            <h3 className="text-lg font-medium text-foreground mt-6 mb-3">2.3 Images</h3>
-            <p className="text-muted-foreground">
-              Images you upload are processed in your browser and are NOT stored on our servers. We do not have access to your images unless you explicitly share them with us for support purposes.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">3. How We Use Your Information</h2>
-            <p className="text-muted-foreground">
-              We use the collected information to:
-            </p>
-            <ul className="list-disc pl-6 text-muted-foreground mt-2">
-              <li>Provide and maintain our Service</li>
-              <li>Process your subscription and payments</li>
-              <li>Send you important updates about the Service</li>
-              <li>Respond to your inquiries and support requests</li>
-              <li>Analyze usage patterns to improve our Service</li>
-              <li>Prevent fraud and ensure security</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">4. Data Sharing and Disclosure</h2>
-            <p className="text-muted-foreground">
-              We do not sell your personal information. We may share your data with:
-            </p>
-            <ul className="list-disc pl-6 text-muted-foreground mt-2">
-              <li><strong>Payment Processors:</strong> Razorpay for processing payments</li>
-              <li><strong>Authentication Services:</strong> For secure login (e.g., Google OAuth)</li>
-              <li><strong>Analytics Providers:</strong> To understand usage patterns</li>
-              <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">5. Data Security</h2>
-            <p className="text-muted-foreground">
-              We implement appropriate security measures to protect your personal information, including:
-            </p>
-            <ul className="list-disc pl-6 text-muted-foreground mt-2">
-              <li>SSL/TLS encryption for all data transmission</li>
-              <li>Secure authentication mechanisms</li>
-              <li>Regular security audits</li>
-              <li>Limited access to personal data</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">6. Cookies and Tracking</h2>
-            <p className="text-muted-foreground">
-              We use cookies and similar technologies to:
-            </p>
-            <ul className="list-disc pl-6 text-muted-foreground mt-2">
-              <li>Keep you signed in</li>
-              <li>Remember your preferences</li>
-              <li>Analyze site traffic</li>
-            </ul>
-            <p className="text-muted-foreground mt-2">
-              You can control cookies through your browser settings.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">7. Your Rights</h2>
-            <p className="text-muted-foreground">
-              You have the right to:
-            </p>
-            <ul className="list-disc pl-6 text-muted-foreground mt-2">
-              <li>Access your personal data</li>
-              <li>Correct inaccurate data</li>
-              <li>Request deletion of your data</li>
-              <li>Object to data processing</li>
-              <li>Export your data</li>
-              <li>Withdraw consent at any time</li>
-            </ul>
-            <p className="text-muted-foreground mt-2">
-              To exercise these rights, contact us at support@snapbeautify.com
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">8. Data Retention</h2>
-            <p className="text-muted-foreground">
-              We retain your personal information for as long as your account is active or as needed to provide services. You may request deletion of your account and data at any time.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">9. Children&apos;s Privacy</h2>
-            <p className="text-muted-foreground">
-              Our Service is not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">10. Changes to This Policy</h2>
-            <p className="text-muted-foreground">
-              We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the &quot;Last updated&quot; date.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mt-8 mb-4">11. Contact Us</h2>
-            <p className="text-muted-foreground">
-              If you have questions about this Privacy Policy, please contact us:
-            </p>
-            <p className="text-muted-foreground mt-2">
-              Email: support@snapbeautify.com
-            </p>
-          </section>
+    <div className="py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-2xl shadow-green-500/25 mb-6">
+            <Shield className="w-10 h-10 text-white" />
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent mb-4">
+            Privacy Policy
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Your privacy matters to us. Here&apos;s how we handle your data with care and transparency.
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">Last updated: January 2025</p>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border">
-          <Link href="/" className="text-primary hover:underline">&larr; Back to Home</Link>
+        {/* Data Collection Cards */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-foreground mb-6 text-center">What We Collect</h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            {dataTypes.map((type, index) => (
+              <div
+                key={index}
+                className="bg-card border border-border/50 rounded-2xl p-6 hover:shadow-lg transition-shadow"
+              >
+                <div className={`w-12 h-12 ${type.color} rounded-xl flex items-center justify-center mb-4`}>
+                  <type.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-1">{type.title}</h3>
+                <p className="text-sm text-muted-foreground mb-4">{type.description}</p>
+                <ul className="space-y-2">
+                  {type.items.map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* How We Use Data */}
+        <div className="mb-12 p-8 rounded-2xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20">
+          <h2 className="text-2xl font-bold text-foreground mb-6">How We Use Your Information</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              'Provide and maintain our Service',
+              'Process subscriptions and payments',
+              'Send important updates',
+              'Respond to support requests',
+              'Analyze usage to improve',
+              'Prevent fraud and ensure security',
+            ].map((item, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <span className="text-primary font-semibold text-sm">{index + 1}</span>
+                </div>
+                <span className="text-muted-foreground">{item}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Detailed Sections */}
+        <div className="space-y-6">
+          {sections.map((section, index) => (
+            <div
+              key={index}
+              className="bg-card border border-border/50 rounded-2xl p-6 hover:shadow-lg transition-shadow"
+            >
+              <div className="flex gap-4">
+                <div className={`flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${section.color} flex items-center justify-center shadow-lg`}>
+                  <section.icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-foreground mb-3">{section.title}</h3>
+                  <p className="text-muted-foreground mb-4">{section.content}</p>
+
+                  {section.list && (
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {section.list.map((item, i) => (
+                        <div key={i} className="p-3 rounded-xl bg-muted/50">
+                          <p className="font-medium text-foreground text-sm">{item.label}</p>
+                          <p className="text-xs text-muted-foreground">{item.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {section.simpleList && (
+                    <div className="flex flex-wrap gap-2">
+                      {section.simpleList.map((item, i) => (
+                        <span key={i} className="px-3 py-1.5 rounded-full bg-muted text-sm text-muted-foreground">
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {section.note && (
+                    <p className="mt-3 text-sm text-muted-foreground italic">{section.note}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Contact Section */}
+        <div className="mt-12 p-8 rounded-2xl bg-gradient-to-br from-green-500/10 via-emerald-500/5 to-transparent border border-green-500/20">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+              <Mail className="w-8 h-8 text-white" />
+            </div>
+            <div className="text-center md:text-left flex-1">
+              <h3 className="text-xl font-semibold text-foreground mb-1">Privacy Questions?</h3>
+              <p className="text-muted-foreground">
+                Contact us at <a href="mailto:support@snapbeautify.com" className="text-primary hover:underline">support@snapbeautify.com</a>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

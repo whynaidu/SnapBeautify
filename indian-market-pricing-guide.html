@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapBeautify - Indian Market & Global Pricing Strategy Guide</title>
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --secondary: #138808;
+            --accent: #000080;
+            --bg: #FFF9F5;
+            --card-bg: #FFFFFF;
+            --text: #1a1a2e;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --india-saffron: #FF9933;
+            --india-green: #138808;
+            --india-blue: #000080;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--india-saffron), var(--india-green));
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .flag-stripe {
+            height: 8px;
+            display: flex;
+        }
+
+        .flag-stripe div {
+            flex: 1;
+        }
+
+        .saffron { background: var(--india-saffron); }
+        .white { background: white; }
+        .green { background: var(--india-green); }
+
+        nav {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background: var(--india-saffron);
+            color: white;
+        }
+
+        section {
+            margin: 3rem 0;
+        }
+
+        h2 {
+            color: var(--india-green);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--india-saffron);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h3 {
+            color: var(--accent);
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem;
+        }
+
+        h4 {
+            color: var(--text);
+            font-size: 1.1rem;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        .card.highlight {
+            border-left: 4px solid var(--india-saffron);
+        }
+
+        .card.success {
+            border-left: 4px solid var(--success);
+            background: linear-gradient(to right, #ecfdf5, var(--card-bg));
+        }
+
+        .card.warning {
+            border-left: 4px solid var(--warning);
+            background: linear-gradient(to right, #fffbeb, var(--card-bg));
+        }
+
+        .card.danger {
+            border-left: 4px solid var(--danger);
+            background: linear-gradient(to right, #fef2f2, var(--card-bg));
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--india-saffron), #FF8C5A);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-card.green {
+            background: linear-gradient(135deg, var(--india-green), #1FAB4C);
+        }
+
+        .stat-card.blue {
+            background: linear-gradient(135deg, var(--india-blue), #1a1a8e);
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--india-green);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge.recommended {
+            background: var(--india-green);
+            color: white;
+        }
+
+        .badge.good {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge.india {
+            background: var(--india-saffron);
+            color: white;
+        }
+
+        .badge.global {
+            background: var(--india-blue);
+            color: white;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .gateway-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+
+        .gateway-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .gateway-card .header {
+            padding: 1.5rem;
+            color: white;
+            text-align: center;
+        }
+
+        .gateway-card.razorpay .header {
+            background: linear-gradient(135deg, #0D6EFD, #0A58CA);
+        }
+
+        .gateway-card.stripe .header {
+            background: linear-gradient(135deg, #635BFF, #4E46E5);
+        }
+
+        .gateway-card.cashfree .header {
+            background: linear-gradient(135deg, #00C853, #00A541);
+        }
+
+        .gateway-card.paytm .header {
+            background: linear-gradient(135deg, #00B9F5, #0099CC);
+        }
+
+        .gateway-card .content {
+            padding: 1.5rem;
+        }
+
+        .gateway-card .fee {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--india-green);
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .gateway-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .gateway-card li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gateway-card li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-tier {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .pricing-tier:hover {
+            transform: translateY(-5px);
+        }
+
+        .pricing-tier.featured {
+            border: 3px solid var(--india-saffron);
+        }
+
+        .pricing-tier.featured::before {
+            content: 'BEST VALUE';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--india-saffron);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .pricing-tier .name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .pricing-tier .price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--india-green);
+        }
+
+        .pricing-tier .price small {
+            font-size: 1rem;
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .pricing-tier .original-price {
+            text-decoration: line-through;
+            color: var(--text-light);
+            font-size: 1.2rem;
+        }
+
+        .pricing-tier .savings {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin: 0.5rem 0;
+            display: inline-block;
+        }
+
+        .pricing-tier ul {
+            list-style: none;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .pricing-tier li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pricing-tier li::before {
+            content: '✓';
+            color: var(--india-green);
+            font-weight: bold;
+        }
+
+        .psychology-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+
+        .psychology-card .icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+
+        .code-block .keyword {
+            color: #569cd6;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .code-block .number {
+            color: #b5cea8;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--india-saffron), var(--india-green));
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 1rem 0 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 1.25rem;
+            width: 12px;
+            height: 12px;
+            background: var(--india-saffron);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--india-saffron);
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .alert.info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+
+        .alert.success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .alert.warning {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background: #f8fafc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .checklist li::before {
+            content: '☐';
+            font-size: 1.2rem;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .quote {
+            font-style: italic;
+            font-size: 1.2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #fff7ed, #ffedd5);
+            border-left: 4px solid var(--india-saffron);
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
+        }
+
+        .quote cite {
+            display: block;
+            margin-top: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-style: normal;
+        }
+
+        footer {
+            background: var(--text);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .rupee {
+            font-family: system-ui;
+        }
+
+        .vs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .vs-item {
+            text-align: center;
+            padding: 1.5rem 2rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .vs-divider {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🇮🇳 Indian Market & Global Pricing Strategy</h1>
+        <p>Comprehensive Guide for SnapBeautify - Targeting Indian & International Consumers</p>
+    </header>
+    <div class="flag-stripe">
+        <div class="saffron"></div>
+        <div class="white"></div>
+        <div class="green"></div>
+    </div>
+
+    <nav>
+        <ul>
+            <li><a href="#market">Market Analysis</a></li>
+            <li><a href="#psychology">Consumer Psychology</a></li>
+            <li><a href="#gateways">Payment Gateways</a></li>
+            <li><a href="#pricing">Pricing Strategy</a></li>
+            <li><a href="#implementation">Implementation</a></li>
+            <li><a href="#recommendations">Final Recommendations</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Section 1: Market Analysis -->
+        <section id="market">
+            <h2>📊 Indian Market Analysis</h2>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <span class="number">1.4B+</span>
+                    <span class="label">Population</span>
+                </div>
+                <div class="stat-card green">
+                    <span class="number">$50B</span>
+                    <span class="label">SaaS Market by 2030</span>
+                </div>
+                <div class="stat-card blue">
+                    <span class="number">30-35%</span>
+                    <span class="label">SaaS CAGR Growth</span>
+                </div>
+                <div class="stat-card">
+                    <span class="number">84%</span>
+                    <span class="label">UPI Digital Payments</span>
+                </div>
+            </div>
+
+            <div class="card highlight">
+                <h3>Key Market Characteristics</h3>
+                <div class="two-column">
+                    <div>
+                        <h4>Tier 1 Cities (Metro)</h4>
+                        <ul>
+                            <li>Delhi, Mumbai, Bangalore, Chennai, Kolkata, Hyderabad</li>
+                            <li>More open to premium products</li>
+                            <li>Strong brand awareness</li>
+                            <li>Higher disposable income</li>
+                            <li>Credit card usage more common</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Tier 2 & 3 Cities</h4>
+                        <ul>
+                            <li>Pune, Jaipur, Lucknow, Indore, Coimbatore, etc.</li>
+                            <li>Equally aspirational but more price-sensitive</li>
+                            <li>Value-conscious decision making</li>
+                            <li>UPI dominant, limited credit card usage</li>
+                            <li>Growing rapidly in digital adoption</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>2025 Consumer Spending Shift</h3>
+                <div class="quote">
+                    "By 2025, value was understood not merely as cost-effectiveness, but as consistent delivery, transparent communication, and dependable outcomes. Consumers increasingly chose services aligned with their expectations, lifestyle, and long-term needs."
+                    <cite>— Industry Analysis 2025</cite>
+                </div>
+                <p>The long-standing focus on finding the <strong>cheapest option</strong> is giving way to <strong>evaluating value</strong> — prioritizing reliability, transparency, and consistency over short-term savings.</p>
+            </div>
+
+            <h3>Generational Differences</h3>
+            <table>
+                <tr>
+                    <th>Generation</th>
+                    <th>Spending Behavior</th>
+                    <th>Preferred Model</th>
+                    <th>Key Insight</th>
+                </tr>
+                <tr>
+                    <td><strong>Gen Z</strong> (18-27)</td>
+                    <td>Subscription-friendly, digital-first</td>
+                    <td>Monthly subscriptions</td>
+                    <td>Prefer convenience over ownership (Netflix culture)</td>
+                </tr>
+                <tr>
+                    <td><strong>Millennials</strong> (28-43)</td>
+                    <td>Balance price and quality</td>
+                    <td>Annual plans with discounts</td>
+                    <td>Research before purchase, value transparency</td>
+                </tr>
+                <tr>
+                    <td><strong>Gen X & Boomers</strong> (44+)</td>
+                    <td>Prioritize savings and durability</td>
+                    <td>Lifetime deals / One-time purchase</td>
+                    <td>Skeptical of recurring payments</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Section 2: Consumer Psychology -->
+        <section id="psychology">
+            <h2>🧠 Indian Consumer Psychology</h2>
+
+            <div class="card success">
+                <h3>💰 "Paisa Vasool" Culture (Value for Money)</h3>
+                <p>The concept of <strong>"Paisa Vasool"</strong> (पैसा वसूल) is central to Indian consumer behavior. It means "getting your money's worth" — consumers seek <strong>maximum value rather than the lowest price</strong>.</p>
+                <div class="alert info">
+                    <span>💡</span>
+                    <div>
+                        <strong>Key Insight:</strong> Indians don't always want the cheapest option. They want to feel they're getting excellent value. A ₹299 plan that delivers clear benefits will outsell a ₹99 plan with vague features.
+                    </div>
+                </div>
+            </div>
+
+            <h3>Psychological Pricing Principles for India</h3>
+
+            <div class="psychology-card">
+                <span class="icon">9️⃣</span>
+                <div>
+                    <h4>Odd-Ending Prices (₹99, ₹199, ₹499)</h4>
+                    <p>Research shows Indian consumers perceive nine-ending prices as an indicator of high value and that the product is on sale. They also remember products priced using odd-pricing better.</p>
+                </div>
+            </div>
+
+            <div class="psychology-card">
+                <span class="icon">🎁</span>
+                <div>
+                    <h4>Bundling & Bonus Perception</h4>
+                    <p>Discounts, offers, and bundles are key decision-making drivers. Example: "Get 3 months FREE with annual plan" works better than "30% discount".</p>
+                </div>
+            </div>
+
+            <div class="psychology-card">
+                <span class="icon">⚓</span>
+                <div>
+                    <h4>Anchoring Heuristics</h4>
+                    <p>Show the original price crossed out next to the discounted price. Indians respond strongly to perceived savings.</p>
+                </div>
+            </div>
+
+            <div class="psychology-card">
+                <span class="icon">⏰</span>
+                <div>
+                    <h4>Scarcity Effect</h4>
+                    <p>"Limited time offer" and "Only 2 days left" create urgency. Combine with festival sales (Diwali, Republic Day).</p>
+                </div>
+            </div>
+
+            <div class="psychology-card">
+                <span class="icon">📱</span>
+                <div>
+                    <h4>Subscription Inertia</h4>
+                    <p>Once subscribed, consumers rarely cancel due to inertia, sunk cost fallacy, and decision fatigue. Free trials convert well in India.</p>
+                </div>
+            </div>
+
+            <div class="card warning">
+                <h3>⚠️ Price Sensitivity Reality Check</h3>
+                <p>While Indians are becoming more value-conscious, <strong>price sensitivity is still high</strong> compared to Western markets:</p>
+                <ul>
+                    <li>60% of consumer expenditure is still in cash</li>
+                    <li>Many users will choose free alternatives over even ₹99/month</li>
+                    <li>Free tier with limitations is essential for market penetration</li>
+                    <li>Lifetime deals are extremely popular (one-time payment preference)</li>
+                </ul>
+            </div>
+
+            <h3>Purchasing Power Parity (PPP)</h3>
+            <div class="vs">
+                <div class="vs-item">
+                    <h4>🇺🇸 US Price</h4>
+                    <p style="font-size: 2rem; font-weight: 700; color: var(--india-green);">$9/month</p>
+                </div>
+                <div class="vs-divider">→ PPP Factor 0.3 →</div>
+                <div class="vs-item">
+                    <h4>🇮🇳 India Price</h4>
+                    <p style="font-size: 2rem; font-weight: 700; color: var(--india-saffron);">₹199/month</p>
+                    <small>(~$2.40)</small>
+                </div>
+            </div>
+            <p style="text-align: center; color: var(--text-light);">Big Mac Index: $5.81 in US vs $2.55 in India — illustrating purchasing power difference</p>
+        </section>
+
+        <!-- Section 3: Payment Gateways -->
+        <section id="gateways">
+            <h2>💳 Payment Gateway Comparison</h2>
+
+            <div class="stat-grid">
+                <div class="stat-card green">
+                    <span class="number">18.4B</span>
+                    <span class="label">UPI Transactions/Month</span>
+                </div>
+                <div class="stat-card">
+                    <span class="number">640M</span>
+                    <span class="label">Daily UPI Transactions</span>
+                </div>
+                <div class="stat-card blue">
+                    <span class="number">100M+</span>
+                    <span class="label">Credit Cards in India</span>
+                </div>
+                <div class="stat-card green">
+                    <span class="number">0%</span>
+                    <span class="label">UPI MDR (Merchant Fee)</span>
+                </div>
+            </div>
+
+            <div class="alert success">
+                <span>✅</span>
+                <div>
+                    <strong>Hybrid Strategy Recommended:</strong> Use Razorpay for Indian customers (UPI, cards, netbanking) and Stripe for international customers. This maximizes conversion and minimizes fees.
+                </div>
+            </div>
+
+            <h3>Gateway Comparison</h3>
+            <div class="comparison-grid">
+                <div class="gateway-card razorpay">
+                    <div class="header">
+                        <h3>Razorpay</h3>
+                        <span class="badge recommended">RECOMMENDED FOR INDIA</span>
+                    </div>
+                    <div class="content">
+                        <div class="fee">2% + GST</div>
+                        <p style="text-align: center; color: var(--text-light);">Domestic Transactions</p>
+                        <ul>
+                            <li>✅ Best UPI integration (0% MDR)</li>
+                            <li>✅ UPI AutoPay for subscriptions</li>
+                            <li>✅ eNACH & card tokenization</li>
+                            <li>✅ Built for India, RBI compliant</li>
+                            <li>✅ Smart retry for failed payments</li>
+                            <li>✅ No setup or annual fees</li>
+                            <li>⚠️ International: 3% + GST</li>
+                            <li>⚠️ Settlement: T+2 days</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="gateway-card stripe">
+                    <div class="header">
+                        <h3>Stripe</h3>
+                        <span class="badge global">BEST FOR INTERNATIONAL</span>
+                    </div>
+                    <div class="content">
+                        <div class="fee">2.9% + 30¢</div>
+                        <p style="text-align: center; color: var(--text-light);">US Transactions</p>
+                        <ul>
+                            <li>✅ Global reach (40+ countries)</li>
+                            <li>✅ Best developer experience</li>
+                            <li>✅ Excellent documentation</li>
+                            <li>✅ Multi-currency support</li>
+                            <li>✅ Advanced fraud detection</li>
+                            <li>⚠️ Limited India availability</li>
+                            <li>⚠️ India: 4.3% + 2% conversion</li>
+                            <li>⚠️ No UPI support</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="gateway-card cashfree">
+                    <div class="header">
+                        <h3>Cashfree</h3>
+                        <span class="badge good">BUDGET ALTERNATIVE</span>
+                    </div>
+                    <div class="content">
+                        <div class="fee">1.95% + GST</div>
+                        <p style="text-align: center; color: var(--text-light);">Domestic Transactions</p>
+                        <ul>
+                            <li>✅ Lowest fees in market</li>
+                            <li>✅ 1.6% promotional rate (new merchants)</li>
+                            <li>✅ Fast settlement (24-48 hrs)</li>
+                            <li>✅ No setup/maintenance fees</li>
+                            <li>✅ Good API documentation</li>
+                            <li>⚠️ Less brand recognition</li>
+                            <li>⚠️ International: 2.99%</li>
+                            <li>⚠️ Smaller ecosystem</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="gateway-card paytm">
+                    <div class="header">
+                        <h3>Paytm Business</h3>
+                        <span class="badge india">WALLET FOCUSED</span>
+                    </div>
+                    <div class="content">
+                        <div class="fee">1.99% + GST</div>
+                        <p style="text-align: center; color: var(--text-light);">Domestic Transactions</p>
+                        <ul>
+                            <li>✅ Huge Paytm Wallet user base</li>
+                            <li>✅ Strong brand recognition</li>
+                            <li>✅ UPI, cards, netbanking</li>
+                            <li>✅ No setup fees</li>
+                            <li>⚠️ Wallet-centric approach</li>
+                            <li>⚠️ International: 2.99-4.5%</li>
+                            <li>⚠️ Less developer-friendly</li>
+                            <li>⚠️ Recent business challenges</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Fee Comparison Table</h3>
+            <table>
+                <tr>
+                    <th>Gateway</th>
+                    <th>Domestic Cards</th>
+                    <th>UPI</th>
+                    <th>International</th>
+                    <th>Setup Fee</th>
+                    <th>Settlement</th>
+                </tr>
+                <tr>
+                    <td><strong>Razorpay</strong></td>
+                    <td>2% + GST</td>
+                    <td>0% (Free)</td>
+                    <td>3% + GST</td>
+                    <td>Free</td>
+                    <td>T+2</td>
+                </tr>
+                <tr>
+                    <td><strong>Cashfree</strong></td>
+                    <td>1.95% + GST</td>
+                    <td>0%</td>
+                    <td>2.99% + GST</td>
+                    <td>Free</td>
+                    <td>T+1</td>
+                </tr>
+                <tr>
+                    <td><strong>Paytm</strong></td>
+                    <td>1.99% + GST</td>
+                    <td>0%</td>
+                    <td>2.99% + GST</td>
+                    <td>Free</td>
+                    <td>T+2</td>
+                </tr>
+                <tr>
+                    <td><strong>PayU</strong></td>
+                    <td>2-3% + GST</td>
+                    <td>0%</td>
+                    <td>3%+ GST</td>
+                    <td>₹6,000</td>
+                    <td>T+2</td>
+                </tr>
+                <tr>
+                    <td><strong>Stripe</strong></td>
+                    <td>N/A (limited)</td>
+                    <td>N/A</td>
+                    <td>4.3% + 2%</td>
+                    <td>Free</td>
+                    <td>T+2</td>
+                </tr>
+            </table>
+            <p style="color: var(--text-light); font-size: 0.9rem;">* GST (18%) is additional on all fees. UPI has 0% MDR as per government mandate.</p>
+
+            <div class="card success">
+                <h3>🎯 Recommended Strategy: Hybrid Approach</h3>
+                <div class="two-column">
+                    <div>
+                        <h4>🇮🇳 For Indian Users</h4>
+                        <p><strong>Use Razorpay</strong></p>
+                        <ul>
+                            <li>Detect user location via IP/phone</li>
+                            <li>Show INR pricing (₹99, ₹199, ₹499)</li>
+                            <li>Enable UPI AutoPay for subscriptions</li>
+                            <li>UPI is FREE (0% fees)</li>
+                            <li>Cards at 2% + GST</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>🌍 For International Users</h4>
+                        <p><strong>Use Stripe</strong></p>
+                        <ul>
+                            <li>Detect non-India location</li>
+                            <li>Show USD pricing ($5, $9, $49)</li>
+                            <li>Stripe Checkout for conversion</li>
+                            <li>2.9% + 30¢ standard rate</li>
+                            <li>Multi-currency support</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Pricing Strategy -->
+        <section id="pricing">
+            <h2>💰 Recommended Pricing Strategy</h2>
+
+            <div class="alert info">
+                <span>📊</span>
+                <div>
+                    <strong>Research-Based Pricing:</strong> Based on PPP factor of ~0.3, successful Indian app pricing (Netflix, Spotify, Canva), and consumer psychology research.
+                </div>
+            </div>
+
+            <h3>Indian Pricing (PPP Adjusted)</h3>
+            <div class="comparison-grid">
+                <div class="pricing-tier">
+                    <div class="name">Free</div>
+                    <div class="price">₹0</div>
+                    <ul>
+                        <li>Basic backgrounds (solid, gradients)</li>
+                        <li>Standard frames only</li>
+                        <li>720p export with watermark</li>
+                        <li>Basic text overlay</li>
+                        <li>5 exports per day</li>
+                    </ul>
+                    <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 1rem;">Essential for market penetration</p>
+                </div>
+
+                <div class="pricing-tier">
+                    <div class="name">Pro Monthly</div>
+                    <div class="original-price">₹299</div>
+                    <div class="price">₹199<small>/month</small></div>
+                    <div class="savings">Save ₹100 - Launch Offer!</div>
+                    <ul>
+                        <li>All premium backgrounds</li>
+                        <li>All frame templates</li>
+                        <li>4K export, no watermark</li>
+                        <li>Advanced text styling</li>
+                        <li>Pattern backgrounds</li>
+                        <li>Unlimited exports</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-tier featured">
+                    <div class="name">Pro Annual</div>
+                    <div class="original-price">₹2,388/year</div>
+                    <div class="price">₹999<small>/year</small></div>
+                    <div class="savings">Save ₹1,389 (58% off)</div>
+                    <ul>
+                        <li>Everything in Pro Monthly</li>
+                        <li>4 months FREE</li>
+                        <li>Priority support</li>
+                        <li>Early access to features</li>
+                        <li>Works out to ₹83/month</li>
+                    </ul>
+                    <p style="color: var(--india-green); font-weight: 600; margin-top: 1rem;">Most Popular Choice!</p>
+                </div>
+
+                <div class="pricing-tier">
+                    <div class="name">Lifetime</div>
+                    <div class="original-price">₹4,999</div>
+                    <div class="price">₹2,499<small> one-time</small></div>
+                    <div class="savings">Limited Time - 50% off!</div>
+                    <ul>
+                        <li>Everything forever</li>
+                        <li>All future updates included</li>
+                        <li>No recurring payments</li>
+                        <li>Perfect for professionals</li>
+                        <li>Pay once, use forever</li>
+                    </ul>
+                    <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 1rem;">Appeals to older demographics</p>
+                </div>
+            </div>
+
+            <h3>International Pricing (Full Price)</h3>
+            <div class="comparison-grid">
+                <div class="pricing-tier">
+                    <div class="name">Free</div>
+                    <div class="price">$0</div>
+                    <ul>
+                        <li>Same as Indian Free tier</li>
+                        <li>Basic features only</li>
+                        <li>Watermarked exports</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-tier">
+                    <div class="name">Pro Monthly</div>
+                    <div class="price">$9<small>/month</small></div>
+                    <ul>
+                        <li>All premium features</li>
+                        <li>Unlimited exports</li>
+                        <li>No watermark</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-tier featured">
+                    <div class="name">Pro Annual</div>
+                    <div class="original-price">$108/year</div>
+                    <div class="price">$79<small>/year</small></div>
+                    <div class="savings">Save $29 (27% off)</div>
+                    <ul>
+                        <li>Everything in Pro</li>
+                        <li>Best annual value</li>
+                        <li>Works out to $6.58/month</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-tier">
+                    <div class="name">Lifetime</div>
+                    <div class="price">$149<small> one-time</small></div>
+                    <ul>
+                        <li>Everything forever</li>
+                        <li>All future updates</li>
+                        <li>One-time payment</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Price Point Psychology Breakdown</h3>
+            <table>
+                <tr>
+                    <th>Price Point</th>
+                    <th>Indian Market Perception</th>
+                    <th>Target Segment</th>
+                    <th>Conversion Expected</th>
+                </tr>
+                <tr>
+                    <td><strong>₹99/month</strong></td>
+                    <td>"Impulse buy" zone, very accessible</td>
+                    <td>Students, casual users</td>
+                    <td>Higher volume, lower value</td>
+                </tr>
+                <tr>
+                    <td><strong>₹199/month</strong></td>
+                    <td>"Standard professional tool" pricing (Netflix, Spotify)</td>
+                    <td>Freelancers, content creators</td>
+                    <td>Optimal balance</td>
+                </tr>
+                <tr>
+                    <td><strong>₹499/month</strong></td>
+                    <td>"Premium" tier, needs strong justification</td>
+                    <td>Agencies, businesses</td>
+                    <td>Lower volume, higher value</td>
+                </tr>
+                <tr>
+                    <td><strong>₹999/year</strong></td>
+                    <td>"Excellent deal" - under ₹1000 psychological barrier</td>
+                    <td>Value-conscious professionals</td>
+                    <td>High conversion, high retention</td>
+                </tr>
+                <tr>
+                    <td><strong>₹2,499 lifetime</strong></td>
+                    <td>"Investment" - appeals to ownership mentality</td>
+                    <td>Professionals, older demographics</td>
+                    <td>Lower volume, one-time revenue</td>
+                </tr>
+            </table>
+
+            <div class="card warning">
+                <h3>🎯 Festival & Promotional Pricing</h3>
+                <p>Leverage Indian festivals for promotional campaigns:</p>
+                <table>
+                    <tr>
+                        <th>Festival</th>
+                        <th>Timing</th>
+                        <th>Suggested Offer</th>
+                    </tr>
+                    <tr>
+                        <td>Diwali Sale</td>
+                        <td>October/November</td>
+                        <td>60% off annual plan (₹999 → ₹399)</td>
+                    </tr>
+                    <tr>
+                        <td>Republic Day</td>
+                        <td>January 26</td>
+                        <td>26% off + bonus month</td>
+                    </tr>
+                    <tr>
+                        <td>Independence Day</td>
+                        <td>August 15</td>
+                        <td>₹199 lifetime for first 1947 users</td>
+                    </tr>
+                    <tr>
+                        <td>New Year</td>
+                        <td>January 1</td>
+                        <td>First year at ₹499</td>
+                    </tr>
+                    <tr>
+                        <td>Holi</td>
+                        <td>March</td>
+                        <td>Colorful backgrounds pack free with Pro</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 5: Implementation -->
+        <section id="implementation">
+            <h2>⚙️ Implementation Guide</h2>
+
+            <h3>Step 1: Geo-Detection for Regional Pricing</h3>
+            <div class="code-block">
+<span class="comment">// lib/geo-pricing.ts</span>
+<span class="keyword">import</span> { headers } <span class="keyword">from</span> <span class="string">'next/headers'</span>;
+
+<span class="keyword">interface</span> PricingConfig {
+  currency: <span class="string">'INR'</span> | <span class="string">'USD'</span>;
+  symbol: <span class="string">string</span>;
+  monthly: <span class="number">number</span>;
+  annual: <span class="number">number</span>;
+  lifetime: <span class="number">number</span>;
+  gateway: <span class="string">'razorpay'</span> | <span class="string">'stripe'</span>;
+}
+
+<span class="keyword">const</span> PRICING: Record&lt;<span class="string">string</span>, PricingConfig&gt; = {
+  IN: {
+    currency: <span class="string">'INR'</span>,
+    symbol: <span class="string">'₹'</span>,
+    monthly: <span class="number">199</span>,
+    annual: <span class="number">999</span>,
+    lifetime: <span class="number">2499</span>,
+    gateway: <span class="string">'razorpay'</span>
+  },
+  DEFAULT: {
+    currency: <span class="string">'USD'</span>,
+    symbol: <span class="string">'$'</span>,
+    monthly: <span class="number">9</span>,
+    annual: <span class="number">79</span>,
+    lifetime: <span class="number">149</span>,
+    gateway: <span class="string">'stripe'</span>
+  }
+};
+
+<span class="keyword">export function</span> getPricingForCountry(countryCode: <span class="string">string</span>): PricingConfig {
+  <span class="keyword">return</span> PRICING[countryCode] || PRICING.DEFAULT;
+}
+
+<span class="keyword">export async function</span> detectCountry(): Promise&lt;<span class="string">string</span>&gt; {
+  <span class="keyword">const</span> headersList = headers();
+  <span class="comment">// Vercel provides country in headers</span>
+  <span class="keyword">return</span> headersList.get(<span class="string">'x-vercel-ip-country'</span>) || <span class="string">'US'</span>;
+}
+            </div>
+
+            <h3>Step 2: Razorpay Integration for India</h3>
+            <div class="code-block">
+<span class="comment">// app/api/razorpay/create-subscription/route.ts</span>
+<span class="keyword">import</span> Razorpay <span class="keyword">from</span> <span class="string">'razorpay'</span>;
+
+<span class="keyword">const</span> razorpay = <span class="keyword">new</span> Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID!,
+  key_secret: process.env.RAZORPAY_KEY_SECRET!,
+});
+
+<span class="comment">// Plan IDs created in Razorpay Dashboard</span>
+<span class="keyword">const</span> RAZORPAY_PLANS = {
+  monthly: <span class="string">'plan_monthly_199'</span>,
+  annual: <span class="string">'plan_annual_999'</span>,
+};
+
+<span class="keyword">export async function</span> POST(req: Request) {
+  <span class="keyword">const</span> { planType, userId, email } = <span class="keyword">await</span> req.json();
+
+  <span class="keyword">const</span> subscription = <span class="keyword">await</span> razorpay.subscriptions.create({
+    plan_id: RAZORPAY_PLANS[planType],
+    customer_notify: <span class="number">1</span>,
+    total_count: planType === <span class="string">'monthly'</span> ? <span class="number">12</span> : <span class="number">1</span>,
+    notes: {
+      userId,
+      email,
+    },
+  });
+
+  <span class="keyword">return</span> Response.json({
+    subscriptionId: subscription.id,
+    razorpayKeyId: process.env.RAZORPAY_KEY_ID,
+  });
+}
+            </div>
+
+            <h3>Step 3: Payment Method Selection UI</h3>
+            <div class="code-block">
+<span class="comment">// components/PaymentSelector.tsx</span>
+<span class="string">'use client'</span>;
+
+<span class="keyword">import</span> { useEffect, useState } <span class="keyword">from</span> <span class="string">'react'</span>;
+
+<span class="keyword">export function</span> PaymentSelector({ plan }: { plan: <span class="string">'monthly'</span> | <span class="string">'annual'</span> }) {
+  <span class="keyword">const</span> [pricing, setPricing] = useState(<span class="keyword">null</span>);
+  <span class="keyword">const</span> [loading, setLoading] = useState(<span class="keyword">true</span>);
+
+  useEffect(() => {
+    fetch(<span class="string">'/api/get-pricing'</span>)
+      .then(res => res.json())
+      .then(data => {
+        setPricing(data);
+        setLoading(<span class="keyword">false</span>);
+      });
+  }, []);
+
+  <span class="keyword">const</span> handlePayment = <span class="keyword">async</span> () => {
+    <span class="keyword">if</span> (pricing.gateway === <span class="string">'razorpay'</span>) {
+      <span class="comment">// Indian payment flow</span>
+      <span class="keyword">const</span> res = <span class="keyword">await</span> fetch(<span class="string">'/api/razorpay/create-subscription'</span>, {
+        method: <span class="string">'POST'</span>,
+        body: JSON.stringify({ planType: plan }),
+      });
+      <span class="keyword">const</span> { subscriptionId, razorpayKeyId } = <span class="keyword">await</span> res.json();
+
+      <span class="keyword">const</span> rzp = <span class="keyword">new</span> (window <span class="keyword">as any</span>).Razorpay({
+        key: razorpayKeyId,
+        subscription_id: subscriptionId,
+        name: <span class="string">'SnapBeautify Pro'</span>,
+        description: <span class="string">`${plan} Subscription`</span>,
+        handler: <span class="keyword">function</span>(response: <span class="keyword">any</span>) {
+          <span class="comment">// Verify payment on server</span>
+          verifyPayment(response);
+        },
+        prefill: {
+          email: user.email,
+        },
+        theme: {
+          color: <span class="string">'#FF6B35'</span>,
+        },
+      });
+      rzp.open();
+    } <span class="keyword">else</span> {
+      <span class="comment">// International Stripe flow</span>
+      <span class="keyword">const</span> res = <span class="keyword">await</span> fetch(<span class="string">'/api/stripe/create-checkout'</span>, {
+        method: <span class="string">'POST'</span>,
+        body: JSON.stringify({ planType: plan }),
+      });
+      <span class="keyword">const</span> { url } = <span class="keyword">await</span> res.json();
+      window.location.href = url;
+    }
+  };
+
+  <span class="keyword">if</span> (loading) <span class="keyword">return</span> &lt;div&gt;Loading...&lt;/div&gt;;
+
+  <span class="keyword">return</span> (
+    &lt;button onClick={handlePayment}&gt;
+      Pay {pricing.symbol}{pricing[plan]}
+      {pricing.gateway === <span class="string">'razorpay'</span> && <span class="string">' (UPI/Card/NetBanking)'</span>}
+    &lt;/button&gt;
+  );
+}
+            </div>
+
+            <h3>Step 4: Razorpay Webhook Handler</h3>
+            <div class="code-block">
+<span class="comment">// app/api/razorpay/webhook/route.ts</span>
+<span class="keyword">import</span> crypto <span class="keyword">from</span> <span class="string">'crypto'</span>;
+<span class="keyword">import</span> { createClient } <span class="keyword">from</span> <span class="string">'@supabase/supabase-js'</span>;
+
+<span class="keyword">const</span> supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_KEY!
+);
+
+<span class="keyword">export async function</span> POST(req: Request) {
+  <span class="keyword">const</span> body = <span class="keyword">await</span> req.text();
+  <span class="keyword">const</span> signature = req.headers.get(<span class="string">'x-razorpay-signature'</span>);
+
+  <span class="comment">// Verify webhook signature</span>
+  <span class="keyword">const</span> expectedSignature = crypto
+    .createHmac(<span class="string">'sha256'</span>, process.env.RAZORPAY_WEBHOOK_SECRET!)
+    .update(body)
+    .digest(<span class="string">'hex'</span>);
+
+  <span class="keyword">if</span> (signature !== expectedSignature) {
+    <span class="keyword">return</span> <span class="keyword">new</span> Response(<span class="string">'Invalid signature'</span>, { status: <span class="number">400</span> });
+  }
+
+  <span class="keyword">const</span> event = JSON.parse(body);
+
+  <span class="keyword">switch</span> (event.event) {
+    <span class="keyword">case</span> <span class="string">'subscription.activated'</span>:
+      <span class="keyword">await</span> supabase
+        .from(<span class="string">'subscriptions'</span>)
+        .upsert({
+          user_id: event.payload.subscription.notes.userId,
+          razorpay_subscription_id: event.payload.subscription.id,
+          status: <span class="string">'active'</span>,
+          plan: event.payload.subscription.plan_id,
+          current_period_end: <span class="keyword">new</span> Date(event.payload.subscription.current_end * <span class="number">1000</span>),
+        });
+      <span class="keyword">break</span>;
+
+    <span class="keyword">case</span> <span class="string">'subscription.cancelled'</span>:
+      <span class="keyword">await</span> supabase
+        .from(<span class="string">'subscriptions'</span>)
+        .update({ status: <span class="string">'cancelled'</span> })
+        .eq(<span class="string">'razorpay_subscription_id'</span>, event.payload.subscription.id);
+      <span class="keyword">break</span>;
+
+    <span class="keyword">case</span> <span class="string">'payment.captured'</span>:
+      <span class="comment">// Log successful payment</span>
+      <span class="keyword">await</span> supabase.from(<span class="string">'payments'</span>).insert({
+        razorpay_payment_id: event.payload.payment.id,
+        amount: event.payload.payment.amount / <span class="number">100</span>,
+        currency: event.payload.payment.currency,
+        status: <span class="string">'captured'</span>,
+      });
+      <span class="keyword">break</span>;
+  }
+
+  <span class="keyword">return</span> Response.json({ received: <span class="keyword">true</span> });
+}
+            </div>
+
+            <h3>Step 5: Database Schema (Supabase)</h3>
+            <div class="code-block">
+<span class="comment">-- Support both Razorpay and Stripe subscriptions</span>
+<span class="keyword">CREATE TABLE</span> subscriptions (
+  id UUID <span class="keyword">PRIMARY KEY DEFAULT</span> uuid_generate_v4(),
+  user_id UUID <span class="keyword">REFERENCES</span> auth.users(id),
+
+  <span class="comment">-- Payment provider info</span>
+  provider TEXT <span class="keyword">CHECK</span> (provider <span class="keyword">IN</span> (<span class="string">'razorpay'</span>, <span class="string">'stripe'</span>)),
+  razorpay_subscription_id TEXT,
+  stripe_subscription_id TEXT,
+  stripe_customer_id TEXT,
+
+  <span class="comment">-- Subscription details</span>
+  status TEXT <span class="keyword">CHECK</span> (status <span class="keyword">IN</span> (
+    <span class="string">'active'</span>, <span class="string">'cancelled'</span>, <span class="string">'past_due'</span>, <span class="string">'lifetime'</span>
+  )),
+  plan TEXT <span class="keyword">CHECK</span> (plan <span class="keyword">IN</span> (
+    <span class="string">'monthly'</span>, <span class="string">'annual'</span>, <span class="string">'lifetime'</span>
+  )),
+  currency TEXT <span class="keyword">DEFAULT</span> <span class="string">'INR'</span>,
+  amount INTEGER,
+
+  <span class="comment">-- Dates</span>
+  current_period_start TIMESTAMPTZ,
+  current_period_end TIMESTAMPTZ,
+  created_at TIMESTAMPTZ <span class="keyword">DEFAULT</span> NOW(),
+  updated_at TIMESTAMPTZ <span class="keyword">DEFAULT</span> NOW()
+);
+
+<span class="comment">-- Index for fast lookups</span>
+<span class="keyword">CREATE INDEX</span> idx_subscriptions_user_id <span class="keyword">ON</span> subscriptions(user_id);
+<span class="keyword">CREATE INDEX</span> idx_subscriptions_status <span class="keyword">ON</span> subscriptions(status);
+
+<span class="comment">-- Row Level Security</span>
+<span class="keyword">ALTER TABLE</span> subscriptions <span class="keyword">ENABLE ROW LEVEL SECURITY</span>;
+
+<span class="keyword">CREATE POLICY</span> <span class="string">"Users can view own subscription"</span> <span class="keyword">ON</span> subscriptions
+  <span class="keyword">FOR SELECT USING</span> (auth.uid() = user_id);
+            </div>
+
+            <h3>Environment Variables</h3>
+            <div class="code-block">
+<span class="comment"># .env.local</span>
+
+<span class="comment"># Razorpay (India)</span>
+RAZORPAY_KEY_ID=rzp_live_xxxxx
+RAZORPAY_KEY_SECRET=xxxxx
+RAZORPAY_WEBHOOK_SECRET=xxxxx
+
+<span class="comment"># Stripe (International)</span>
+STRIPE_SECRET_KEY=sk_live_xxxxx
+STRIPE_PUBLISHABLE_KEY=pk_live_xxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxx
+
+<span class="comment"># Supabase</span>
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=xxxxx
+SUPABASE_SERVICE_KEY=xxxxx
+            </div>
+        </section>
+
+        <!-- Section 6: Final Recommendations -->
+        <section id="recommendations">
+            <h2>✅ Final Recommendations</h2>
+
+            <div class="card success">
+                <h3>🎯 Summary: What You Should Do</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>Phase 1: Setup Payment Infrastructure</h4>
+                        <ul>
+                            <li>Create Razorpay account (for India)</li>
+                            <li>Create Stripe account (for International)</li>
+                            <li>Set up subscription plans in both dashboards</li>
+                            <li>Configure webhooks for both providers</li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Phase 2: Implement Geo-Detection</h4>
+                        <ul>
+                            <li>Use Vercel's x-vercel-ip-country header</li>
+                            <li>Route Indian users to Razorpay</li>
+                            <li>Route international users to Stripe</li>
+                            <li>Display appropriate currency and pricing</li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Phase 3: Launch with Indian Focus</h4>
+                        <ul>
+                            <li>Start with ₹199/month, ₹999/year pricing</li>
+                            <li>Emphasize UPI payments (free for you!)</li>
+                            <li>Plan Diwali launch for maximum impact</li>
+                            <li>Offer lifetime deal to early adopters</li>
+                        </ul>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>Phase 4: Optimize & Scale</h4>
+                        <ul>
+                            <li>A/B test ₹149 vs ₹199 monthly pricing</li>
+                            <li>Monitor conversion by payment method</li>
+                            <li>Add regional language support</li>
+                            <li>Consider tier-2/3 city specific promotions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Key Takeaways</h3>
+            <div class="comparison-grid">
+                <div class="card">
+                    <h4>💰 Pricing</h4>
+                    <ul class="checklist">
+                        <li>Use PPP-adjusted pricing for India (~30% of US price)</li>
+                        <li>₹199/month is the sweet spot (matches Netflix, Spotify)</li>
+                        <li>₹999/year annual plan with "Save 58%" messaging</li>
+                        <li>₹2,499 lifetime for ownership-minded buyers</li>
+                        <li>Always show original price crossed out</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>💳 Payments</h4>
+                    <ul class="checklist">
+                        <li>Razorpay for India (UPI is FREE!)</li>
+                        <li>Stripe for international customers</li>
+                        <li>Enable UPI AutoPay for subscriptions</li>
+                        <li>Highlight "Pay with UPI" prominently</li>
+                        <li>Support all major banks & wallets</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>🧠 Psychology</h4>
+                    <ul class="checklist">
+                        <li>Use ₹X99 pricing (₹199, ₹999)</li>
+                        <li>Emphasize "Paisa Vasool" value</li>
+                        <li>Leverage festival sales (Diwali, Republic Day)</li>
+                        <li>Offer free trial to reduce friction</li>
+                        <li>Show "X users from your city" social proof</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4>📊 Metrics to Track</h4>
+                    <ul class="checklist">
+                        <li>Conversion rate by payment method</li>
+                        <li>UPI vs Card preference</li>
+                        <li>Tier 1 vs Tier 2/3 city performance</li>
+                        <li>Annual vs Monthly preference</li>
+                        <li>Lifetime deal uptake</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert warning">
+                <span>⚠️</span>
+                <div>
+                    <strong>Important Considerations:</strong>
+                    <ul style="margin-top: 0.5rem;">
+                        <li><strong>GST Compliance:</strong> You must charge 18% GST on all Indian transactions and file GST returns</li>
+                        <li><strong>VPN Abuse:</strong> Some users may use VPN to get Indian pricing. Consider requiring Indian payment method (UPI/Indian card) for INR pricing</li>
+                        <li><strong>Refund Policy:</strong> RBI mandates easy cancellation. Make it simple or face chargebacks</li>
+                        <li><strong>RBI Guidelines:</strong> Card tokenization and recurring payment rules must be followed</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card highlight">
+                <h3>📚 Sources & References</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                        <a href="https://founderlabs.in/how-to-price-your-product-for-the-indian-market-a-complete-guide-for-2025/" target="_blank">Founderlabs - Pricing for Indian Market 2025</a>
+                    </li>
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                        <a href="https://qikink.com/blog/best-payment-gateways-india/" target="_blank">Best Payment Gateways in India Comparison</a>
+                    </li>
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                        <a href="https://dodopayments.com/blogs/purchasing-power-parity-pricing-saas" target="_blank">PPP Pricing for SaaS</a>
+                    </li>
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                        <a href="https://razorpay.com/subscriptions/" target="_blank">Razorpay Subscriptions Documentation</a>
+                    </li>
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                        <a href="https://www.cashfree.com/payment-gateway-charges/" target="_blank">Cashfree Payment Gateway Charges</a>
+                    </li>
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                        <a href="https://gr4vy.com/posts/payment-methods-in-india-a-complete-guide-for-2025/" target="_blank">Payment Methods in India 2025 Guide</a>
+                    </li>
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                        <a href="https://coinlaw.io/upi-statistics/" target="_blank">UPI Statistics 2025</a>
+                    </li>
+                    <li style="padding: 0.5rem 0;">
+                        <a href="https://www.shopify.com/in/blog/psychological-pricing" target="_blank">Psychological Pricing Strategies - Shopify India</a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>SnapBeautify Indian Market & Global Pricing Strategy Guide</p>
+        <p style="opacity: 0.7; margin-top: 0.5rem;">Generated January 2026 | Research-Based Recommendations</p>
+    </footer>
+</body>
+</html>
