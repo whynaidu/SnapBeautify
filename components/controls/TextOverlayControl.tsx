@@ -10,7 +10,7 @@ import { FREE_TIER_LIMITS, FREE_FONTS } from '@/lib/subscription/feature-gates';
 import { Plus, Trash2, Type, Copy, Search, Check, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FONTS_BY_CATEGORY, FONT_CATEGORIES, FontCategory } from '@/lib/constants/fonts';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 
 export function TextOverlayControl() {
     const {
@@ -23,8 +23,6 @@ export function TextOverlayControl() {
         updateTextOverlay,
     } = useEditorStore();
 
-    const [selectedFontCategory, setSelectedFontCategory] = useState<FontCategory>('popular');
-    const [fontSearch, setFontSearch] = useState('');
     const selectedOverlay = textOverlays.find(t => t.id === selectedTextOverlayId);
 
     // Subscription access (for PRO badge only)
@@ -32,8 +30,29 @@ export function TextOverlayControl() {
 
     // Free tier limits
     const MAX_FREE_OVERLAYS = FREE_TIER_LIMITS.maxTextOverlays;
-    const FREE_FONT_COUNT = FREE_TIER_LIMITS.freeFontCount;
     const FREE_FONT_WEIGHTS = FREE_TIER_LIMITS.freeFontWeights;
+
+    // Helper function to find which category a font belongs to
+    const findFontCategory = (fontFamily: string): FontCategory | null => {
+        for (const [category, fonts] of Object.entries(FONTS_BY_CATEGORY)) {
+            if (fonts.some(font => font.fontFamily === fontFamily)) {
+                return category as FontCategory;
+            }
+        }
+        return null;
+    };
+
+    // Initialize category based on current font, or default to 'popular'
+    const getInitialCategory = (): FontCategory => {
+        if (selectedOverlay?.fontFamily) {
+            const category = findFontCategory(selectedOverlay.fontFamily);
+            if (category) return category;
+        }
+        return 'popular';
+    };
+
+    const [selectedFontCategory, setSelectedFontCategory] = useState<FontCategory>(getInitialCategory);
+    const [fontSearch, setFontSearch] = useState('');
 
     // Check if user can add more overlays (for display, not blocking)
     const canAddOverlay = isPro || textOverlays.length < MAX_FREE_OVERLAYS;
@@ -48,26 +67,16 @@ export function TextOverlayControl() {
         duplicateTextOverlay(id);
     };
 
-    // Helper function to find which category a font belongs to
-    const findFontCategory = (fontFamily: string): FontCategory | null => {
-        for (const [category, fonts] of Object.entries(FONTS_BY_CATEGORY)) {
-            if (fonts.some(font => font.fontFamily === fontFamily)) {
-                return category as FontCategory;
-            }
+    // Handle font selection - update category when user selects a font
+    const handleFontSelection = (id: string, fontFamily: string) => {
+        updateTextOverlay(id, { fontFamily });
+        // When user selects a font, update category to match
+        const category = findFontCategory(fontFamily);
+        if (category && category !== selectedFontCategory) {
+            setSelectedFontCategory(category);
+            setFontSearch('');
         }
-        return null;
     };
-
-    // Auto-select the correct font category when overlay font changes
-    useEffect(() => {
-        if (selectedOverlay?.fontFamily) {
-            const category = findFontCategory(selectedOverlay.fontFamily);
-            if (category && category !== selectedFontCategory) {
-                setSelectedFontCategory(category);
-                setFontSearch(''); // Clear search when switching categories
-            }
-        }
-    }, [selectedOverlay?.fontFamily, selectedOverlay?.id]);
 
     // Filter fonts based on search
     const filteredFonts = useMemo(() => {
@@ -391,7 +400,7 @@ export function TextOverlayControl() {
                                         return (
                                             <button
                                                 key={font.fontFamily}
-                                                onClick={() => updateTextOverlay(selectedOverlay.id, { fontFamily: font.fontFamily })}
+                                                onClick={() => handleFontSelection(selectedOverlay.id, font.fontFamily)}
                                                 className={cn(
                                                     'w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-left transition-all group',
                                                     isSelected

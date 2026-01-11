@@ -19,13 +19,14 @@ import {
   CheckCircle,
   Image,
   Wand2,
-  Github,
   Star,
   Layers,
   Camera
 } from 'lucide-react';
-import { useState } from 'react';
+import { GitHubIcon } from '@/components/ui/icons';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 interface AuthGateProps {
   children: React.ReactNode;
@@ -66,7 +67,7 @@ function AnimatedBlob({ className }: { className?: string }) {
 }
 
 // Floating icon component
-function FloatingIcon({ icon: Icon, x, y, delay }: { icon: any; x: string; y: string; delay: number }) {
+function FloatingIcon({ icon: Icon, x, y, delay }: { icon: React.ComponentType<{ className?: string }>; x: string; y: string; delay: number }) {
   return (
     <motion.div
       className="absolute text-zinc-300 dark:text-zinc-700"
@@ -90,38 +91,26 @@ function FloatingIcon({ icon: Icon, x, y, delay }: { icon: any; x: string; y: st
   );
 }
 
-// Animated input wrapper
-function AnimatedInput({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        delay,
-        duration: 0.4,
-        type: 'spring',
-        stiffness: 200,
-        damping: 20
-      }}
-      whileHover={{ scale: 1.01 }}
-      className="space-y-2"
-    >
-      {children}
-    </motion.div>
-  );
-}
+// Pre-generated particle positions for stable rendering
+const particleData = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  left: `${(i * 17 + 5) % 100}%`,
+  top: `${(i * 23 + 10) % 100}%`,
+  duration: 3 + (i % 5) * 0.4,
+  delay: (i % 4) * 0.5,
+}));
 
 // Particle effect
 function Particles() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(20)].map((_, i) => (
+      {particleData.map((particle) => (
         <motion.div
-          key={i}
+          key={particle.id}
           className="absolute w-1 h-1 bg-zinc-400/30 dark:bg-zinc-600/30 rounded-full"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: particle.left,
+            top: particle.top,
           }}
           animate={{
             y: [0, -100, 0],
@@ -129,8 +118,8 @@ function Particles() {
             scale: [0, 1, 0],
           }}
           transition={{
-            duration: 3 + Math.random() * 2,
-            delay: Math.random() * 2,
+            duration: particle.duration,
+            delay: particle.delay,
             repeat: Infinity,
             ease: 'easeInOut',
           }}
@@ -140,8 +129,11 @@ function Particles() {
   );
 }
 
-export function AuthGate({ children }: AuthGateProps) {
+// Inner component that uses useSearchParams - must be wrapped in Suspense
+function AuthGateInner({ children }: AuthGateProps) {
   const { isAuthenticated, isLoading, signIn, signUp, signInWithGoogle, signInWithGithub } = useAuth();
+  const searchParams = useSearchParams();
+  const fromLogout = searchParams.get('fromLogout') === 'true';
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -151,6 +143,15 @@ export function AuthGate({ children }: AuthGateProps) {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Clean up the fromLogout parameter from URL
+  useEffect(() => {
+    if (fromLogout) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('fromLogout');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, [fromLogout]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -222,8 +223,8 @@ export function AuthGate({ children }: AuthGateProps) {
     setShowConfirmPassword(false);
   };
 
-  // Show loading state
-  if (isLoading) {
+  // Show loading state (skip if coming from logout to prevent animation stutter)
+  if (isLoading && !fromLogout) {
     return (
       <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center overflow-hidden">
         <motion.div
@@ -686,7 +687,7 @@ export function AuthGate({ children }: AuthGateProps) {
                 whileTap={{ scale: 0.98 }}
               >
                 <motion.div whileHover={{ rotate: 360 }} transition={{ duration: 0.5 }}>
-                  <Github className="w-5 h-5" />
+                  <GitHubIcon className="w-5 h-5" />
                 </motion.div>
                 <span className="group-hover:translate-x-1 transition-transform">GitHub</span>
               </motion.button>
@@ -916,4 +917,25 @@ export function AuthGate({ children }: AuthGateProps) {
 
   // User is authenticated - show the app
   return <>{children}</>;
+}
+
+// Loading fallback for Suspense
+function AuthGateLoading() {
+  return (
+    <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-zinc-400" />
+        <span className="text-zinc-500 dark:text-zinc-400 text-sm">Loading...</span>
+      </div>
+    </div>
+  );
+}
+
+// Exported component with Suspense boundary for useSearchParams
+export function AuthGate({ children }: AuthGateProps) {
+  return (
+    <Suspense fallback={<AuthGateLoading />}>
+      <AuthGateInner>{children}</AuthGateInner>
+    </Suspense>
+  );
 }

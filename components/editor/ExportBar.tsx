@@ -26,10 +26,12 @@ import {
     shareImageCapacitor
 } from '@/lib/canvas/export-capacitor';
 import { renderCanvas } from '@/lib/canvas/renderer';
+import { showUpgradeModal } from '@/lib/events';
 import { toast } from 'sonner';
 import { ExportFormat, ExportScale } from '@/types/editor';
 import { canvasPool } from '@/lib/utils/canvas-pool';
 import { measureExport } from '@/lib/utils/performance';
+import { logger } from '@/lib/utils/logger';
 
 export function ExportBar() {
     const [canCopy, setCanCopy] = useState(true);
@@ -44,12 +46,8 @@ export function ExportBar() {
     const hasWebpExport = checkFeature('webp_export').hasAccess;
 
     // Show upgrade modal for premium features
-    const showUpgradeModal = (feature: string, message: string) => {
-        window.dispatchEvent(
-            new CustomEvent('show-upgrade-modal', {
-                detail: { featureId: feature, message },
-            })
-        );
+    const handleShowUpgradeModal = (feature: string) => {
+        showUpgradeModal({ feature });
     };
 
     // Check if a scale is premium (3x and 4x are Pro only)
@@ -61,7 +59,7 @@ export function ExportBar() {
     // Handle scale selection with premium check
     const handleScaleChange = (scale: ExportScale) => {
         if (isPremiumScale(scale)) {
-            showUpgradeModal('4k_export', 'Upgrade to Pro for 3x and 4x export quality (up to 4K resolution)');
+            handleShowUpgradeModal('4k_export');
             return;
         }
         setExportScale(scale);
@@ -70,7 +68,7 @@ export function ExportBar() {
     // Handle format selection with premium check
     const handleFormatChange = (format: ExportFormat) => {
         if (isPremiumFormat(format)) {
-            showUpgradeModal('webp_export', 'Upgrade to Pro to export in WebP format (smaller file sizes)');
+            handleShowUpgradeModal('webp_export');
             return;
         }
         setExportFormat(format);
@@ -294,7 +292,7 @@ export function ExportBar() {
             // Refresh subscription to update export count display
             await refreshSubscription();
         } catch (error) {
-            console.error('Failed to increment export count:', error);
+            logger.error('export:increment-failed', error instanceof Error ? error : new Error(String(error)));
         }
     };
 
@@ -303,23 +301,13 @@ export function ExportBar() {
 
         // Check if free user is trying to export with premium features
         if (!canExport) {
-            const featureList = premiumUsage.premiumFeatures.slice(0, 3).join(', ');
-            const moreCount = premiumUsage.premiumFeatures.length > 3
-                ? ` and ${premiumUsage.premiumFeatures.length - 3} more`
-                : '';
-            showUpgradeModal(
-                'premium_features',
-                `You're using premium features: ${featureList}${moreCount}. Upgrade to Pro to export without watermark!`
-            );
+            handleShowUpgradeModal('premium_features');
             return;
         }
 
         // Check export limit for free users
         if (!hasUnlimitedExports && exportsRemaining <= 0) {
-            showUpgradeModal(
-                'unlimited_exports',
-                `You've reached your daily limit of ${FREE_TIER_LIMITS.exportsPerDay} exports. Upgrade to Pro for unlimited exports!`
-            );
+            handleShowUpgradeModal('unlimited_exports');
             return;
         }
 

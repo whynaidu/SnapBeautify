@@ -398,7 +398,7 @@ export default function PricingPage() {
               Compare Plans
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400">
-              See what's included in each plan
+              See what&apos;s included in each plan
             </p>
           </div>
 

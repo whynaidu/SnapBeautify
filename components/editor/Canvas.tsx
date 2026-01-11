@@ -323,8 +323,8 @@ export function Canvas() {
 
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
-        let x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
-        let y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+        const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+        const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
 
         // If dragging, update position with snapping
         if (isDragging && draggedTextId) {
@@ -433,8 +433,8 @@ export function Canvas() {
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
         const touch = e.touches[0];
-        let x = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
-        let y = Math.max(0, Math.min(100, ((touch.clientY - rect.top) / rect.height) * 100));
+        const x = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
+        const y = Math.max(0, Math.min(100, ((touch.clientY - rect.top) / rect.height) * 100));
 
         const snapped = snapToCenter(x, y);
         updateTextOverlay(draggedTextId, { x: snapped.x, y: snapped.y });

@@ -107,14 +107,14 @@ class PerformanceMonitor {
     /**
      * Start a manual performance measurement
      */
-    start(name: string): () => void {
+    start(name: string): (threshold?: number, metadata?: Record<string, unknown>) => void {
         if (!this.enabled) {
             return () => {}; // No-op
         }
 
-        const start = performance.now();
+        const startTime = performance.now();
         return (threshold: number = THRESHOLDS.RENDER, metadata?: Record<string, unknown>) => {
-            const duration = performance.now() - start;
+            const duration = performance.now() - startTime;
             this.recordMetric(name, duration, threshold, metadata);
         };
     }

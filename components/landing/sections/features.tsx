@@ -29,6 +29,16 @@ interface Feature {
   animation: React.FC
 }
 
+// Pre-generated sparkle positions for stable rendering
+const sparklePositions = [
+  { left: '25%', top: '30%' },
+  { left: '70%', top: '25%' },
+  { left: '35%', top: '65%' },
+  { left: '60%', top: '55%' },
+  { left: '45%', top: '40%' },
+  { left: '75%', top: '70%' },
+]
+
 // Animation: Background Removal - Layers peeling away
 function BackgroundRemovalAnim() {
   return (
@@ -64,14 +74,11 @@ function BackgroundRemovalAnim() {
         </div>
       </motion.div>
       {/* Sparkles */}
-      {[...Array(6)].map((_, i) => (
+      {sparklePositions.map((pos, i) => (
         <motion.div
           key={i}
           className="absolute"
-          style={{
-            left: `${20 + Math.random() * 60}%`,
-            top: `${20 + Math.random() * 60}%`,
-          }}
+          style={pos}
           animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
         >

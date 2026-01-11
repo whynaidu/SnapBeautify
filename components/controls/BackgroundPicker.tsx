@@ -9,7 +9,7 @@ import { PRESET_GRADIENTS, SOLID_COLORS, MESH_GRADIENTS, TEXT_PATTERNS } from '@
 import { FONTS_BY_CATEGORY, FONT_CATEGORIES, FontCategory } from '@/lib/constants/fonts';
 import { cn } from '@/lib/utils';
 import { Check, Pipette, X, Search, Crown } from 'lucide-react';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useSubscription } from '@/lib/subscription/context';
 
 export function BackgroundPicker() {
@@ -57,11 +57,7 @@ export function BackgroundPicker() {
     // Check if text pattern is active
     const isTextPatternActive = backgroundType === 'textPattern';
 
-    // Font picker state
-    const [fontCategory, setFontCategory] = useState<FontCategory>('popular');
-    const [fontSearch, setFontSearch] = useState('');
-
-    // Helper function to find which category a font belongs to
+    // Font picker state - derive initial category from textPatternFontFamily
     const findFontCategory = (fontFamily: string): FontCategory | null => {
         for (const [category, fonts] of Object.entries(FONTS_BY_CATEGORY)) {
             if (fonts.some(font => font.fontFamily === fontFamily)) {
@@ -71,16 +67,28 @@ export function BackgroundPicker() {
         return null;
     };
 
-    // Auto-select the correct font category when text pattern font changes
-    useEffect(() => {
+    // Initialize category based on current font, or default to 'popular'
+    const getInitialCategory = (): FontCategory => {
         if (textPatternFontFamily) {
             const category = findFontCategory(textPatternFontFamily);
-            if (category && category !== fontCategory) {
-                setFontCategory(category);
-                setFontSearch(''); // Clear search when switching categories
-            }
+            if (category) return category;
         }
-    }, [textPatternFontFamily]);
+        return 'popular';
+    };
+
+    const [fontCategory, setFontCategory] = useState<FontCategory>(getInitialCategory);
+    const [fontSearch, setFontSearch] = useState('');
+
+    // Handle font selection - update category when user selects a font
+    const handleFontSelection = (fontFamily: string) => {
+        setTextPatternFontFamily(fontFamily);
+        // When user selects a font, update category to match
+        const category = findFontCategory(fontFamily);
+        if (category && category !== fontCategory) {
+            setFontCategory(category);
+            setFontSearch('');
+        }
+    };
 
     // Filter fonts based on search
     const filteredFonts = useMemo(() => {
@@ -651,7 +659,7 @@ export function BackgroundPicker() {
                                         return (
                                             <button
                                                 key={font.fontFamily}
-                                                onClick={() => setTextPatternFontFamily(font.fontFamily)}
+                                                onClick={() => handleFontSelection(font.fontFamily)}
                                                 className={cn(
                                                     'w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-all group relative',
                                                     isSelected

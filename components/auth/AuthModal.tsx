@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/auth/context';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -14,7 +13,6 @@ import {
   Loader2,
   Mail,
   Lock,
-  Github,
   AlertCircle,
   CheckCircle,
   Sparkles,
@@ -23,8 +21,8 @@ import {
   ArrowRight,
   Shield,
   Zap,
-  X
 } from 'lucide-react';
+import { GitHubIcon } from '@/components/ui/icons';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -81,7 +79,7 @@ export function AuthModal({ isOpen, onClose, defaultTab = 'login', onSuccess }: 
         onSuccess?.();
         onClose();
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -111,7 +109,7 @@ export function AuthModal({ isOpen, onClose, defaultTab = 'login', onSuccess }: 
       } else {
         setSuccess('Check your email for a confirmation link!');
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -127,7 +125,7 @@ export function AuthModal({ isOpen, onClose, defaultTab = 'login', onSuccess }: 
         setError(error.message);
         setIsLoading(false);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to connect to Google');
       setIsLoading(false);
     }
@@ -142,7 +140,7 @@ export function AuthModal({ isOpen, onClose, defaultTab = 'login', onSuccess }: 
         setError(error.message);
         setIsLoading(false);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to connect to GitHub');
       setIsLoading(false);
     }
@@ -280,7 +278,7 @@ export function AuthModal({ isOpen, onClose, defaultTab = 'login', onSuccess }: 
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
             >
-              <Github className="w-5 h-5" />
+              <GitHubIcon className="w-5 h-5" />
               GitHub
             </motion.button>
           </div>

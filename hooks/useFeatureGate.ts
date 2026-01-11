@@ -1,6 +1,8 @@
 'use client';
 
 import { useSubscription } from '@/lib/subscription/context';
+import { showUpgradeModal } from '@/lib/events';
+import { logger } from '@/lib/utils/logger';
 import type { FeatureId } from '@/lib/subscription/types';
 
 interface UseFeatureGateResult {
@@ -19,16 +21,9 @@ export function useFeatureGate(featureId: FeatureId): UseFeatureGateResult {
   const { hasAccess, upgradeMessage } = checkFeature(featureId);
 
   const showUpgradePrompt = () => {
-    // This could trigger a modal, toast, or redirect
-    // For now, we'll just log - in production, connect to your UI system
     if (!hasAccess) {
-      console.log('Upgrade required:', upgradeMessage);
-      // Could dispatch an event or set state to show upgrade modal
-      window.dispatchEvent(
-        new CustomEvent('show-upgrade-modal', {
-          detail: { featureId, message: upgradeMessage },
-        })
-      );
+      logger.debug('feature-gate:upgrade-required', { featureId, upgradeMessage });
+      showUpgradeModal({ feature: featureId });
     }
   };
 

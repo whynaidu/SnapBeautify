@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth/context';
+import { showAuthModal } from '@/lib/events';
+import { logger } from '@/lib/utils/logger';
 import type {
   Subscription,
   SubscriptionPlan,
@@ -59,7 +61,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         setPricing(data);
       }
     } catch (error) {
-      console.error('Error fetching pricing:', error);
+      logger.error('subscription:pricing-fetch', error instanceof Error ? error : new Error(String(error)));
     }
   }, []);
 
@@ -88,7 +90,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         setExportsRemaining(data.exportsRemaining ?? FREE_TIER_LIMITS.exportsPerDay);
       }
     } catch (error) {
-      console.error('Error fetching subscription status:', error);
+      logger.error('subscription:status-fetch', error instanceof Error ? error : new Error(String(error)));
     }
   }, [userId]);
 
@@ -124,9 +126,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
       return true;
     }
     // Dispatch event to open auth modal
-    window.dispatchEvent(new CustomEvent('show-auth-modal', {
-      detail: { defaultTab: 'signup' }
-    }));
+    showAuthModal({ defaultTab: 'signup' });
     return false;
   }, [isAuthenticated]);
 
@@ -155,14 +155,14 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
       }
 
       if (!pricing || !userId) {
-        console.error('Pricing not loaded or user not authenticated');
+        logger.warn('subscription:checkout', 'Pricing not loaded or user not authenticated');
         return;
       }
 
       if (pricing.gateway === 'razorpay') {
         const loaded = await loadRazorpayScript();
         if (!loaded) {
-          console.error('Failed to load Razorpay');
+          logger.warn('subscription:razorpay', 'Failed to load Razorpay script');
           return;
         }
 
@@ -234,7 +234,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
                   detail: { plan: planType }
                 }));
               } else {
-                console.error('Payment verification failed');
+                logger.warn('subscription:payment', 'Payment verification failed');
                 window.dispatchEvent(new CustomEvent('subscription-error', {
                   detail: { message: 'Payment verification failed. Please contact support.' }
                 }));
@@ -245,7 +245,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
             },
             modal: {
               ondismiss: () => {
-                console.log('Razorpay modal closed');
+                logger.debug('subscription:razorpay-modal-closed');
               },
               confirm_close: true, // Ask user to confirm before closing
             },
@@ -254,7 +254,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
           const rzp = new window.Razorpay!(options);
           rzp.open();
         } catch (error) {
-          console.error('Error initiating Razorpay checkout:', error);
+          logger.error('subscription:razorpay-checkout', error instanceof Error ? error : new Error(String(error)));
           window.dispatchEvent(new CustomEvent('subscription-error', {
             detail: { message: 'Failed to initiate payment. Please try again.' }
           }));
@@ -284,7 +284,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
             window.location.href = data.url;
           }
         } catch (error) {
-          console.error('Error initiating Stripe checkout:', error);
+          logger.error('subscription:stripe-checkout', error instanceof Error ? error : new Error(String(error)));
         }
       }
     },
@@ -315,7 +315,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         window.location.href = data.url;
       }
     } catch (error) {
-      console.error('Error opening customer portal:', error);
+      logger.error('subscription:portal-open', error instanceof Error ? error : new Error(String(error)));
     }
   }, [userId]);
 

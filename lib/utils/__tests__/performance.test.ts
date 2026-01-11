@@ -413,7 +413,7 @@ describe('Performance Monitoring', () => {
     });
 
     it('should measure duration', () => {
-      vi.spyOn(performance, 'measure').mockImplementation(() => {});
+      vi.spyOn(performance, 'measure').mockImplementation(() => ({} as PerformanceMeasure));
       vi.spyOn(performance, 'getEntriesByName').mockReturnValue([
         { duration: 150 } as PerformanceEntry,
       ]);

@@ -314,11 +314,11 @@ export default function AboutPage() {
 
             <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6">
               Unlike other tools, SnapBeautify processes everything directly in your browser.
-              Your images never touch our servers. Your privacy isn't a feature — it's our foundation.
+              Your images never touch our servers. Your privacy isn&apos;t a feature — it&apos;s our foundation.
             </p>
 
             <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              Whether you're an e-commerce seller, content creator, or someone who just wants
+              Whether you&apos;re an e-commerce seller, content creator, or someone who just wants
               better-looking pictures, SnapBeautify has you covered.
             </p>
           </motion.div>

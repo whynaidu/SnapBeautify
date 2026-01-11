@@ -1,6 +1,7 @@
 'use client';
 
 import { useSubscription } from '@/lib/subscription/context';
+import { showUpgradeModal } from '@/lib/events';
 import { Crown, Sparkles } from 'lucide-react';
 
 interface ProBadgeProps {
@@ -34,13 +35,7 @@ export function ProBadge({ showUpgrade = true, className = '' }: ProBadgeProps) 
   if (showUpgrade) {
     return (
       <button
-        onClick={() => {
-          window.dispatchEvent(
-            new CustomEvent('show-upgrade-modal', {
-              detail: { featureId: 'general', message: 'Upgrade to unlock all Pro features!' },
-            })
-          );
-        }}
+        onClick={() => showUpgradeModal({ feature: 'general' })}
         className={`inline-flex items-center gap-1 px-2 py-1 bg-zinc-700 hover:bg-zinc-600 rounded-full text-xs font-medium text-zinc-300 transition-colors ${className}`}
       >
         <Sparkles className="w-3 h-3 text-orange-500" />
@@ -96,16 +91,7 @@ export function ExportCounter({ className = '' }: { className?: string }) {
       </span>
       {isExhausted && (
         <button
-          onClick={() => {
-            window.dispatchEvent(
-              new CustomEvent('show-upgrade-modal', {
-                detail: {
-                  featureId: 'unlimited_exports',
-                  message: 'Upgrade to Pro for unlimited exports!',
-                },
-              })
-            );
-          }}
+          onClick={() => showUpgradeModal({ feature: 'unlimited_exports' })}
           className="text-orange-500 hover:text-orange-400 font-medium"
         >
           Upgrade

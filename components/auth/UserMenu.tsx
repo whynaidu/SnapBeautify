@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth/context';
 import { useSubscription } from '@/lib/subscription/context';
+import { showAuthModal, showUpgradeModal } from '@/lib/events';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,25 +20,15 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { User, LogOut, Crown, Sun, Moon, Laptop, FileText, Shield, RefreshCcw, Mail, Truck, Check } from 'lucide-react';
 
-export function UserMenu() {
-  const { user, isAuthenticated, signOut } = useAuth();
-  const { isPro, plan } = useSubscription();
-  const { setTheme, theme } = useTheme();
-
-  const handleSignOut = async () => {
-    await signOut();
-    // Force navigation to home page to trigger re-render with cleared auth state
-    window.location.href = '/';
-  };
-
-  const handleLogin = () => {
-    window.dispatchEvent(new CustomEvent('show-auth-modal', {
-      detail: { defaultTab: 'login' }
-    }));
-  };
-
-  // Common settings menu items (shown for both authenticated and non-authenticated users)
-  const SettingsMenuContent = () => (
+// Extracted outside to avoid recreating on each render
+function SettingsMenuContent({
+  theme,
+  setTheme
+}: {
+  theme: string | undefined;
+  setTheme: (theme: string) => void;
+}) {
+  return (
     <>
       {/* Theme submenu */}
       <DropdownMenuSub>
@@ -100,6 +91,22 @@ export function UserMenu() {
       </DropdownMenuItem>
     </>
   );
+}
+
+export function UserMenu() {
+  const { user, isAuthenticated, signOut } = useAuth();
+  const { isPro, plan } = useSubscription();
+  const { setTheme, theme } = useTheme();
+
+  const handleSignOut = async () => {
+    await signOut();
+    // Redirect with flag to skip loading animation
+    window.location.replace('/app?fromLogout=true');
+  };
+
+  const handleLogin = () => {
+    showAuthModal({ defaultTab: 'login' });
+  };
 
   if (!isAuthenticated) {
     return (
@@ -116,7 +123,7 @@ export function UserMenu() {
             Sign In
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <SettingsMenuContent />
+          <SettingsMenuContent theme={theme} setTheme={setTheme} />
         </DropdownMenuContent>
       </DropdownMenu>
     );
@@ -154,16 +161,14 @@ export function UserMenu() {
         <DropdownMenuSeparator />
         {!isPro && (
           <DropdownMenuItem
-            onClick={() => window.dispatchEvent(new CustomEvent('show-upgrade-modal', {
-              detail: { featureId: 'pro', message: 'Upgrade to Pro for all features!' }
-            }))}
+            onClick={() => showUpgradeModal({ feature: 'pro' })}
             className="cursor-pointer"
           >
             <Crown className="w-4 h-4 mr-2 text-orange-500" />
             Upgrade to Pro
           </DropdownMenuItem>
         )}
-        <SettingsMenuContent />
+        <SettingsMenuContent theme={theme} setTheme={setTheme} />
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-500 focus:text-red-500">
           <LogOut className="w-4 h-4 mr-2" />

@@ -169,7 +169,7 @@ export function ExportErrorBoundary({ children }: { children: ReactNode }) {
                     <AlertCircle className="w-12 h-12 text-destructive mb-4" />
                     <h3 className="text-lg font-semibold mb-2">Export Failed</h3>
                     <p className="text-muted-foreground mb-4">
-                        We couldn't export your image. This might be due to memory constraints
+                        We couldn&apos;t export your image. This might be due to memory constraints
                         or browser limitations.
                     </p>
                     <Button onClick={() => window.location.reload()} variant="outline">

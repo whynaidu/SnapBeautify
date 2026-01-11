@@ -21,8 +21,6 @@ export function CropOverlay({ canvasWidth, canvasHeight, displayScale }: CropOve
     const [startCrop, setStartCrop] = useState<CropArea | null>(null);
     const overlayRef = useRef<HTMLDivElement>(null);
 
-    if (!cropArea) return null;
-
     const handleMouseDown = useCallback((e: React.MouseEvent | React.TouchEvent, handle: DragHandle) => {
         e.preventDefault();
         e.stopPropagation();
@@ -43,7 +41,7 @@ export function CropOverlay({ canvasWidth, canvasHeight, displayScale }: CropOve
         const deltaX = ((clientX - startPos.x) / rect.width) * 100;
         const deltaY = ((clientY - startPos.y) / rect.height) * 100;
 
-        let newCrop = { ...startCrop };
+        const newCrop = { ...startCrop };
 
         switch (dragHandle) {
             case 'move':
@@ -108,6 +106,9 @@ export function CropOverlay({ canvasWidth, canvasHeight, displayScale }: CropOve
             };
         }
     }, [isDragging, handleMouseMove, handleMouseUp]);
+
+    // Early return after all hooks have been called
+    if (!cropArea) return null;
 
     // The overlay needs to exactly match the canvas position and size
     // Since the canvas is in normal flow and scales from center,

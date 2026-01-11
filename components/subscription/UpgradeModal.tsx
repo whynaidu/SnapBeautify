@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSubscription } from '@/lib/subscription/context';
-import { Button } from '@/components/ui/button';
+import { EVENTS } from '@/lib/events';
 import {
   X,
   Sparkles,
@@ -12,7 +12,6 @@ import {
   Crown,
   Gem,
   Shield,
-  Lock,
   ChevronRight,
   Star,
   Infinity,
@@ -37,25 +36,27 @@ const proFeatures = [
 ];
 
 export function UpgradeModal({ isOpen: controlledOpen, onClose, featureMessage }: UpgradeModalProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState(featureMessage);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [internalMessage, setInternalMessage] = useState<string | undefined>(undefined);
   const [hoveredPlan, setHoveredPlan] = useState<string | null>(null);
   const { pricing, initiateCheckout, isLoading } = useSubscription();
 
+  // Determine actual open state: controlled prop takes precedence over internal state
+  const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  // Determine message: prop takes precedence, then internal, then undefined
+  const message = featureMessage || internalMessage;
+
   useEffect(() => {
-    const handleShowModal = (event: CustomEvent<{ featureId: string; message: string }>) => {
-      setMessage(event.detail.message);
-      setIsOpen(true);
+    const handleShowModal = (event: CustomEvent<{ feature?: string }>) => {
+      if (event.detail?.feature) {
+        setInternalMessage(`Upgrade to Pro to access ${event.detail.feature} and more!`);
+      }
+      setInternalOpen(true);
     };
 
-    window.addEventListener('show-upgrade-modal', handleShowModal as EventListener);
-    return () => window.removeEventListener('show-upgrade-modal', handleShowModal as EventListener);
+    window.addEventListener(EVENTS.SHOW_UPGRADE_MODAL, handleShowModal as EventListener);
+    return () => window.removeEventListener(EVENTS.SHOW_UPGRADE_MODAL, handleShowModal as EventListener);
   }, []);
-
-  useEffect(() => {
-    if (controlledOpen !== undefined) setIsOpen(controlledOpen);
-    if (featureMessage) setMessage(featureMessage);
-  }, [controlledOpen, featureMessage]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -68,7 +69,8 @@ export function UpgradeModal({ isOpen: controlledOpen, onClose, featureMessage }
   }, [isOpen]);
 
   const handleClose = () => {
-    setIsOpen(false);
+    setInternalOpen(false);
+    setInternalMessage(undefined);
     onClose?.();
   };
 
@@ -330,7 +332,7 @@ export function UpgradeModal({ isOpen: controlledOpen, onClose, featureMessage }
                 <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-5">
                   <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
                     <Crown className="w-4 h-4 text-amber-500" />
-                    What's included
+                    What&apos;s included
                   </h3>
 
                   <div className="grid grid-cols-2 gap-3">
