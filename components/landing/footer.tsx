@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Container } from './layout/container'
 import { Logo } from './shared/logo'
 import {
@@ -15,7 +16,10 @@ import {
   Heart,
   Zap,
   Shield,
-  Globe
+  Globe,
+  Check,
+  Loader2,
+  AlertCircle
 } from 'lucide-react'
 
 const footerLinks = {
@@ -75,6 +79,52 @@ const features = [
 ]
 
 export function Footer() {
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [message, setMessage] = useState('')
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!email.trim()) {
+      setStatus('error')
+      setMessage('Please enter your email address')
+      return
+    }
+
+    setStatus('loading')
+    setMessage('')
+
+    try {
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email.trim() }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setStatus('success')
+        setMessage(data.message)
+        setEmail('')
+        // Reset to idle after 5 seconds
+        setTimeout(() => {
+          setStatus('idle')
+          setMessage('')
+        }, 5000)
+      } else {
+        setStatus('error')
+        setMessage(data.error || 'Failed to subscribe')
+      }
+    } catch {
+      setStatus('error')
+      setMessage('Something went wrong. Please try again.')
+    }
+  }
+
   return (
     <footer className="relative bg-zinc-950 text-white overflow-hidden">
       {/* Decorative background elements */}
@@ -149,21 +199,64 @@ export function Footer() {
                 <p className="text-zinc-500 text-xs sm:text-sm mb-4">
                   Get updates on new features and tips for better photos.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="flex-1 px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 text-sm transition-colors"
-                  />
-                  <motion.button
-                    className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-colors"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Subscribe
-                    <ArrowRight className="w-4 h-4" />
-                  </motion.button>
-                </div>
+                <form onSubmit={handleSubscribe} className="space-y-3">
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      disabled={status === 'loading' || status === 'success'}
+                      className="flex-1 px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    <motion.button
+                      type="submit"
+                      disabled={status === 'loading' || status === 'success'}
+                      className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+                      whileHover={status === 'idle' || status === 'error' ? { scale: 1.02 } : {}}
+                      whileTap={status === 'idle' || status === 'error' ? { scale: 0.98 } : {}}
+                    >
+                      {status === 'loading' ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : status === 'success' ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Subscribed
+                        </>
+                      ) : (
+                        <>
+                          Subscribe
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </motion.button>
+                  </div>
+
+                  {/* Status message */}
+                  <AnimatePresence mode="wait">
+                    {message && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className={`flex items-center gap-2 text-xs ${
+                          status === 'success'
+                            ? 'text-green-400'
+                            : status === 'error'
+                            ? 'text-red-400'
+                            : 'text-zinc-400'
+                        }`}
+                      >
+                        {status === 'success' ? (
+                          <Check className="w-3.5 h-3.5" />
+                        ) : status === 'error' ? (
+                          <AlertCircle className="w-3.5 h-3.5" />
+                        ) : null}
+                        {message}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </form>
               </div>
             </div>
 
