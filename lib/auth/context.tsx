@@ -107,12 +107,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = useCallback(async () => {
     try {
-      // Sign out from Supabase with global scope to clear all sessions
-      await supabase.auth.signOut({ scope: 'global' });
+      // Sign out from Supabase - use local scope to sign out current session
+      // Note: 'global' scope requires server-side setup and can fail silently
+      const { error } = await supabase.auth.signOut({ scope: 'local' });
+      if (error) {
+        console.error('Error signing out:', error);
+      }
     } catch (error) {
       console.error('Error signing out:', error);
     }
-    // Clear local state
+    // Clear local state regardless of API result
     setUser(null);
     setSession(null);
   }, [supabase]);
