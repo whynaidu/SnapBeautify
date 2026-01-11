@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
@@ -11,22 +11,84 @@ import { ModeToggle } from '@/components/theme-toggle'
 import { cn } from '@/lib/utils'
 
 const navLinks = [
-  { label: 'Features', href: '#features' },
-  { label: 'How It Works', href: '#how-it-works' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'Features', href: '#features', sectionId: 'features' },
+  { label: 'How It Works', href: '#how-it-works', sectionId: 'how-it-works' },
+  { label: 'Pricing', href: '#pricing', sectionId: 'pricing' },
+  { label: 'FAQ', href: '#faq', sectionId: 'faq' },
 ]
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState<string | null>(null)
 
+  // Handle scroll for header background
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20)
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Scroll spy using Intersection Observer
+  useEffect(() => {
+    const sectionIds = navLinks.map(link => link.sectionId)
+    const sections = sectionIds
+      .map(id => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[]
+
+    if (sections.length === 0) return
+
+    const observerOptions: IntersectionObserverInit = {
+      root: null,
+      rootMargin: '-20% 0px -60% 0px', // Trigger when section is in the middle portion of viewport
+      threshold: 0,
+    }
+
+    const observerCallback: IntersectionObserverCallback = (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id)
+        }
+      })
+    }
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions)
+
+    sections.forEach(section => {
+      observer.observe(section)
+    })
+
+    return () => {
+      sections.forEach(section => {
+        observer.unobserve(section)
+      })
+    }
+  }, [])
+
+  // Handle nav link click - smooth scroll
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault()
+    const targetId = href.replace('#', '')
+    const targetElement = document.getElementById(targetId)
+
+    if (targetElement) {
+      const headerOffset = 80 // Account for fixed header
+      const elementPosition = targetElement.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.scrollY - headerOffset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      })
+
+      // Update active section immediately for better UX
+      setActiveSection(targetId)
+    }
+
+    // Close mobile menu if open
+    setIsMobileMenuOpen(false)
   }, [])
 
   return (
@@ -46,16 +108,38 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white font-medium transition-colors text-sm"
-              >
-                {link.label}
-              </Link>
-            ))}
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.sectionId
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className={cn(
+                    'relative px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm',
+                    isActive
+                      ? 'text-black dark:text-white'
+                      : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+                  )}
+                >
+                  {/* Active indicator background */}
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeSection"
+                      className="absolute inset-0 bg-zinc-100 dark:bg-zinc-800 rounded-full -z-10"
+                      initial={false}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 380,
+                        damping: 30,
+                      }}
+                    />
+                  )}
+                  {link.label}
+                </a>
+              )
+            })}
           </div>
 
           {/* Desktop CTAs */}
@@ -102,18 +186,35 @@ export function Header() {
               exit={{ opacity: 0, height: 0 }}
               className="md:hidden mt-4 pb-4"
             >
-              <div className="flex flex-col gap-4">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white font-medium py-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                <div className="flex gap-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+              <div className="flex flex-col gap-1">
+                {navLinks.map((link) => {
+                  const isActive = activeSection === link.sectionId
+                  return (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      onClick={(e) => handleNavClick(e, link.href)}
+                      className={cn(
+                        'px-4 py-3 rounded-xl font-medium transition-all',
+                        isActive
+                          ? 'text-black dark:text-white bg-zinc-100 dark:bg-zinc-800'
+                          : 'text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900'
+                      )}
+                    >
+                      <div className="flex items-center justify-between">
+                        {link.label}
+                        {isActive && (
+                          <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="w-2 h-2 rounded-full bg-black dark:bg-white"
+                          />
+                        )}
+                      </div>
+                    </a>
+                  )
+                })}
+                <div className="flex gap-4 pt-4 mt-2 border-t border-zinc-200 dark:border-zinc-800">
                   <Link href="/app" className="flex-1">
                     <Button variant="outline" size="sm" className="w-full border-zinc-300 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-black dark:hover:text-white">
                       Sign In

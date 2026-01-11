@@ -94,9 +94,8 @@ export default function ContactPage() {
         <motion.div
           className="grid md:grid-cols-2 gap-6 mb-12"
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
           {contactMethods.map((method, index) => (
             <motion.a
@@ -104,9 +103,8 @@ export default function ContactPage() {
               href={`mailto:${method.contact}`}
               className="group relative p-8 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-xl transition-all overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + index * 0.1 }}
               whileHover={{ y: -4 }}
             >
               <motion.div
@@ -131,9 +129,8 @@ export default function ContactPage() {
         <motion.div
           className="mb-12 p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800"
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
         >
           <div className="flex items-center justify-center gap-4 text-center">
             <motion.div

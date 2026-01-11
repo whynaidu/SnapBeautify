@@ -106,9 +106,10 @@ export default function TermsPage() {
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.5, delay: index * 0.05 }}
+              {...(index < 3
+                ? { animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay: 0.2 + index * 0.1 } }
+                : { whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: '-50px' }, transition: { duration: 0.5, delay: index * 0.05 } }
+              )}
               whileHover={{ y: -2 }}
               className="group relative bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-2xl p-6 transition-all duration-300 hover:shadow-lg"
             >

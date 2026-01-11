@@ -100,9 +100,8 @@ export default function RefundPage() {
         <motion.div
           className="mb-12 p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800"
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
           <div className="flex items-start gap-4">
             <motion.div
@@ -125,9 +124,8 @@ export default function RefundPage() {
         <motion.div
           className="mb-12"
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
         >
           <h2 className="text-2xl font-bold text-black dark:text-white mb-6 text-center">Refund Policy by Plan</h2>
           <div className="grid md:grid-cols-3 gap-4">
@@ -136,9 +134,8 @@ export default function RefundPage() {
                 key={index}
                 className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 hover:shadow-lg transition-all"
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 + index * 0.1 }}
                 whileHover={{ y: -4, scale: 1.02 }}
               >
                 <motion.div

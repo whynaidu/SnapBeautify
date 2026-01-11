@@ -129,9 +129,8 @@ export default function PrivacyPage() {
         <motion.div
           className="mb-12"
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
           <h2 className="text-2xl font-bold text-black dark:text-white mb-6 text-center">What We Collect</h2>
           <div className="grid md:grid-cols-3 gap-4">
@@ -140,9 +139,8 @@ export default function PrivacyPage() {
                 key={index}
                 className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 hover:shadow-lg transition-all"
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + index * 0.1 }}
                 whileHover={{ y: -4 }}
               >
                 <motion.div
@@ -170,9 +168,8 @@ export default function PrivacyPage() {
         <motion.div
           className="mb-12 p-8 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800"
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
         >
           <h2 className="text-2xl font-bold text-black dark:text-white mb-6">How We Use Your Information</h2>
           <div className="grid md:grid-cols-2 gap-4">
@@ -181,9 +178,8 @@ export default function PrivacyPage() {
                 key={index}
                 className="flex items-center gap-3"
                 initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6 + index * 0.05 }}
               >
                 <div className="w-8 h-8 rounded-lg bg-black dark:bg-white flex items-center justify-center flex-shrink-0">
                   <span className="text-white dark:text-black font-semibold text-sm">{index + 1}</span>

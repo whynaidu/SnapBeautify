@@ -266,17 +266,16 @@ export default function AboutPage() {
         <motion.div
           className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-20"
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
         >
           {stats.map((stat, index) => (
             <motion.div
               key={index}
               className="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-center group hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
               initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 + index * 0.1 }}
               whileHover={{ y: -5 }}
             >
               <motion.div
