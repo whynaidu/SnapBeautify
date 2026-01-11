@@ -23,17 +23,19 @@ import { User, LogOut, Crown, Sun, Moon, Laptop, FileText, Shield, RefreshCcw, M
 
 // Avatar component with fallback
 function UserAvatar({ src, name, size = 'sm' }: { src?: string | null; name?: string; size?: 'sm' | 'md' }) {
-  const sizeClasses = size === 'sm' ? 'w-6 h-6' : 'w-10 h-10';
-  const iconSize = size === 'sm' ? 'w-3.5 h-3.5' : 'w-5 h-5';
+  const sizeClasses = size === 'sm' ? 'w-7 h-7' : 'w-10 h-10';
+  const iconSize = size === 'sm' ? 'w-4 h-4' : 'w-5 h-5';
+  // Only show ring on medium size (dropdown), not on small (header button)
+  const ringClasses = size === 'md' ? 'ring-2 ring-zinc-200 dark:ring-zinc-700' : '';
 
   if (src) {
     return (
-      <div className={`${sizeClasses} rounded-full overflow-hidden ring-2 ring-zinc-200 dark:ring-zinc-700`}>
+      <div className={`${sizeClasses} rounded-full overflow-hidden ${ringClasses} flex-shrink-0`}>
         <Image
           src={src}
           alt={name || 'User avatar'}
-          width={size === 'sm' ? 24 : 40}
-          height={size === 'sm' ? 24 : 40}
+          width={size === 'sm' ? 28 : 40}
+          height={size === 'sm' ? 28 : 40}
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"
         />
@@ -44,7 +46,7 @@ function UserAvatar({ src, name, size = 'sm' }: { src?: string | null; name?: st
   // Fallback to initials or icon
   const initial = name?.charAt(0).toUpperCase();
   return (
-    <div className={`${sizeClasses} rounded-full bg-primary/20 flex items-center justify-center`}>
+    <div className={`${sizeClasses} rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 ${ringClasses}`}>
       {initial ? (
         <span className={`${size === 'sm' ? 'text-xs' : 'text-sm'} font-medium`}>{initial}</span>
       ) : (
@@ -170,13 +172,13 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2 rounded-full pl-1.5">
+        <button className="flex items-center gap-2 h-8.5 px-0.5 sm:h-9 sm:pl-0.5 sm:pr-3 rounded-full border border-zinc-200 dark:border-zinc-700 bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
           <UserAvatar src={avatarUrl} name={displayName} size="sm" />
-          <span className="max-w-[100px] truncate text-xs hidden sm:inline">
+          <span className="max-w-[100px] truncate text-sm hidden sm:inline">
             {displayName}
           </span>
           {isPro && <Crown className="w-3.5 h-3.5 text-orange-500" />}
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64 rounded-xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
         <DropdownMenuLabel>
