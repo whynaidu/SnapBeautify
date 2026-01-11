@@ -126,36 +126,36 @@ export function Footer() {
   }
 
   return (
-    <footer className="relative bg-zinc-950 text-white overflow-hidden">
+    <footer className="relative bg-zinc-100 dark:bg-zinc-950 text-zinc-900 dark:text-white overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#27272a_1px,transparent_1px),linear-gradient(to_bottom,#27272a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#27272a_1px,transparent_1px),linear-gradient(to_bottom,#27272a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
 
         {/* Gradient orbs */}
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-zinc-800 rounded-full blur-3xl opacity-50" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-zinc-800 rounded-full blur-3xl opacity-50" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-zinc-300 dark:bg-zinc-800 rounded-full blur-3xl opacity-50" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-zinc-300 dark:bg-zinc-800 rounded-full blur-3xl opacity-50" />
 
         {/* Animated floating elements */}
         <motion.div
-          className="absolute top-20 right-[20%] w-2 h-2 bg-zinc-600 rounded-full"
+          className="absolute top-20 right-[20%] w-2 h-2 bg-zinc-400 dark:bg-zinc-600 rounded-full"
           animate={{ y: [0, -20, 0], opacity: [0.3, 0.8, 0.3] }}
           transition={{ duration: 4, repeat: Infinity }}
         />
         <motion.div
-          className="absolute top-40 left-[15%] w-1.5 h-1.5 bg-zinc-500 rounded-full"
+          className="absolute top-40 left-[15%] w-1.5 h-1.5 bg-zinc-400 dark:bg-zinc-500 rounded-full"
           animate={{ y: [0, -15, 0], opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
         />
         <motion.div
-          className="absolute bottom-40 right-[30%] w-2 h-2 bg-zinc-600 rounded-full"
+          className="absolute bottom-40 right-[30%] w-2 h-2 bg-zinc-400 dark:bg-zinc-600 rounded-full"
           animate={{ y: [0, -25, 0], opacity: [0.2, 0.7, 0.2] }}
           transition={{ duration: 5, repeat: Infinity, delay: 1 }}
         />
       </div>
 
       {/* Top decorative border */}
-      <div className="h-px bg-gradient-to-r from-transparent via-zinc-700 to-transparent" />
+      <div className="h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent" />
 
       <Container className="relative z-10 px-4 sm:px-6">
         {/* Main footer content */}
@@ -168,7 +168,7 @@ export function Footer() {
                 <Logo />
               </Link>
 
-              <p className="text-zinc-400 text-sm sm:text-base max-w-md leading-relaxed">
+              <p className="text-zinc-600 dark:text-zinc-400 text-sm sm:text-base max-w-md leading-relaxed">
                 Transform your photos in seconds with AI-powered enhancement.
                 100% browser-based, 100% private. No uploads, no compromises.
               </p>
@@ -178,7 +178,7 @@ export function Footer() {
                 {features.map((feature, index) => (
                   <motion.div
                     key={feature.label}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-xs sm:text-sm text-zinc-400"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400"
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -194,7 +194,7 @@ export function Footer() {
               <div className="pt-4 sm:pt-6">
                 <div className="flex items-center gap-2 mb-3">
                   <Mail className="w-4 h-4 text-zinc-500" />
-                  <p className="font-medium text-sm text-white">Stay in the loop</p>
+                  <p className="font-medium text-sm text-zinc-900 dark:text-white">Stay in the loop</p>
                 </div>
                 <p className="text-zinc-500 text-xs sm:text-sm mb-4">
                   Get updates on new features and tips for better photos.
@@ -207,12 +207,12 @@ export function Footer() {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email"
                       disabled={status === 'loading' || status === 'success'}
-                      className="flex-1 px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 px-4 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 focus:ring-1 focus:ring-zinc-400 dark:focus:ring-zinc-600 text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <motion.button
                       type="submit"
                       disabled={status === 'loading' || status === 'success'}
-                      className="px-5 py-2.5 bg-white text-black hover:bg-zinc-200 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+                      className="px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
                       whileHover={status === 'idle' || status === 'error' ? { scale: 1.02 } : {}}
                       whileTap={status === 'idle' || status === 'error' ? { scale: 0.98 } : {}}
                     >
@@ -241,10 +241,10 @@ export function Footer() {
                         exit={{ opacity: 0, y: -10 }}
                         className={`flex items-center gap-2 text-xs ${
                           status === 'success'
-                            ? 'text-green-400'
+                            ? 'text-green-600 dark:text-green-400'
                             : status === 'error'
-                            ? 'text-red-400'
-                            : 'text-zinc-400'
+                            ? 'text-red-600 dark:text-red-400'
+                            : 'text-zinc-600 dark:text-zinc-400'
                         }`}
                       >
                         {status === 'success' ? (
@@ -272,11 +272,11 @@ export function Footer() {
                       <li key={link.href}>
                         <Link
                           href={link.href}
-                          className="text-zinc-400 hover:text-white transition-colors text-sm inline-flex items-center group"
+                          className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors text-sm inline-flex items-center group"
                         >
                           <span className="relative">
                             {link.label}
-                            <span className="absolute left-0 -bottom-0.5 w-0 h-px bg-white transition-all group-hover:w-full" />
+                            <span className="absolute left-0 -bottom-0.5 w-0 h-px bg-zinc-900 dark:bg-white transition-all group-hover:w-full" />
                           </span>
                         </Link>
                       </li>
@@ -290,21 +290,21 @@ export function Footer() {
             <div className="lg:col-span-3 space-y-6">
               {/* Quick CTA card */}
               <motion.div
-                className="p-5 rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-900/50 border border-zinc-800"
-                whileHover={{ borderColor: 'rgb(63 63 70)' }}
+                className="p-5 rounded-2xl bg-gradient-to-br from-white to-zinc-50 dark:from-zinc-900 dark:to-zinc-900/50 border border-zinc-200 dark:border-zinc-800"
+                whileHover={{ borderColor: 'rgb(161 161 170)' }}
               >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-black" />
+                  <div className="w-10 h-10 rounded-xl bg-black dark:bg-white flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-white dark:text-black" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm text-white">Ready to start?</p>
+                    <p className="font-semibold text-sm text-zinc-900 dark:text-white">Ready to start?</p>
                     <p className="text-xs text-zinc-500">It's free, no signup</p>
                   </div>
                 </div>
                 <Link href="/app">
                   <motion.button
-                    className="w-full py-2.5 bg-white text-black hover:bg-zinc-200 rounded-xl font-medium text-sm transition-colors"
+                    className="w-full py-2.5 bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 rounded-xl font-medium text-sm transition-colors"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -325,7 +325,7 @@ export function Footer() {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition-all ${social.color}`}
+                      className={`w-10 h-10 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 hover:text-white transition-all ${social.color}`}
                       aria-label={social.label}
                       whileHover={{ scale: 1.1, y: -2 }}
                       whileTap={{ scale: 0.95 }}
@@ -340,7 +340,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="py-6 border-t border-zinc-800">
+        <div className="py-6 border-t border-zinc-200 dark:border-zinc-800">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             {/* Copyright */}
             <p className="text-zinc-500 text-xs sm:text-sm text-center sm:text-left">
@@ -365,7 +365,7 @@ export function Footer() {
             {/* Back to top - desktop only */}
             <motion.button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="hidden sm:flex items-center gap-2 text-zinc-500 hover:text-white text-xs sm:text-sm transition-colors"
+              className="hidden sm:flex items-center gap-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white text-xs sm:text-sm transition-colors"
               whileHover={{ y: -2 }}
             >
               Back to top
