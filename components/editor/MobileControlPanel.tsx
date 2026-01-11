@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Palette, Square, Sun, Frame, Type, ChevronUp, ChevronDown, Sparkles, GripHorizontal } from 'lucide-react';
+import { Palette, Square, Sun, Frame, Type, ChevronUp, ChevronDown, Sparkles } from 'lucide-react';
 import { BackgroundPicker } from '@/components/controls/BackgroundPicker';
 import { PaddingControl } from '@/components/controls/PaddingControl';
 import { ShadowControl } from '@/components/controls/ShadowControl';

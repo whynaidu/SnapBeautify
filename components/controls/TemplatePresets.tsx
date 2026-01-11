@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { useSubscription } from '@/lib/subscription/context';
 import { FREE_TIER_LIMITS } from '@/lib/subscription/feature-gates';
-import { TEMPLATE_PRESETS, TEMPLATES_BY_CATEGORY } from '@/lib/constants/templates';
+import { TEMPLATES_BY_CATEGORY } from '@/lib/constants/templates';
 import { TemplatePreset } from '@/types/editor';
 import { cn } from '@/lib/utils';
 import { Check, Sparkles, Crown } from 'lucide-react';

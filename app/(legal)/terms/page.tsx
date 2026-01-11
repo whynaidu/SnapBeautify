@@ -1,8 +1,7 @@
 'use client'
 
-import { Metadata } from 'next';
 import { motion } from 'framer-motion';
-import { FileText, CheckCircle2, AlertCircle, Scale, Globe, Shield, CreditCard, Users, Ban, Edit3, Gavel, ArrowRight } from 'lucide-react';
+import { FileText, CheckCircle2, AlertCircle, Globe, Shield, CreditCard, Users, Ban, Edit3, Gavel, ArrowRight } from 'lucide-react';
 
 const sections = [
   {

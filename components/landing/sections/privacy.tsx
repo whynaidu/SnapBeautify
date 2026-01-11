@@ -15,7 +15,6 @@ import {
   XCircle,
   Laptop,
   Globe,
-  ArrowRight,
   Fingerprint,
   ShieldCheck
 } from 'lucide-react'

@@ -9,11 +9,9 @@ import {
   Sparkles,
   Download,
   ArrowDown,
-  MousePointerClick,
   Wand2,
   Image,
   FileImage,
-  Layers,
   Check,
   Zap
 } from 'lucide-react'

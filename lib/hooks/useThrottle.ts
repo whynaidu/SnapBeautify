@@ -8,12 +8,13 @@ import { useRef, useCallback, useEffect, useState } from 'react';
  * @param delay - Minimum time between calls in milliseconds
  * @returns Throttled version of the callback
  */
-export function useThrottle<T extends (...args: any[]) => void>(
+export function useThrottle<T extends (...args: unknown[]) => void>(
     callback: T,
     delay: number
-): T {
+): (...args: Parameters<T>) => void {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const lastRunRef = useRef<number>(Date.now());
+    // Initialize to 0 - first call will always execute immediately
+    const lastRunRef = useRef<number>(0);
     const lastArgsRef = useRef<Parameters<T> | undefined>(undefined);
 
     // Cleanup timeout on unmount
@@ -25,15 +26,15 @@ export function useThrottle<T extends (...args: any[]) => void>(
         };
     }, []);
 
-    return useCallback(
-        ((...args: Parameters<T>) => {
+    const throttledCallback = useCallback(
+        (...args: Parameters<T>) => {
             const now = Date.now();
             const timeSinceLastRun = now - lastRunRef.current;
 
             // Store the latest args
             lastArgsRef.current = args;
 
-            // If enough time has passed, execute immediately
+            // If enough time has passed (or first call), execute immediately
             if (timeSinceLastRun >= delay) {
                 callback(...args);
                 lastRunRef.current = now;
@@ -50,9 +51,11 @@ export function useThrottle<T extends (...args: any[]) => void>(
                     }
                 }, delay - timeSinceLastRun);
             }
-        }) as T,
+        },
         [callback, delay]
     );
+
+    return throttledCallback;
 }
 
 /**
@@ -66,7 +69,8 @@ export function useThrottle<T extends (...args: any[]) => void>(
 export function useThrottledValue<T>(value: T, delay: number): T {
     const [throttledValue, setThrottledValue] = useState<T>(value);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const lastUpdateRef = useRef<number>(Date.now());
+    // Initialize to 0 - first update will always apply immediately
+    const lastUpdateRef = useRef<number>(0);
 
     useEffect(() => {
         const now = Date.now();

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Section } from '../layout/section'
 import { Badge } from '../shared/badge'
 import { FadeIn } from '../animations/fade-in'
-import { ChevronDown, HelpCircle, Plus, Minus, MessageCircleQuestion, Sparkles } from 'lucide-react'
+import { HelpCircle, Plus, Minus, MessageCircleQuestion, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { motion, AnimatePresence } from 'framer-motion'
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { updateSubscriptionStatus, logPayment, upsertSubscription } from '@/lib/subscription/supabase';
-import type { SubscriptionPlan, SubscriptionStatus } from '@/lib/subscription/types';
+import type { SubscriptionPlan } from '@/lib/subscription/types';
 
 // Razorpay webhook event types
 interface RazorpayWebhookEvent {

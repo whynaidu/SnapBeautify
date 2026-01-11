@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { motion } from 'framer-motion';
-import { Upload, Image as ImageIcon, Clipboard, Sparkles, ArrowUpFromLine } from 'lucide-react';
+import { Clipboard, Sparkles, ArrowUpFromLine } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { loadImageFromFile } from '@/lib/utils/image';
 import { cn } from '@/lib/utils';

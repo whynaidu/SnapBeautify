@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion';
-import { Shield, User, Database, Share2, Lock, Cookie, UserCheck, Clock, Baby, Bell, Mail, ArrowRight, Check } from 'lucide-react';
+import { Shield, User, Database, Share2, Lock, Cookie, UserCheck, Clock, Baby, Bell, Mail, ArrowRight } from 'lucide-react';
 
 const dataTypes = [
   {

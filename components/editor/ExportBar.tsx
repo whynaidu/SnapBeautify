@@ -11,7 +11,7 @@ import {
 import { Copy, Download, ChevronDown, Check, Share2, Loader2, Crown, Lock } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { useSubscription } from '@/lib/subscription/context';
-import { FREE_TIER_LIMITS, checkPremiumFeaturesUsed } from '@/lib/subscription/feature-gates';
+import { checkPremiumFeaturesUsed } from '@/lib/subscription/feature-gates';
 import {
     copyCanvasToClipboard,
     downloadCanvas,

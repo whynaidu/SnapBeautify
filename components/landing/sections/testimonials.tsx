@@ -5,7 +5,6 @@ import { Section } from '../layout/section'
 import { Badge } from '../shared/badge'
 import { FadeIn } from '../animations/fade-in'
 import { Star, Quote, MessageSquare } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 const testimonials = [
   {

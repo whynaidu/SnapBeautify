@@ -18,18 +18,7 @@ import {
   Star,
   Gift,
   Infinity,
-  HelpCircle,
-  ChevronDown,
-  Smartphone,
-  Globe,
-  Clock,
-  Users,
-  Image,
-  Layers,
-  Wand2,
-  Download,
-  Palette,
-  Scissors
+  ChevronDown
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 

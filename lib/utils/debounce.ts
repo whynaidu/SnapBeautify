@@ -6,7 +6,7 @@
  * @param delay - Delay in milliseconds
  * @returns Debounced function with cancel method
  */
-export function debounce<T extends (...args: any[]) => void>(
+export function debounce<T extends (...args: unknown[]) => void>(
     func: T,
     delay: number
 ): T & { cancel: () => void } {
@@ -42,15 +42,14 @@ export function debounce<T extends (...args: any[]) => void>(
  * @param delay - Delay in milliseconds
  * @returns Debounced async function
  */
-export function debounceAsync<T extends (...args: any[]) => Promise<any>>(
+export function debounceAsync<T extends (...args: never[]) => Promise<unknown>>(
     func: T,
     delay: number
-): T & { cancel: () => void } {
+): ((...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>>) & { cancel: () => void } {
     let timeoutId: NodeJS.Timeout | null = null;
-    let latestResolve: ((value: any) => void) | null = null;
-    let latestReject: ((reason?: any) => void) | null = null;
+    let latestReject: ((reason?: unknown) => void) | null = null;
 
-    const debounced = ((...args: Parameters<T>): Promise<ReturnType<T>> => {
+    const debounced = ((...args: Parameters<T>): Promise<Awaited<ReturnType<T>>> => {
         return new Promise((resolve, reject) => {
             // Cancel previous execution
             if (timeoutId) {
@@ -62,24 +61,22 @@ export function debounceAsync<T extends (...args: any[]) => Promise<any>>(
                 }
             }
 
-            // Store latest promise handlers
-            latestResolve = resolve;
+            // Store latest reject handler for cancellation
             latestReject = reject;
 
             timeoutId = setTimeout(async () => {
                 try {
                     const result = await func(...args);
-                    resolve(result);
+                    resolve(result as Awaited<ReturnType<T>>);
                 } catch (error) {
                     reject(error);
                 } finally {
                     timeoutId = null;
-                    latestResolve = null;
                     latestReject = null;
                 }
             }, delay);
         });
-    }) as T & { cancel: () => void };
+    }) as ((...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>>) & { cancel: () => void };
 
     debounced.cancel = () => {
         if (timeoutId) {
@@ -90,7 +87,6 @@ export function debounceAsync<T extends (...args: any[]) => Promise<any>>(
         if (latestReject) {
             latestReject(new Error('Debounced: cancelled'));
             latestReject = null;
-            latestResolve = null;
         }
     };
 
