@@ -143,6 +143,17 @@ function AuthGateInner({ children }: AuthGateProps) {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // Track if initial auth check is done to prevent flicker
+  const [authCheckDone, setAuthCheckDone] = useState(fromLogout);
+
+  // Mark auth check as done when loading completes
+  useEffect(() => {
+    if (!isLoading && !authCheckDone) {
+      // Small delay to ensure smooth transition
+      const timer = setTimeout(() => setAuthCheckDone(true), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, authCheckDone]);
 
   // Clean up the fromLogout parameter from URL
   useEffect(() => {
@@ -223,8 +234,9 @@ function AuthGateInner({ children }: AuthGateProps) {
     setShowConfirmPassword(false);
   };
 
-  // Show loading state (skip if coming from logout to prevent animation stutter)
-  if (isLoading && !fromLogout) {
+  // Show loading state until auth check is complete
+  // Skip loader if coming from logout (authCheckDone is initialized to true in that case)
+  if (!authCheckDone) {
     return (
       <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center overflow-hidden">
         <motion.div
@@ -919,13 +931,22 @@ function AuthGateInner({ children }: AuthGateProps) {
   return <>{children}</>;
 }
 
-// Loading fallback for Suspense
+// Loading fallback for Suspense - matches the AuthGate loading animation to prevent flicker
 function AuthGateLoading() {
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <Loader2 className="w-8 h-8 animate-spin text-zinc-400" />
-        <span className="text-zinc-500 dark:text-zinc-400 text-sm">Loading...</span>
+    <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center overflow-hidden">
+      <div className="flex flex-col items-center gap-6">
+        {/* Static version of the animated rings (no motion to avoid hydration issues) */}
+        <div className="relative">
+          <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-zinc-200 dark:border-zinc-800 opacity-50" />
+          <div className="relative w-24 h-24 rounded-2xl bg-black dark:bg-white flex items-center justify-center">
+            <Sparkles className="w-12 h-12 text-white dark:text-black" />
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span className="text-lg font-medium">Loading SnapBeautify...</span>
+        </div>
       </div>
     </div>
   );
