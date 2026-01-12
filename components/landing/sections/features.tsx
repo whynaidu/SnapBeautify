@@ -445,21 +445,6 @@ function FeatureCard({
         </div>
       </div>
 
-      {/* Hover shine effect */}
-      <motion.div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{
-          background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.1) 45%, transparent 50%)',
-        }}
-        animate={{
-          x: ['-100%', '100%'],
-        }}
-        transition={{
-          duration: 1.5,
-          repeat: Infinity,
-          repeatDelay: 1,
-        }}
-      />
     </motion.div>
   )
 }
@@ -467,22 +452,14 @@ function FeatureCard({
 export function FeaturesSection() {
   return (
     <Section id="features" className="relative overflow-hidden">
-      {/* Background */}
+      {/* Background - simplified, no rotation animations */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-zinc-50 dark:bg-zinc-950" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#27272a_1px,transparent_1px),linear-gradient(to_bottom,#27272a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-50" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#27272a_1px,transparent_1px),linear-gradient(to_bottom,#27272a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
 
-        {/* Decorative circles */}
-        <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 rounded-full border border-zinc-200 dark:border-zinc-800"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-        />
-        <motion.div
-          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full border border-zinc-200 dark:border-zinc-800"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
-        />
+        {/* Static decorative circles - no animation */}
+        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full border border-zinc-200/50 dark:border-zinc-800/50 hidden lg:block" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full border border-zinc-200/50 dark:border-zinc-800/50 hidden lg:block" />
       </div>
 
       {/* Section Header */}
@@ -537,21 +514,14 @@ export function FeaturesSection() {
       {/* Bottom CTA */}
       <FadeIn delay={0.5}>
         <div className="mt-10 sm:mt-16 text-center px-4 sm:px-0">
-          <motion.a
+          <a
             href="/app"
-            className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-black dark:bg-white text-white dark:text-black font-semibold text-base sm:text-lg"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            className="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-black dark:bg-white text-white dark:text-black font-semibold text-base sm:text-lg hover:opacity-90 transition-opacity"
           >
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             Explore All Features
-            <motion.span
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              →
-            </motion.span>
-          </motion.a>
+            <span>→</span>
+          </a>
         </div>
       </FadeIn>
     </Section>

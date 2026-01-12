@@ -116,15 +116,24 @@ function TestimonialCard({ name, role, avatar, rating, quote }: TestimonialCardP
 }
 
 function MarqueeRow({ testimonials, direction = 'left', speed = 30 }: { testimonials: TestimonialCardProps[], direction?: 'left' | 'right', speed?: number }) {
-  // Duplicate testimonials for seamless loop
-  const duplicated = [...testimonials, ...testimonials, ...testimonials]
+  // Duplicate only 2x for better performance (was 3x)
+  const duplicated = [...testimonials, ...testimonials]
 
   return (
     <div className="relative overflow-hidden py-2">
+      {/* Static grid on mobile, animated marquee on larger screens */}
+      {/* Mobile: show static grid */}
+      <div className="flex md:hidden overflow-x-auto gap-4 px-4 no-scrollbar">
+        {testimonials.map((testimonial, index) => (
+          <TestimonialCard key={index} {...testimonial} />
+        ))}
+      </div>
+
+      {/* Desktop: animated marquee */}
       <motion.div
-        className="flex"
+        className="hidden md:flex"
         animate={{
-          x: direction === 'left' ? ['0%', '-33.33%'] : ['-33.33%', '0%'],
+          x: direction === 'left' ? ['0%', '-50%'] : ['-50%', '0%'],
         }}
         transition={{
           duration: speed,
@@ -178,10 +187,10 @@ export function TestimonialsSection() {
         {/* Right fade gradient */}
         <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-32 md:w-64 bg-gradient-to-l from-white dark:from-black to-transparent z-10 pointer-events-none" />
 
-        {/* Scrolling rows */}
+        {/* Scrolling rows - slower speeds for better performance */}
         <div className="space-y-4">
-          <MarqueeRow testimonials={row1} direction="left" speed={35} />
-          <MarqueeRow testimonials={row2} direction="right" speed={40} />
+          <MarqueeRow testimonials={row1} direction="left" speed={60} />
+          <MarqueeRow testimonials={row2} direction="right" speed={70} />
         </div>
       </div>
 

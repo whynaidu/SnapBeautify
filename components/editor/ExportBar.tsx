@@ -426,7 +426,7 @@ export function ExportBar() {
     });
 
     return (
-        <div className="h-16 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border-t border-zinc-200/50 dark:border-zinc-800/50 px-3 sm:px-6 flex items-center justify-between z-50">
+        <div className="h-16 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 px-3 sm:px-6 flex items-center justify-between z-50">
             <div className="flex items-center gap-2 sm:gap-3">
                 {/* Format Selector */}
                 <DropdownMenu>
@@ -442,7 +442,7 @@ export function ExportBar() {
                             <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="rounded-xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
+                    <DropdownMenuContent align="start" className="rounded-xl bg-white/90 dark:bg-zinc-900/90 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                         {(['png', 'jpeg', 'webp'] as ExportFormat[]).map((format) => (
                             <DropdownMenuItem
                                 key={format}
@@ -475,7 +475,7 @@ export function ExportBar() {
                             <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50 hidden sm:block" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="rounded-xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
+                    <DropdownMenuContent align="start" className="rounded-xl bg-white/90 dark:bg-zinc-900/90 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                         {([1, 2, 3, 4] as ExportScale[]).map((scale) => (
                             <DropdownMenuItem
                                 key={scale}

@@ -40,7 +40,7 @@ export function Header() {
     };
 
     return (
-        <header className="h-16 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border-b border-zinc-200/50 dark:border-zinc-800/50 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50">
+        <header className="h-16 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-4 md:px-6 flex items-center justify-between sticky top-0 z-50">
             {/* Logo and brand */}
             <div className="flex items-center gap-4">
                 <Link href="/" className="flex items-center gap-3 group">

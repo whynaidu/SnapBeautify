@@ -12,144 +12,15 @@ export function CTAFinalSection() {
       {/* Base Background */}
       <div className="absolute inset-0 bg-zinc-100 dark:bg-zinc-950" />
 
-      {/* Animated Background */}
+      {/* Simple Background - static, no animations */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#a1a1aa_1px,transparent_1px),linear-gradient(to_bottom,#a1a1aa_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#3f3f46_1px,transparent_1px),linear-gradient(to_bottom,#3f3f46_1px,transparent_1px)] bg-[size:3rem_3rem] sm:bg-[size:4rem_4rem] opacity-60" />
+        {/* Grid pattern - static */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#a1a1aa_1px,transparent_1px),linear-gradient(to_bottom,#a1a1aa_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#3f3f46_1px,transparent_1px),linear-gradient(to_bottom,#3f3f46_1px,transparent_1px)] bg-[size:3rem_3rem] sm:bg-[size:4rem_4rem] opacity-30" />
 
-        {/* Floating circles - Mobile: smaller, Desktop: larger */}
-        {/* Top left circle */}
-        <div
-          className="absolute rounded-full border border-zinc-400/40 dark:border-zinc-500/40 w-32 h-32 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-[400px] lg:h-[400px] -left-8 -top-8 sm:-left-[5%] sm:-top-[10%]"
-          style={{
-            animation: 'cta-float-slow 8s ease-in-out infinite',
-            willChange: 'transform'
-          }}
-        />
-        {/* Top right circle */}
-        <div
-          className="absolute rounded-full border border-zinc-400/30 dark:border-zinc-500/30 w-24 h-24 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-[300px] lg:h-[300px] -right-6 -top-4 sm:right-[5%] sm:top-0"
-          style={{
-            animation: 'cta-float-medium 6s ease-in-out infinite',
-            willChange: 'transform'
-          }}
-        />
-        {/* Bottom right circle - hidden on mobile */}
-        <div
-          className="absolute rounded-full border border-zinc-400/30 dark:border-zinc-500/30 hidden sm:block sm:w-48 sm:h-48 md:w-72 md:h-72 lg:w-[350px] lg:h-[350px] sm:-right-[5%] sm:bottom-[10%]"
-          style={{
-            animation: 'cta-float-slow-reverse 9s ease-in-out infinite',
-            willChange: 'transform'
-          }}
-        />
-        {/* Bottom left circle - hidden on mobile/tablet */}
-        <div
-          className="absolute rounded-full border border-zinc-400/40 dark:border-zinc-500/40 hidden lg:block lg:w-[280px] lg:h-[280px] lg:-left-[8%] lg:bottom-[20%]"
-          style={{
-            animation: 'cta-float-medium-reverse 7s ease-in-out infinite',
-            willChange: 'transform'
-          }}
-        />
-
-        {/* Animated dots */}
-        <div
-          className="absolute w-3 h-3 rounded-full bg-zinc-500/60 dark:bg-zinc-400/60"
-          style={{ left: '15%', top: '20%', animation: 'cta-pulse-float 3s ease-in-out infinite', willChange: 'transform, opacity' }}
-        />
-        <div
-          className="absolute w-2.5 h-2.5 rounded-full bg-zinc-500/50 dark:bg-zinc-400/50"
-          style={{ left: '85%', top: '25%', animation: 'cta-pulse-float 3.5s ease-in-out infinite 0.5s', willChange: 'transform, opacity' }}
-        />
-        <div
-          className="absolute w-3.5 h-3.5 rounded-full bg-zinc-500/60 dark:bg-zinc-400/60 hidden sm:block"
-          style={{ left: '75%', top: '70%', animation: 'cta-pulse-float 3s ease-in-out infinite', willChange: 'transform, opacity' }}
-        />
-        <div
-          className="absolute w-2.5 h-2.5 rounded-full bg-zinc-500/50 dark:bg-zinc-400/50 hidden sm:block"
-          style={{ left: '20%', top: '75%', animation: 'cta-pulse-float 3.5s ease-in-out infinite 0.5s', willChange: 'transform, opacity' }}
-        />
-        <div
-          className="absolute w-3 h-3 rounded-full bg-zinc-500/60 dark:bg-zinc-400/60 hidden md:block"
-          style={{ left: '50%', top: '10%', animation: 'cta-pulse-float 3s ease-in-out infinite', willChange: 'transform, opacity' }}
-        />
-        <div
-          className="absolute w-2 h-2 rounded-full bg-zinc-500/40 dark:bg-zinc-400/40 hidden md:block"
-          style={{ left: '60%', top: '85%', animation: 'cta-pulse-float 3.5s ease-in-out infinite 0.5s', willChange: 'transform, opacity' }}
-        />
-        <div
-          className="absolute w-2.5 h-2.5 rounded-full bg-zinc-500/50 dark:bg-zinc-400/50 hidden lg:block"
-          style={{ left: '35%', top: '55%', animation: 'cta-pulse-float 3s ease-in-out infinite', willChange: 'transform, opacity' }}
-        />
-        <div
-          className="absolute w-3 h-3 rounded-full bg-zinc-500/60 dark:bg-zinc-400/60 hidden lg:block"
-          style={{ left: '90%', top: '50%', animation: 'cta-pulse-float 3.5s ease-in-out infinite 0.5s', willChange: 'transform, opacity' }}
-        />
-
-        {/* Pulsing rings */}
-        <div
-          className="absolute rounded-full border-2 border-zinc-500/30 dark:border-zinc-400/30"
-          style={{
-            width: 200,
-            height: 200,
-            left: '15%',
-            top: '20%',
-            animation: 'cta-ring-pulse 4s ease-out infinite',
-            willChange: 'transform, opacity'
-          }}
-        />
-        <div
-          className="absolute rounded-full border-2 border-zinc-500/30 dark:border-zinc-400/30 hidden sm:block"
-          style={{
-            width: 180,
-            height: 180,
-            right: '10%',
-            top: '30%',
-            animation: 'cta-ring-pulse 4s ease-out infinite 1s',
-            willChange: 'transform, opacity'
-          }}
-        />
-        <div
-          className="absolute rounded-full border border-zinc-500/20 dark:border-zinc-400/20 hidden lg:block"
-          style={{
-            width: 150,
-            height: 150,
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            animation: 'cta-ring-pulse 4s ease-out infinite 0.5s',
-            willChange: 'transform, opacity'
-          }}
-        />
-
-        {/* Plus signs */}
-        <div
-          className="absolute"
-          style={{ left: '25%', top: '30%', animation: 'cta-cross-float 5s ease-in-out infinite', willChange: 'transform, opacity' }}
-        >
-          <div className="w-6 h-0.5 bg-zinc-500/50 dark:bg-zinc-400/50 rounded-full" />
-          <div className="w-0.5 h-6 bg-zinc-500/50 dark:bg-zinc-400/50 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-        </div>
-        <div
-          className="absolute hidden sm:block"
-          style={{ left: '70%', top: '20%', animation: 'cta-cross-float 6s ease-in-out infinite 0.8s', willChange: 'transform, opacity' }}
-        >
-          <div className="w-5 h-0.5 bg-zinc-500/40 dark:bg-zinc-400/40 rounded-full" />
-          <div className="w-0.5 h-5 bg-zinc-500/40 dark:bg-zinc-400/40 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-        </div>
-        <div
-          className="absolute hidden md:block"
-          style={{ right: '15%', bottom: '25%', animation: 'cta-cross-float 5s ease-in-out infinite', willChange: 'transform, opacity' }}
-        >
-          <div className="w-7 h-0.5 bg-zinc-500/50 dark:bg-zinc-400/50 rounded-full" />
-          <div className="w-0.5 h-7 bg-zinc-500/50 dark:bg-zinc-400/50 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-        </div>
-        <div
-          className="absolute hidden lg:block"
-          style={{ left: '15%', bottom: '30%', animation: 'cta-cross-float 6s ease-in-out infinite 0.8s', willChange: 'transform, opacity' }}
-        >
-          <div className="w-5 h-0.5 bg-zinc-500/40 dark:bg-zinc-400/40 rounded-full" />
-          <div className="w-0.5 h-5 bg-zinc-500/40 dark:bg-zinc-400/40 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-        </div>
+        {/* Static decorative circles - no animation */}
+        <div className="absolute rounded-full border border-zinc-400/20 dark:border-zinc-500/20 w-32 h-32 sm:w-64 sm:h-64 lg:w-[300px] lg:h-[300px] -left-16 -top-16 sm:-left-[5%] sm:-top-[10%]" />
+        <div className="absolute rounded-full border border-zinc-400/15 dark:border-zinc-500/15 w-24 h-24 sm:w-48 sm:h-48 lg:w-[250px] lg:h-[250px] -right-12 -top-8 sm:right-[5%] sm:top-0" />
+        <div className="absolute rounded-full border border-zinc-400/15 dark:border-zinc-500/15 hidden sm:block sm:w-48 sm:h-48 lg:w-[280px] lg:h-[280px] sm:-right-[5%] sm:bottom-[10%]" />
       </div>
 
       <Container className="relative z-10 px-4 sm:px-6">

@@ -225,3 +225,52 @@
   0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.5; }
   50% { transform: translateY(-10px) rotate(45deg); opacity: 0.8; }
 }
+
+/* ============================================
+   PERFORMANCE OPTIMIZATIONS
+   ============================================ */
+
+/* Disable expensive backdrop-blur on mobile devices */
+@media (max-width: 768px) {
+  .backdrop-blur-xl,
+  .backdrop-blur-lg,
+  .backdrop-blur-md,
+  .backdrop-blur-sm,
+  .backdrop-blur {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Increase opacity to compensate for no blur */
+  .bg-white\/95,
+  .bg-white\/90,
+  .bg-white\/80 {
+    background-color: rgb(255 255 255 / 0.98) !important;
+  }
+
+  .dark .bg-black\/95,
+  .dark .bg-black\/90,
+  .dark .bg-zinc-900\/90 {
+    background-color: rgb(0 0 0 / 0.98) !important;
+  }
+
+  /* Disable complex CTA animations on mobile */
+  [style*="cta-float"],
+  [style*="cta-pulse"],
+  [style*="cta-ring"],
+  [style*="cta-cross"] {
+    animation: none !important;
+  }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -28,7 +28,7 @@ export function ControlPanel() {
 
     if (!originalImage) {
         return (
-            <div className="w-80 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-xl border-l border-zinc-200/50 dark:border-zinc-800/50 flex items-center justify-center">
+            <div className="w-80 bg-white dark:bg-zinc-900 border-l border-zinc-200/50 dark:border-zinc-800/50 flex items-center justify-center">
                 <div className="text-center p-6">
                     <div className="w-14 h-14 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4">
                         <Palette className="w-7 h-7 text-zinc-400 dark:text-zinc-500" />
@@ -40,7 +40,7 @@ export function ControlPanel() {
     }
 
     return (
-        <div className="w-80 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-xl border-l border-zinc-200/50 dark:border-zinc-800/50 flex flex-col h-full">
+        <div className="w-80 bg-white dark:bg-zinc-900 border-l border-zinc-200/50 dark:border-zinc-800/50 flex flex-col h-full">
             <Tabs defaultValue="templates" className="w-full flex flex-col flex-1 overflow-hidden">
                 {/* Tab navigation */}
                 <div className="p-3 border-b border-zinc-200/50 dark:border-zinc-800/50 flex-shrink-0">

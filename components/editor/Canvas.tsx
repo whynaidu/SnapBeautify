@@ -214,7 +214,7 @@ export function Canvas() {
         ctx.drawImage(originalImage, 0, 0);
     }, [originalImage, isCropping]);
 
-    // Calculate display scale to fit container
+    // Calculate display scale to fit container (throttled for performance)
     useEffect(() => {
         if (!containerRef.current || !originalImage) return;
 
@@ -239,9 +239,21 @@ export function Canvas() {
             setDisplayScale(scale);
         };
 
+        // Throttle resize handler for performance
+        let ticking = false;
+        const handleResize = () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    updateScale();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
         updateScale();
-        window.addEventListener('resize', updateScale);
-        return () => window.removeEventListener('resize', updateScale);
+        window.addEventListener('resize', handleResize, { passive: true });
+        return () => window.removeEventListener('resize', handleResize);
     }, [canvasWidth, canvasHeight, originalImage, isCropping]);
 
     // Helper function to snap to center and show alignment guides
@@ -528,7 +540,7 @@ export function Canvas() {
 
                             {/* Premium features badge at bottom */}
                             <div className="absolute bottom-4 left-4 right-4 flex justify-center">
-                                <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white px-4 py-3 rounded-2xl max-w-md shadow-xl">
+                                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white px-4 py-3 rounded-2xl max-w-md shadow-xl">
                                     <div className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-2">Premium Features Used:</div>
                                     <div className="text-[10px] text-zinc-600 dark:text-zinc-400 flex flex-wrap gap-1.5">
                                         {premiumUsage.premiumFeatures.map((feature, i) => (

@@ -178,194 +178,76 @@ function AnimatedShieldDesktop() {
   )
 }
 
-// Animated shield rings - Mobile version
+// Static shield for mobile - no animations for performance
 function AnimatedShieldMobile() {
-  // Icons that orbit on the outer ring (same as desktop)
-  const outerOrbitIcons = [
-    { icon: Lock, startAngle: 0 },
-    { icon: Eye, startAngle: 90 },
-    { icon: Server, startAngle: 180 },
-    { icon: Wifi, startAngle: 270 },
-  ]
-
-  // Icons that orbit on the middle ring (same as desktop)
-  const middleOrbitIcons = [
-    { icon: Fingerprint, startAngle: 45 },
-    { icon: Cloud, startAngle: 225 },
-  ]
-
   return (
-    <div className="relative w-full h-56 flex items-center justify-center">
-      {/* Outer rotating ring with 4 icons */}
-      <motion.div
-        className="absolute w-48 h-48 rounded-full border-2 border-dashed border-zinc-300 dark:border-zinc-700"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-      >
-        {/* Icons on outer ring */}
-        {outerOrbitIcons.map((item, index) => {
-          const Icon = item.icon
-          const angle = item.startAngle * (Math.PI / 180)
-          const radius = 96 // Half of 192px (w-48)
-          return (
-            <div
-              key={index}
-              className="absolute"
-              style={{
-                left: `calc(50% + ${Math.cos(angle) * radius}px - 14px)`,
-                top: `calc(50% + ${Math.sin(angle) * radius}px - 14px)`,
-              }}
-            >
-              <motion.div
-                className="w-7 h-7 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center shadow-md"
-                animate={{ rotate: -360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-              >
-                <Icon className="w-3.5 h-3.5 text-black dark:text-white" />
-              </motion.div>
-            </div>
-          )
-        })}
-      </motion.div>
+    <div className="relative w-full h-48 flex items-center justify-center">
+      {/* Static outer ring */}
+      <div className="absolute w-40 h-40 rounded-full border-2 border-dashed border-zinc-300 dark:border-zinc-700" />
 
-      {/* Middle rotating ring with 2 icons */}
-      <motion.div
-        className="absolute w-28 h-28 rounded-full border border-zinc-300 dark:border-zinc-700"
-        animate={{ rotate: -360 }}
-        transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-      >
-        {/* Icons on middle ring */}
-        {middleOrbitIcons.map((item, index) => {
-          const Icon = item.icon
-          const angle = item.startAngle * (Math.PI / 180)
-          const radius = 56 // Half of 112px (w-28)
-          return (
-            <div
-              key={index}
-              className="absolute"
-              style={{
-                left: `calc(50% + ${Math.cos(angle) * radius}px - 12px)`,
-                top: `calc(50% + ${Math.sin(angle) * radius}px - 12px)`,
-              }}
-            >
-              <motion.div
-                className="w-6 h-6 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center shadow-sm"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-              >
-                <Icon className="w-3 h-3 text-black dark:text-white" />
-              </motion.div>
-            </div>
-          )
-        })}
-      </motion.div>
+      {/* Static middle ring */}
+      <div className="absolute w-24 h-24 rounded-full border border-zinc-300 dark:border-zinc-700" />
 
-      {/* Inner pulsing ring */}
-      <motion.div
-        className="absolute w-16 h-16 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700"
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-      />
+      {/* Static inner circle */}
+      <div className="absolute w-14 h-14 rounded-full bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700" />
 
-      {/* Center shield */}
-      <motion.div
-        className="relative z-10 w-11 h-11 rounded-xl bg-black dark:bg-white flex items-center justify-center shadow-lg"
-        animate={{ y: [0, -3, 0] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-      >
+      {/* Center shield - static */}
+      <div className="relative z-10 w-10 h-10 rounded-xl bg-black dark:bg-white flex items-center justify-center shadow-lg">
         <ShieldCheck className="w-5 h-5 text-white dark:text-black" />
-      </motion.div>
+      </div>
 
-      {/* Floating particles */}
-      {[...Array(8)].map((_, i) => {
-        const angle = (i * 45) * (Math.PI / 180)
-        const radius = 108
-        return (
-          <motion.div
-            key={`particle-mobile-${i}`}
-            className="absolute w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-600"
-            style={{
-              left: `calc(50% + ${Math.cos(angle) * radius}px - 3px)`,
-              top: `calc(50% + ${Math.sin(angle) * radius}px - 3px)`,
-            }}
-            animate={{
-              scale: [0.5, 1, 0.5],
-              opacity: [0.3, 0.8, 0.3],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              delay: i * 0.25,
-            }}
-          />
-        )
-      })}
+      {/* Static icons around the ring */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center shadow-sm">
+        <Lock className="w-3 h-3 text-black dark:text-white" />
+      </div>
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center shadow-sm">
+        <Server className="w-3 h-3 text-black dark:text-white" />
+      </div>
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center shadow-sm">
+        <Eye className="w-3 h-3 text-black dark:text-white" />
+      </div>
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center shadow-sm">
+        <Wifi className="w-3 h-3 text-black dark:text-white" />
+      </div>
     </div>
   )
 }
 
-// Data flow animation
+// Data flow visual - simplified, no continuous animations
 function DataFlowVisual() {
   return (
     <div className="relative h-24 flex items-center justify-center gap-4">
       {/* Your Device */}
-      <motion.div
-        className="flex flex-col items-center"
-        initial={{ opacity: 0, x: -20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-      >
+      <div className="flex flex-col items-center">
         <div className="w-14 h-14 rounded-xl bg-black dark:bg-white flex items-center justify-center mb-2">
           <Laptop className="w-7 h-7 text-white dark:text-black" />
         </div>
         <span className="text-xs font-medium text-black dark:text-white">Your Device</span>
-      </motion.div>
+      </div>
 
-      {/* Animated dots - staying local */}
+      {/* Static dots */}
       <div className="flex items-center gap-1 px-4">
         {[...Array(5)].map((_, i) => (
-          <motion.div
+          <div
             key={i}
             className="w-2 h-2 rounded-full bg-green-500"
-            animate={{
-              scale: [1, 1.5, 1],
-              opacity: [0.3, 1, 0.3]
-            }}
-            transition={{
-              duration: 1,
-              repeat: Infinity,
-              delay: i * 0.15,
-            }}
+            style={{ opacity: 0.3 + (i * 0.15) }}
           />
         ))}
       </div>
 
       {/* Lock icon - data stays */}
-      <motion.div
-        className="w-12 h-12 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center"
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
+      <div className="w-12 h-12 rounded-full bg-green-500/20 border-2 border-green-500 flex items-center justify-center">
         <Lock className="w-5 h-5 text-green-600 dark:text-green-400" />
-      </motion.div>
+      </div>
 
       {/* Blocked arrow */}
       <div className="flex items-center gap-1 px-4">
-        <motion.div
-          animate={{ x: [0, 5, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          <XCircle className="w-5 h-5 text-red-500" />
-        </motion.div>
+        <XCircle className="w-5 h-5 text-red-500" />
       </div>
 
       {/* Server - crossed out */}
-      <motion.div
-        className="flex flex-col items-center opacity-40"
-        initial={{ opacity: 0, x: 20 }}
-        whileInView={{ opacity: 0.4, x: 0 }}
-        viewport={{ once: true }}
-      >
+      <div className="flex flex-col items-center opacity-40">
         <div className="relative w-14 h-14 rounded-xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center mb-2">
           <Globe className="w-7 h-7 text-zinc-400" />
           <div className="absolute inset-0 flex items-center justify-center">
@@ -373,7 +255,7 @@ function DataFlowVisual() {
           </div>
         </div>
         <span className="text-xs font-medium text-zinc-400">External Server</span>
-      </motion.div>
+      </div>
     </div>
   )
 }
@@ -381,44 +263,14 @@ function DataFlowVisual() {
 export function PrivacySection() {
   return (
     <Section className="relative overflow-hidden">
-      {/* Background */}
+      {/* Background - simplified, no animations */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-zinc-50 dark:bg-zinc-950" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#27272a_1px,transparent_1px),linear-gradient(to_bottom,#27272a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-50" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#27272a_1px,transparent_1px),linear-gradient(to_bottom,#27272a_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
 
-        {/* Decorative circles - Desktop */}
-        <motion.div
-          className="hidden sm:block absolute -top-20 -right-20 w-96 h-96 rounded-full border border-zinc-200 dark:border-zinc-800"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-        />
-        <motion.div
-          className="hidden sm:block absolute -bottom-20 -left-20 w-72 h-72 rounded-full border border-zinc-200 dark:border-zinc-800"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
-        />
-
-        {/* Decorative circles - Mobile */}
-        <motion.div
-          className="sm:hidden absolute -top-10 -right-10 w-48 h-48 rounded-full border border-zinc-200 dark:border-zinc-800"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
-        />
-        <motion.div
-          className="sm:hidden absolute -bottom-10 -left-10 w-36 h-36 rounded-full border border-zinc-200 dark:border-zinc-800"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-        />
-        <motion.div
-          className="sm:hidden absolute top-1/3 -right-8 w-24 h-24 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-        />
-        <motion.div
-          className="sm:hidden absolute bottom-1/4 -left-6 w-20 h-20 rounded-full border border-dashed border-zinc-300 dark:border-zinc-700"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-        />
+        {/* Static decorative circles - no animation */}
+        <div className="hidden lg:block absolute -top-20 -right-20 w-96 h-96 rounded-full border border-zinc-200/50 dark:border-zinc-800/50" />
+        <div className="hidden lg:block absolute -bottom-20 -left-20 w-72 h-72 rounded-full border border-zinc-200/50 dark:border-zinc-800/50" />
       </div>
 
       {/* Header */}

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Palette, Square, Sun, Frame, Type, ChevronUp, ChevronDown, Sparkles } from 'lucide-react';
 import { BackgroundPicker } from '@/components/controls/BackgroundPicker';
@@ -30,15 +29,14 @@ export function MobileControlPanel() {
     const [activeTab, setActiveTab] = useState('templates');
 
     return (
-        <motion.div
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
+        <div
             className={cn(
                 'fixed bottom-16 left-0 right-0 z-50',
-                'bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl',
-                'border-t border-zinc-200/50 dark:border-zinc-800/50',
+                // Use solid background instead of backdrop-blur for better mobile performance
+                'bg-white dark:bg-zinc-900',
+                'border-t border-zinc-200 dark:border-zinc-800',
                 'rounded-t-3xl shadow-2xl shadow-black/10 dark:shadow-black/30',
-                'transition-all duration-300 ease-out',
+                'transition-[height] duration-200 ease-out',
                 isExpanded ? 'h-[65vh]' : 'h-16'
             )}
         >
@@ -63,15 +61,9 @@ export function MobileControlPanel() {
                 </div>
             </button>
 
-            {/* Expandable content */}
-            <AnimatePresence>
-                {isExpanded && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="h-[calc(65vh-4rem)] overflow-hidden"
-                    >
+            {/* Expandable content - no animation for performance */}
+            {isExpanded && (
+                <div className="h-[calc(65vh-4rem)] overflow-hidden">
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
                             {/* Tab navigation */}
                             <div className="px-3 pb-2 flex-shrink-0">
@@ -131,9 +123,8 @@ export function MobileControlPanel() {
                                 </TabsContent>
                             </div>
                         </Tabs>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.div>
+                </div>
+            )}
+        </div>
     );
 }

@@ -108,10 +108,10 @@ export function TemplatePresets() {
                                 key={template.id}
                                 onClick={() => handleApplyTemplate(template)}
                                 className={cn(
-                                    'relative group rounded-lg overflow-hidden transition-all',
+                                    'relative group rounded-lg overflow-hidden',
                                     isApplied
-                                        ? 'ring-2 ring-primary ring-offset-2 ring-offset-background scale-105'
-                                        : 'hover:scale-105 border border-border'
+                                        ? 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+                                        : 'border border-border hover:border-primary/50'
                                 )}
                             >
                                 {/* Preview */}
@@ -163,7 +163,7 @@ export function TemplatePresets() {
                                 </div>
 
                                 {/* Template Name */}
-                                <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm px-2 py-1">
+                                <div className="absolute bottom-0 left-0 right-0 bg-black/80 px-2 py-1">
                                     <span className="text-[10px] text-white font-medium truncate block">
                                         {template.name}
                                     </span>

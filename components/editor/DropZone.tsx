@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { motion } from 'framer-motion';
 import { Clipboard, Sparkles, ArrowUpFromLine } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
 import { loadImageFromFile } from '@/lib/utils/image';
@@ -133,12 +132,7 @@ export function DropZone() {
     if (originalImage) return null;
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="w-full max-w-2xl mx-auto p-4 sm:p-6"
-        >
+        <div className="w-full max-w-2xl mx-auto p-4 sm:p-6">
             <div
                 {...getRootProps()}
                 role="button"
@@ -168,12 +162,10 @@ export function DropZone() {
                 />
 
                 <div className="flex flex-col items-center gap-4 sm:gap-6 p-6 sm:p-10 text-center">
-                    {/* Icon container */}
-                    <motion.div
-                        animate={isDragActive ? { scale: 1.1, rotate: 5 } : { scale: 1, rotate: 0 }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                    {/* Icon container - static for performance */}
+                    <div
                         className={cn(
-                            'w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shadow-lg',
+                            'w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shadow-lg transition-colors duration-200',
                             isDragActive
                                 ? 'bg-white dark:bg-black shadow-white/20'
                                 : 'bg-black dark:bg-white shadow-black/10 dark:shadow-white/10'
@@ -184,7 +176,7 @@ export function DropZone() {
                         ) : (
                             <ArrowUpFromLine className="w-8 h-8 sm:w-10 sm:h-10 text-white dark:text-black" />
                         )}
-                    </motion.div>
+                    </div>
 
                     {/* Text content */}
                     <div>
@@ -243,17 +235,13 @@ export function DropZone() {
                     </div>
                 </div>
 
-                {/* Decorative gradient when active */}
+                {/* Decorative gradient when active - simplified for performance */}
                 {isDragActive && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="absolute inset-0 rounded-3xl pointer-events-none overflow-hidden"
-                    >
-                        <div className="absolute -inset-4 bg-gradient-to-r from-violet-500/20 via-transparent to-pink-500/20 blur-2xl" />
-                    </motion.div>
+                    <div className="absolute inset-0 rounded-3xl pointer-events-none overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 via-transparent to-pink-500/10" />
+                    </div>
                 )}
             </div>
-        </motion.div>
+        </div>
     );
 }

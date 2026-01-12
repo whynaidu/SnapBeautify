@@ -350,7 +350,7 @@ export function BackgroundPicker() {
                                             {isPremiumGradient && (
                                                 <Crown className="absolute top-0.5 right-0.5 w-3 h-3 text-orange-500 drop-shadow" />
                                             )}
-                                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/50 backdrop-blur-sm px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/80 px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
                                                 {gradient.name}
                                             </span>
                                         </button>
@@ -405,7 +405,7 @@ export function BackgroundPicker() {
                                             {isPremiumMesh && (
                                                 <Crown className="absolute top-0.5 right-0.5 w-3 h-3 text-orange-500 drop-shadow" />
                                             )}
-                                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/50 backdrop-blur-sm px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/80 px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
                                                 {mesh.name}
                                             </span>
                                         </button>
@@ -459,7 +459,7 @@ export function BackgroundPicker() {
                                         {isSelected && (
                                             <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg z-10" />
                                         )}
-                                        <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/50 backdrop-blur-sm px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                                        <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/80 px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
                                             {pattern.name}
                                         </span>
                                     </button>
@@ -928,7 +928,7 @@ export function BackgroundPicker() {
                                             {isSelected && (
                                                 <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
                                             )}
-                                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/50 backdrop-blur-sm px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/80 px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
                                                 {gradient.name}
                                             </span>
                                         </button>
@@ -1104,7 +1104,7 @@ export function BackgroundPicker() {
                                         {isSelected && (
                                             <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
                                         )}
-                                        <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/50 backdrop-blur-sm px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                                        <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/80 px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
                                             {gradient.name}
                                         </span>
                                     </button>

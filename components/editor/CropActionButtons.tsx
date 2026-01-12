@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Check, X, Crop } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
@@ -22,11 +21,8 @@ export function CropActionButtons() {
     return (
         <>
             {/* Desktop: Sidebar position (where control panel normally is) */}
-            <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
-                className="hidden md:flex md:flex-col gap-4 fixed right-0 top-0 bottom-0 w-80 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-xl border-l border-zinc-200/50 dark:border-zinc-800/50 p-6 justify-center z-40"
+            <div
+                className="hidden md:flex md:flex-col gap-4 fixed right-0 top-0 bottom-0 w-80 bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 p-6 justify-center z-40"
             >
                 <div className="space-y-6">
                     <div className="text-center">
@@ -59,16 +55,11 @@ export function CropActionButtons() {
                         </Button>
                     </div>
                 </div>
-            </motion.div>
+            </div>
 
             {/* Mobile: Bottom position (where Show Controls drawer button is) */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden fixed bottom-4 left-4 right-4 z-50"
-            >
-                <div className="flex flex-row gap-3 p-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-2xl shadow-black/10 dark:shadow-black/30">
+            <div className="md:hidden fixed bottom-4 left-4 right-4 z-50">
+                <div className="flex flex-row gap-3 p-3 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-2xl shadow-black/10 dark:shadow-black/30">
                     <Button
                         onClick={handleApply}
                         size="lg"
@@ -87,7 +78,7 @@ export function CropActionButtons() {
                         Cancel
                     </Button>
                 </div>
-            </motion.div>
+            </div>
         </>
     );
 }
