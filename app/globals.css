@@ -261,6 +261,21 @@
   [style*="cta-cross"] {
     animation: none !important;
   }
+
+  /* Optimize touch scrolling and prevent pull-to-refresh globally */
+  html {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Optimize canvas rendering with hardware acceleration hints */
+  canvas {
+    transform: translateZ(0);
+    will-change: transform;
+    /* Prevent text selection during drag on mobile */
+    -webkit-user-select: none;
+    user-select: none;
+  }
 }
 
 /* Respect user's motion preferences */

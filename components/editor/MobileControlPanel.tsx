@@ -36,9 +36,16 @@ export function MobileControlPanel() {
                 'bg-white dark:bg-zinc-900',
                 'border-t border-zinc-200 dark:border-zinc-800',
                 'rounded-t-3xl shadow-2xl shadow-black/10 dark:shadow-black/30',
-                'transition-[height] duration-200 ease-out',
-                isExpanded ? 'h-[65vh]' : 'h-16'
+                // Fixed height for GPU-optimized animation
+                'h-[65vh]',
+                // Add will-change hint for better GPU acceleration
+                'will-change-transform'
             )}
+            style={{
+                // Use transform instead of height for GPU-accelerated animation
+                transform: isExpanded ? 'translateY(0)' : 'translateY(calc(65vh - 4rem))',
+                transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
         >
             {/* Pull handle / Toggle button */}
             <button
@@ -61,9 +68,13 @@ export function MobileControlPanel() {
                 </div>
             </button>
 
-            {/* Expandable content - no animation for performance */}
-            {isExpanded && (
-                <div className="h-[calc(65vh-4rem)] overflow-hidden">
+            {/* Expandable content - always mounted for performance, hidden with opacity/pointer-events */}
+            <div
+                className={cn(
+                    "h-[calc(65vh-4rem)] overflow-hidden transition-opacity duration-200",
+                    isExpanded ? "opacity-100" : "opacity-0 pointer-events-none"
+                )}
+            >
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
                             {/* Tab navigation */}
                             <div className="px-3 pb-2 flex-shrink-0">
@@ -123,8 +134,7 @@ export function MobileControlPanel() {
                                 </TabsContent>
                             </div>
                         </Tabs>
-                </div>
-            )}
+            </div>
         </div>
     );
 }

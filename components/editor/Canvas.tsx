@@ -18,6 +18,8 @@ export function Canvas() {
     const [isDragging, setIsDragging] = useState(false);
     const [draggedTextId, setDraggedTextId] = useState<string | null>(null);
     const [alignmentGuides, setAlignmentGuides] = useState({ showCenterX: false, showCenterY: false });
+    const rafIdRef = useRef<number | null>(null);
+    const pendingUpdateRef = useRef<{ x: number; y: number } | null>(null);
 
     // Get subscription status
     const { isPro } = useSubscription();
@@ -284,6 +286,37 @@ export function Canvas() {
         return { x: snappedX, y: snappedY };
     }, []);
 
+    // RAF-based batched update for smooth text dragging on mobile
+    const batchedUpdateTextPosition = useCallback((x: number, y: number, textId: string) => {
+        // Store the pending update
+        pendingUpdateRef.current = { x, y };
+
+        // Cancel any existing RAF
+        if (rafIdRef.current !== null) {
+            return; // Already scheduled, will use latest position
+        }
+
+        // Schedule update for next frame
+        rafIdRef.current = requestAnimationFrame(() => {
+            const pending = pendingUpdateRef.current;
+            if (pending && textId) {
+                const snapped = snapToCenter(pending.x, pending.y);
+                updateTextOverlay(textId, { x: snapped.x, y: snapped.y });
+            }
+            rafIdRef.current = null;
+            pendingUpdateRef.current = null;
+        });
+    }, [snapToCenter, updateTextOverlay]);
+
+    // Cleanup RAF on unmount
+    useEffect(() => {
+        return () => {
+            if (rafIdRef.current !== null) {
+                cancelAnimationFrame(rafIdRef.current);
+            }
+        };
+    }, []);
+
     // Handle text overlay dragging
     const handleCanvasMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
         if (!canvasRef.current || textOverlays.length === 0) return;
@@ -399,7 +432,10 @@ export function Canvas() {
     const handleCanvasTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
         if (!canvasRef.current || textOverlays.length === 0) return;
 
-        e.preventDefault(); // Prevent scrolling while dragging
+        // Prevent default touch behavior and scrolling
+        e.preventDefault();
+        e.stopPropagation();
+
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
         const touch = e.touches[0];
@@ -441,16 +477,19 @@ export function Canvas() {
     const handleCanvasTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
         if (!isDragging || !draggedTextId || !canvasRef.current) return;
 
-        e.preventDefault(); // Prevent scrolling while dragging
+        // Prevent scrolling and pull-to-refresh while dragging
+        e.preventDefault();
+        e.stopPropagation();
+
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
         const touch = e.touches[0];
         const x = Math.max(0, Math.min(100, ((touch.clientX - rect.left) / rect.width) * 100));
         const y = Math.max(0, Math.min(100, ((touch.clientY - rect.top) / rect.height) * 100));
 
-        const snapped = snapToCenter(x, y);
-        updateTextOverlay(draggedTextId, { x: snapped.x, y: snapped.y });
-    }, [isDragging, draggedTextId, updateTextOverlay, snapToCenter]);
+        // Use batched RAF update for smooth performance
+        batchedUpdateTextPosition(x, y, draggedTextId);
+    }, [isDragging, draggedTextId, batchedUpdateTextPosition]);
 
     const handleCanvasTouchEnd = useCallback(() => {
         setIsDragging(false);
@@ -495,7 +534,7 @@ export function Canvas() {
                         style={{
                             transform: `scale(${displayScale})`,
                             transformOrigin: 'top left',
-                            touchAction: isCropping ? 'none' : 'auto', // Prevent default touch behaviors during crop
+                            touchAction: 'none', // Prevent pull-to-refresh and scrolling on mobile
                         }}
                         className="rounded-2xl shadow-2xl shadow-black/20 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/5"
                     />
