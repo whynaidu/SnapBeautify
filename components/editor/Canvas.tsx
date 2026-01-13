@@ -108,6 +108,9 @@ export function Canvas() {
     // Show watermark if free user is using premium features
     const showWatermark = !isPro && premiumUsage.isPremiumUsed;
 
+    // Check if mobile for performance optimizations
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
     // Create a memoized render function
     const performRender = useCallback(async () => {
         if (!canvasRef.current || !originalImage) return;
@@ -197,7 +200,6 @@ export function Canvas() {
 
     // Throttle the render function - 33ms on mobile (30fps), 16ms on desktop (60fps)
     // Mobile devices struggle with 60fps canvas rendering, 30fps is much smoother
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const throttledRender = useThrottle(performRender, isMobile ? 33 : 16);
 
     // Re-render canvas when any setting changes (throttled)
