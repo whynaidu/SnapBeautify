@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,7 @@ const ALL_PADDING_PRESETS = [32, 48, 64, 96, 128];
 export function PaddingControl() {
     const { padding, setPadding } = useEditorStore();
     const [localPadding, setLocalPadding] = useState(padding);
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     // Subscription access (for PRO badge only)
     const { isPro } = useSubscription();
@@ -32,6 +33,26 @@ export function PaddingControl() {
         setLocalPadding(padding);
     }, [padding]);
 
+    // Cleanup timer on unmount
+    useEffect(() => {
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, []);
+
+    // Debounced update to store - only update every 100ms during slider drag
+    const debouncedSetPadding = useCallback((value: number) => {
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+
+        debounceTimerRef.current = setTimeout(() => {
+            setPadding(value);
+        }, 100); // 100ms debounce for smooth dragging
+    }, [setPadding]);
+
     const handlePaddingChange = (value: number) => {
         setLocalPadding(value);
         setPadding(value);
@@ -39,7 +60,8 @@ export function PaddingControl() {
 
     const handleSliderChange = (value: number) => {
         setLocalPadding(value);
-        setPadding(value);
+        // Use debounced update for smooth slider interaction
+        debouncedSetPadding(value);
     };
 
     const handleInputChange = (value: number) => {

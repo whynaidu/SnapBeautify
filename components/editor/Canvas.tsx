@@ -112,6 +112,11 @@ export function Canvas() {
     const performRender = useCallback(async () => {
         if (!canvasRef.current || !originalImage) return;
 
+        // On mobile during drag, skip expensive renders for better performance
+        if (isMobile && isDragging) {
+            return;
+        }
+
         await measureRender(
             'canvas:render',
             async () => {
@@ -156,6 +161,8 @@ export function Canvas() {
             }
         );
     }, [
+        isMobile,
+        isDragging,
         originalImage,
         backgroundType,
         backgroundColor,
@@ -188,16 +195,18 @@ export function Canvas() {
         textOverlays,
     ]);
 
-    // Throttle the render function to 60fps (16ms)
-    const throttledRender = useThrottle(performRender, 16);
+    // Throttle the render function - 33ms on mobile (30fps), 16ms on desktop (60fps)
+    // Mobile devices struggle with 60fps canvas rendering, 30fps is much smoother
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const throttledRender = useThrottle(performRender, isMobile ? 33 : 16);
 
     // Re-render canvas when any setting changes (throttled)
-    // Skip rendering when in crop mode - we'll show the raw image instead
+    // Skip rendering when in crop mode or when actively dragging (for better drag performance)
     useEffect(() => {
-        if (!isCropping) {
+        if (!isCropping && !isDragging) {
             throttledRender();
         }
-    }, [throttledRender, isCropping]);
+    }, [throttledRender, isCropping, isDragging]);
 
     // Render raw image when in crop mode
     useEffect(() => {
@@ -495,7 +504,11 @@ export function Canvas() {
         setIsDragging(false);
         setDraggedTextId(null);
         setAlignmentGuides({ showCenterX: false, showCenterY: false });
-    }, []);
+        // Trigger a final render after drag ends
+        requestAnimationFrame(() => {
+            throttledRender();
+        });
+    }, [throttledRender]);
 
     return (
         <div

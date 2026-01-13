@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
@@ -26,6 +26,7 @@ export function ShadowControl() {
     const [localBlur, setLocalBlur] = useState(shadowBlur);
     const [localOpacity, setLocalOpacity] = useState(shadowOpacity);
     const [isEnabled, setIsEnabled] = useState(shadowBlur > 0);
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     // Sync local state with store
     useEffect(() => {
@@ -37,16 +38,37 @@ export function ShadowControl() {
         setLocalOpacity(shadowOpacity);
     }, [shadowOpacity]);
 
+    // Cleanup timer on unmount
+    useEffect(() => {
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, []);
+
+    // Debounced store updates
+    const debouncedUpdate = useCallback((updateFn: () => void) => {
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(updateFn, 100);
+    }, []);
+
     const handleBlurChange = (value: number) => {
         setLocalBlur(value);
-        setShadowBlur(value);
-        if (value > 0 && !isEnabled) setIsEnabled(true);
-        if (value === 0 && isEnabled) setIsEnabled(false);
+        debouncedUpdate(() => {
+            setShadowBlur(value);
+            if (value > 0 && !isEnabled) setIsEnabled(true);
+            if (value === 0 && isEnabled) setIsEnabled(false);
+        });
     };
 
     const handleOpacityChange = (value: number) => {
         setLocalOpacity(value);
-        setShadowOpacity(value);
+        debouncedUpdate(() => {
+            setShadowOpacity(value);
+        });
     };
 
     const handleColorChange = (color: string) => {

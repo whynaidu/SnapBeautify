@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Palette, Square, Sun, Frame, Type, ChevronUp, ChevronDown, Sparkles } from 'lucide-react';
 import { BackgroundPicker } from '@/components/controls/BackgroundPicker';
@@ -13,6 +13,12 @@ import { ScaleControl } from '@/components/controls/ScaleControl';
 import { TextOverlayControl } from '@/components/controls/TextOverlayControl';
 import { TemplatePresets } from '@/components/controls/TemplatePresets';
 import { cn } from '@/lib/utils';
+
+// Memoize heavy tab content to prevent unnecessary re-renders
+const MemoizedTemplatePresets = memo(TemplatePresets);
+const MemoizedBackgroundPicker = memo(BackgroundPicker);
+const MemoizedFramePicker = memo(FramePicker);
+const MemoizedTextOverlayControl = memo(TextOverlayControl);
 
 const tabs = [
     { value: 'templates', icon: Sparkles, label: 'Templates' },
@@ -31,7 +37,9 @@ export function MobileControlPanel() {
     return (
         <div
             className={cn(
-                'fixed bottom-16 left-0 right-0 z-50',
+                'fixed left-0 right-0 z-50',
+                // Position above ExportBar (which is h-16)
+                'bottom-16',
                 // Use solid background instead of backdrop-blur for better mobile performance
                 'bg-white dark:bg-zinc-900',
                 'border-t border-zinc-200 dark:border-zinc-800',
@@ -77,7 +85,7 @@ export function MobileControlPanel() {
             >
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
                             {/* Tab navigation */}
-                            <div className="px-3 pb-2 flex-shrink-0">
+                            <div className="px-3 pb-2 shrink-0">
                                 <TabsList className="w-full grid grid-cols-6 bg-zinc-100 dark:bg-zinc-800/80 rounded-xl h-12 p-1 gap-0.5">
                                     {tabs.map((tab) => (
                                         <TabsTrigger
@@ -98,14 +106,14 @@ export function MobileControlPanel() {
                                 </TabsList>
                             </div>
 
-                            {/* Scrollable content */}
-                            <div className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-700">
+                            {/* Scrollable content - use passive scrolling for better performance */}
+                            <div className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-700" style={{ overscrollBehavior: 'contain' }}>
                                 <TabsContent value="templates" className="mt-0 space-y-4">
-                                    <TemplatePresets />
+                                    <MemoizedTemplatePresets />
                                 </TabsContent>
 
                                 <TabsContent value="background" className="mt-0 space-y-4">
-                                    <BackgroundPicker />
+                                    <MemoizedBackgroundPicker />
                                 </TabsContent>
 
                                 <TabsContent value="style" className="mt-0 space-y-4">
@@ -126,11 +134,11 @@ export function MobileControlPanel() {
                                 </TabsContent>
 
                                 <TabsContent value="frame" className="mt-0 space-y-4">
-                                    <FramePicker />
+                                    <MemoizedFramePicker />
                                 </TabsContent>
 
                                 <TabsContent value="text" className="mt-0 space-y-4">
-                                    <TextOverlayControl />
+                                    <MemoizedTextOverlayControl />
                                 </TabsContent>
                             </div>
                         </Tabs>

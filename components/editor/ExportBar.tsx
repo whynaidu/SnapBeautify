@@ -426,7 +426,7 @@ export function ExportBar() {
     });
 
     return (
-        <div className="h-16 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 px-3 sm:px-6 flex items-center justify-between z-50">
+        <div className="fixed md:relative bottom-0 left-0 right-0 md:bottom-auto h-16 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 px-3 sm:px-6 flex items-center justify-between z-40">
             <div className="flex items-center gap-2 sm:gap-3">
                 {/* Format Selector */}
                 <DropdownMenu>
