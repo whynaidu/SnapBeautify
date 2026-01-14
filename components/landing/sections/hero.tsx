@@ -121,8 +121,8 @@ function HeroVisual() {
                 <Wand2 className="w-4 h-4 sm:w-5 sm:h-5 text-white dark:text-black" />
               </div>
               <div>
-                <p className="font-semibold text-black dark:text-white text-xs sm:text-sm">AI Enhancement</p>
-                <p className="text-zinc-500 text-[10px] sm:text-xs">Processing complete</p>
+                <p className="font-semibold text-black dark:text-white text-xs sm:text-sm">Beautification Complete</p>
+                <p className="text-zinc-500 text-[10px] sm:text-xs">Ready to export</p>
               </div>
             </div>
             <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-green-500 text-white text-xs sm:text-sm font-medium">
@@ -166,7 +166,7 @@ function HeroVisual() {
 function Stats() {
   const stats = [
     { value: '10K+', label: 'Happy Users', icon: Users },
-    { value: '500K+', label: 'Photos Enhanced', icon: ImageIcon },
+    { value: '500K+', label: 'Screenshots Beautified', icon: ImageIcon },
     { value: '4.9', label: 'User Rating', icon: Star },
   ]
 
@@ -204,16 +204,16 @@ export function HeroSection() {
         <div className="text-center mb-12 lg:mb-16">
           <FadeIn immediate>
             <Badge variant="default" className="mb-6">
-              <Zap className="w-3 h-3 mr-2" />
-              AI-Powered Image Enhancement
+              <Sparkles className="w-3 h-3 mr-2" />
+              Screenshot Beautification Made Simple
             </Badge>
           </FadeIn>
 
           <FadeIn delay={0.1} immediate>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-black dark:text-white mb-6 max-w-4xl mx-auto">
-              Transform Any Photo Into{' '}
+              Make Your Screenshots{' '}
               <span className="relative">
-                <span className="text-zinc-500">Perfection</span>
+                <span className="text-zinc-500">Stunning</span>
                 <motion.span
                   className="absolute -bottom-2 left-0 right-0 h-1 bg-black dark:bg-white rounded-full"
                   initial={{ scaleX: 0 }}
@@ -226,8 +226,8 @@ export function HeroSection() {
 
           <FadeIn delay={0.2} immediate>
             <p className="text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Professional image enhancement powered by AI. Remove backgrounds, enhance colors,
-              and create stunning visuals — all in your browser, completely private.
+              Transform screenshots into beautiful presentations with custom backgrounds, device frames,
+              and professional styling — all in your browser, completely private.
             </p>
           </FadeIn>
 
@@ -239,7 +239,7 @@ export function HeroSection() {
                     size="lg"
                     className="bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 h-14 px-8 text-base font-semibold rounded-full"
                   >
-                    Start Enhancing Free
+                    Start Beautifying Free
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </motion.div>

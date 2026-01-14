@@ -10,45 +10,45 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const faqs = [
   {
-    question: 'Is SnapBeautify really free?',
+    question: 'What can I do with SnapBeautify?',
     answer:
-      'Yes! Our free tier lets you use basic features with a small watermark. Upgrade to premium to remove the watermark and unlock advanced features like AI background removal, batch processing, and more.',
-    category: 'pricing',
+      'SnapBeautify lets you transform screenshots and images into beautiful presentations with custom backgrounds (gradients, patterns, text, logos), device frames (macOS, Windows, iPhone, Android), text overlays, shadows, and more. Perfect for social media, portfolios, and presentations.',
+    category: 'general',
   },
   {
     question: 'Do I need to create an account?',
     answer:
-      'No account needed to try! You can start editing immediately. Only create an account when you want to save preferences or purchase premium.',
+      'No! You can start beautifying screenshots immediately without creating an account. All features work instantly in your browser.',
     category: 'general',
   },
   {
     question: 'Are my images uploaded to your servers?',
     answer:
-      'Never. All processing happens locally in your browser. Your images stay on your device at all times. We take your privacy seriously.',
+      'Never. All processing happens locally in your browser. Your images stay on your device at all times. We take your privacy seriously - your screenshots never leave your computer.',
     category: 'privacy',
   },
   {
-    question: 'What payment methods do you accept?',
+    question: 'What export formats are supported?',
     answer:
-      "We accept UPI (Google Pay, PhonePe, Paytm), Credit/Debit Cards (Visa, Mastercard, Rupay), Net Banking, and popular wallets through Razorpay — India's most trusted payment gateway.",
-    category: 'pricing',
+      'You can export in PNG, JPEG, or WebP formats at 1x, 2x, 3x, or 4x quality. You can also copy directly to clipboard or use native share on mobile devices.',
+    category: 'features',
   },
   {
-    question: 'Can I cancel my subscription?',
+    question: 'What device frames are available?',
     answer:
-      "Absolutely. Cancel anytime from your account settings. You'll retain access until your current billing period ends. No questions asked.",
-    category: 'pricing',
+      'We offer professional mockups including macOS, Windows, Browser chrome, iPhone (with Dynamic Island), and Android frames. You can also go frameless with elegant shadows.',
+    category: 'features',
   },
   {
-    question: "What's your refund policy?",
+    question: 'Can I use custom fonts for text overlays?',
     answer:
-      'We offer full refunds within 7 days for Monthly plans, 30 days for Annual (pro-rata after 14 days), and 14 days for Lifetime. No questions asked within the refund window.',
-    category: 'pricing',
+      'Yes! You can add multiple text layers with custom colors, fonts, sizes, and weights. Text is fully draggable and you can duplicate styled text easily.',
+    category: 'features',
   },
   {
     question: 'Does it work on mobile?',
     answer:
-      'Yes! SnapBeautify works on any device with a modern browser — desktop, tablet, or mobile. The interface adapts to your screen size for the best experience.',
+      'Yes! SnapBeautify works on any device with a modern browser — desktop, tablet, or mobile. The interface is fully responsive and adapts to your screen size.',
     category: 'general',
   },
 ]

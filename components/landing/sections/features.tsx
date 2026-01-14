@@ -6,19 +6,25 @@ import { Badge } from '../shared/badge'
 import { FadeIn } from '../animations/fade-in'
 import { cn } from '@/lib/utils'
 import {
-  Wand2,
+  Palette,
   Sparkles,
-  Sun,
+  Smartphone,
   LayoutTemplate,
   Layers,
-  CheckCircle,
+  Crop,
   LucideIcon,
   Zap,
   Image,
-  SunMedium,
+  Type,
   Grid3X3,
-  BadgeCheck,
+  Frame,
   ArrowRight,
+  Monitor,
+  Wand2,
+  SunMedium,
+  CheckCircle,
+  BadgeCheck,
+  FileImage,
 } from 'lucide-react'
 
 interface Feature {
@@ -307,44 +313,44 @@ function NoWatermarkAnim() {
 
 const features: Feature[] = [
   {
-    icon: Wand2,
-    title: 'AI Background Removal',
-    description: 'One-click intelligent background removal. Perfect cutouts every time, powered by advanced AI.',
+    icon: Palette,
+    title: 'Custom Backgrounds',
+    description: 'Choose from solid colors, gradients, mesh patterns, text overlays, logo grids, and wave splits.',
     gradient: 'from-purple-500/10 via-transparent to-pink-500/10',
     animation: BackgroundRemovalAnim,
   },
   {
-    icon: Sparkles,
-    title: 'Smart Enhancement',
-    description: 'Auto-improve colors, contrast, and lighting with AI that understands your photos.',
+    icon: Frame,
+    title: 'Device Frames',
+    description: 'Showcase your screenshots in professional device mockups - macOS, Windows, iPhone, Android, and browsers.',
     gradient: 'from-orange-500/10 via-transparent to-yellow-500/10',
     animation: EnhancementAnim,
   },
   {
-    icon: Sun,
-    title: 'Shadow Detection',
-    description: 'Detect and enhance or remove shadows for professional-looking results.',
+    icon: Sparkles,
+    title: 'Complete Customization',
+    description: 'Adjust padding, border radius, shadows, zoom, and rotation for pixel-perfect results.',
     gradient: 'from-yellow-500/10 via-transparent to-amber-500/10',
     animation: ShadowAnim,
   },
   {
-    icon: Layers,
-    title: 'Batch Processing',
-    description: 'Edit multiple images at once. Save hours on repetitive editing tasks.',
+    icon: Type,
+    title: 'Text Overlays',
+    description: 'Add draggable text with custom fonts, colors, and sizes. Perfect for annotations and branding.',
     gradient: 'from-blue-500/10 via-transparent to-cyan-500/10',
     animation: BatchAnim,
   },
   {
-    icon: LayoutTemplate,
-    title: 'Premium Templates',
-    description: '50+ professional templates for social media, e-commerce, and more.',
+    icon: Crop,
+    title: 'Smart Cropping',
+    description: 'Interactive crop tool with resize handles. Revert to original anytime.',
     gradient: 'from-green-500/10 via-transparent to-emerald-500/10',
     animation: TemplatesAnim,
   },
   {
-    icon: CheckCircle,
-    title: 'No Watermark',
-    description: 'Export your images clean and professional, ready for any use.',
+    icon: Grid3X3,
+    title: 'Social Media Ready',
+    description: 'Preset aspect ratios for Twitter, LinkedIn, Instagram, Stories, and more.',
     gradient: 'from-teal-500/10 via-transparent to-green-500/10',
     animation: NoWatermarkAnim,
   },
@@ -480,7 +486,7 @@ export function FeaturesSection() {
 
         <FadeIn delay={0.2}>
           <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
-            Everything you need to transform your images. Professional results without the complexity.
+            Everything you need to present your screenshots beautifully. Professional results without the complexity.
           </p>
         </FadeIn>
       </div>

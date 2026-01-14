@@ -37,7 +37,7 @@ export function MobileControlPanel() {
     return (
         <div
             className={cn(
-                'fixed left-0 right-0 z-50',
+                'fixed left-0 right-0 z-40',
                 // Position above ExportBar (which is h-16)
                 'bottom-16',
                 // Use solid background instead of backdrop-blur for better mobile performance

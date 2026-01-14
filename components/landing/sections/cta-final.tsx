@@ -27,20 +27,20 @@ export function CTAFinalSection() {
         <div className="text-center max-w-3xl mx-auto">
           <FadeIn>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-300 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm text-zinc-600 dark:text-zinc-400 text-[10px] sm:text-xs font-medium mb-4 sm:mb-6">
-              Start transforming your photos today
+              Start beautifying your screenshots today
             </div>
           </FadeIn>
 
           <FadeIn delay={0.1}>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-black dark:text-white mb-4 sm:mb-6">
-              Ready to Create Stunning Photos?
+              Ready to Make Your Screenshots Stunning?
             </h2>
           </FadeIn>
 
           <FadeIn delay={0.2}>
             <p className="text-sm sm:text-base lg:text-lg text-zinc-600 dark:text-zinc-400 mb-6 sm:mb-8 max-w-xl mx-auto px-2 sm:px-0">
-              Join thousands of creators who trust SnapBeautify for their image
-              editing needs. Start free, upgrade when you&apos;re ready.
+              Join thousands of creators who trust SnapBeautify to present their work beautifully.
+              Start free, no signup required.
             </p>
           </FadeIn>
 
@@ -51,7 +51,7 @@ export function CTAFinalSection() {
                   size="lg"
                   className="bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 h-10 sm:h-12 px-6 sm:px-8 text-sm sm:text-base shadow-lg w-full sm:w-auto"
                 >
-                  Start Enhancing Free
+                  Start Beautifying Free
                   <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-2" />
                 </Button>
               </Link>
@@ -60,7 +60,7 @@ export function CTAFinalSection() {
 
           <FadeIn delay={0.4}>
             <p className="text-zinc-500 dark:text-zinc-600 text-xs sm:text-sm mt-4 sm:mt-6">
-              No credit card required • Works on any device • Cancel anytime
+              No signup required • Works on any device • 100% browser-based
             </p>
           </FadeIn>
         </div>

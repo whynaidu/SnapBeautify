@@ -209,24 +209,24 @@ const steps = [
   {
     number: '01',
     icon: Upload,
-    title: 'Upload Your Image',
-    description: 'Simply drag and drop your image or click to browse. We support all popular formats.',
+    title: 'Upload Your Screenshot',
+    description: 'Simply drag and drop your screenshot or image. Supports JPG, PNG, WebP and more.',
     animation: UploadAnimation,
     color: 'from-blue-500/20 to-cyan-500/20',
   },
   {
     number: '02',
     icon: Wand2,
-    title: 'Apply the Magic',
-    description: 'Choose from AI-powered tools. Background removal, enhancement, filters, and more.',
+    title: 'Customize & Style',
+    description: 'Choose backgrounds, add device frames, adjust shadows, overlay text, and make it perfect.',
     animation: MagicAnimation,
     color: 'from-purple-500/20 to-pink-500/20',
   },
   {
     number: '03',
     icon: Download,
-    title: 'Download & Share',
-    description: 'Get your perfect image instantly in full resolution. No watermarks, no limits.',
+    title: 'Export & Share',
+    description: 'Download in PNG, JPEG, or WebP at 1x-4x quality. Copy to clipboard or share directly.',
     animation: DownloadAnimation,
     color: 'from-green-500/20 to-emerald-500/20',
   },
@@ -319,7 +319,7 @@ export function HowItWorksSection() {
 
         <FadeIn delay={0.2}>
           <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto">
-            Transform any image in seconds. No signup, no learning curve, just results.
+            Beautify any screenshot in seconds. No signup, no learning curve, just stunning results.
           </p>
         </FadeIn>
       </div>
