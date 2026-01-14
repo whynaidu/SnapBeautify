@@ -21,7 +21,8 @@ import {
   Wand2,
   Star,
   Layers,
-  Camera
+  Camera,
+  Home
 } from 'lucide-react';
 import { GitHubIcon } from '@/components/ui/icons';
 import { useState, useEffect, Suspense } from 'react';
@@ -553,6 +554,22 @@ function AuthGateInner({ children }: AuthGateProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, type: 'spring', stiffness: 100 }}
           >
+            {/* Back to Landing Page Link */}
+            <motion.div
+              className="flex justify-center mb-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.05 }}
+            >
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
+              >
+                <Home className="w-4 h-4" />
+                <span>Back to Landing Page</span>
+              </Link>
+            </motion.div>
+
             {/* Mobile Logo */}
             <motion.div
               className="lg:hidden flex justify-center mb-8"

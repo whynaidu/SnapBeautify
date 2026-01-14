@@ -108,7 +108,7 @@ export function TrustBar() {
             </div>
 
             {/* Payment methods */}
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
               {paymentMethods.map((method, index) => {
                 const Icon = method.icon
                 return (
@@ -119,16 +119,16 @@ export function TrustBar() {
                     viewport={{ once: true }}
                     transition={{ delay: 0.3 + index * 0.1 }}
                     whileHover={{ scale: 1.02 }}
-                    className="group flex items-center gap-3 px-5 py-3 rounded-2xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-default"
+                    className="group flex items-center gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-default"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0">
                       <Icon className="w-5 h-5 text-zinc-600 dark:text-zinc-300" />
                     </div>
-                    <div className="text-left">
+                    <div className="text-left min-w-0 flex-1">
                       <p className="text-sm font-semibold text-zinc-900 dark:text-white leading-tight">
                         {method.name}
                       </p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-tight mt-0.5">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-tight mt-0.5 truncate">
                         {method.label}
                       </p>
                     </div>
@@ -143,16 +143,16 @@ export function TrustBar() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.6 }}
                 whileHover={{ scale: 1.02 }}
-                className="group flex items-center gap-3 px-5 py-3 rounded-2xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-default"
+                className="group flex items-center gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-default"
               >
-                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                   <Sparkles className="w-5 h-5 text-blue-500" />
                 </div>
-                <div className="text-left">
+                <div className="text-left min-w-0 flex-1">
                   <p className="text-sm font-semibold text-zinc-900 dark:text-white leading-tight">
                     Razorpay
                   </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-tight mt-0.5">
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-tight mt-0.5 truncate">
                     Secure payments
                   </p>
                 </div>

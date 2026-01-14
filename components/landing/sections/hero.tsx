@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Badge } from '../shared/badge'
 import { Button } from '@/components/ui/button'
@@ -84,12 +85,13 @@ function HeroVisual() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {/* Before image - static, no animation */}
             <div className="relative aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-zinc-200 dark:bg-zinc-800">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <ImageIcon className="w-10 h-10 sm:w-16 sm:h-16 text-zinc-400 mx-auto mb-2" />
-                  <p className="text-zinc-500 text-xs sm:text-sm">Original Image</p>
-                </div>
-              </div>
+              <Image
+                src="/images/hero/before.png"
+                alt="Before beautification"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
+              />
               {/* Before label */}
               <div className="absolute top-2 left-2 sm:top-3 sm:left-3 px-2 sm:px-3 py-1 rounded-full bg-black/70 text-white text-[10px] sm:text-xs font-medium">
                 Before
@@ -100,12 +102,13 @@ function HeroVisual() {
 
             {/* After image - static, no animation */}
             <div className="relative aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-black dark:bg-white">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <ImageIcon className="w-10 h-10 sm:w-16 sm:h-16 text-white dark:text-black mx-auto mb-2" />
-                  <p className="text-zinc-300 dark:text-zinc-700 text-xs sm:text-sm">Enhanced</p>
-                </div>
-              </div>
+              <Image
+                src="/images/hero/after.png"
+                alt="After beautification"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
+              />
               {/* After label */}
               <div className="absolute top-2 right-2 sm:top-3 sm:right-3 px-2 sm:px-3 py-1 rounded-full bg-green-500 text-white text-[10px] sm:text-xs font-medium flex items-center gap-1">
                 <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3" />

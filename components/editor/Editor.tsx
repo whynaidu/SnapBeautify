@@ -6,7 +6,7 @@ import { Header } from './Header';
 import { Canvas } from './Canvas';
 import { ControlPanel } from './ControlPanel';
 import { ExportBar } from './ExportBar';
-import { MobileControlPanel } from './MobileControlPanel';
+import { MobileControlPanelV2 } from './MobileControlPanelV2';
 import { CropActionButtons } from './CropActionButtons';
 import { KeyboardShortcuts } from '@/components/shared/KeyboardShortcuts';
 import { useEditorStore } from '@/lib/store/editor-store';
@@ -97,7 +97,7 @@ export function Editor() {
                 {originalImage && !isCropping && <ExportBar />}
 
                 {/* Mobile: Show bottom control panel (hide when cropping) */}
-                {isMobile && originalImage && !isCropping && <MobileControlPanel />}
+                {isMobile && originalImage && !isCropping && <MobileControlPanelV2 />}
 
                 {/* Show crop action buttons when in crop mode */}
                 {isCropping && <CropActionButtons />}

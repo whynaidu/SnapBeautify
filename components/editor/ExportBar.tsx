@@ -192,6 +192,7 @@ export function ExportBar() {
                 textPatternFontFamily,
                 textPatternFontSize,
                 textPatternFontWeight,
+                textPatternRows,
                 waveSplitFlipped,
                 logoPatternImage,
                 logoPatternOpacity,
