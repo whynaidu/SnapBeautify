@@ -9,8 +9,164 @@ import { PRESET_GRADIENTS, SOLID_COLORS, MESH_GRADIENTS, TEXT_PATTERNS } from '@
 import { FONTS_BY_CATEGORY, FONT_CATEGORIES, FontCategory } from '@/lib/constants/fonts';
 import { cn } from '@/lib/utils';
 import { Check, Pipette, X, Search, Crown } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo, useCallback } from 'react';
 import { useSubscription } from '@/lib/subscription/context';
+
+// Memoized Color Button component to prevent re-renders
+const ColorButton = memo(function ColorButton({
+    color,
+    isSelected,
+    isPremium,
+    onClick,
+}: {
+    color: string;
+    isSelected: boolean;
+    isPremium: boolean;
+    onClick: () => void;
+}) {
+    return (
+        <button
+            onClick={onClick}
+            className={cn(
+                'w-full aspect-square rounded-md border-2 transition-all relative',
+                isSelected
+                    ? 'border-foreground/80 scale-110 z-10'
+                    : 'border-transparent hover:scale-105'
+            )}
+            style={{ backgroundColor: color }}
+            title={isPremium ? `${color} (PRO)` : color}
+        >
+            {isPremium && (
+                <Crown className="absolute -top-1 -right-1 w-2.5 h-2.5 text-orange-500" />
+            )}
+        </button>
+    );
+});
+
+// Memoized Gradient Preset Button component
+const GradientPresetButton = memo(function GradientPresetButton({
+    gradient,
+    isSelected,
+    isPremium,
+    onClick,
+}: {
+    gradient: { name: string; colors: [string, string]; angle: number };
+    isSelected: boolean;
+    isPremium: boolean;
+    onClick: () => void;
+}) {
+    return (
+        <button
+            onClick={onClick}
+            className={cn(
+                'relative w-full aspect-square rounded-lg transition-all group',
+                isSelected
+                    ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
+                    : 'hover:scale-105'
+            )}
+            style={{
+                background: `linear-gradient(${gradient.angle}deg, ${gradient.colors[0]}, ${gradient.colors[1]})`,
+            }}
+            title={isPremium ? `${gradient.name} (PRO)` : gradient.name}
+        >
+            {isSelected && (
+                <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
+            )}
+            {isPremium && (
+                <Crown className="absolute top-0.5 right-0.5 w-3 h-3 text-orange-500 drop-shadow" />
+            )}
+            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/80 px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                {gradient.name}
+            </span>
+        </button>
+    );
+});
+
+// Memoized Mesh Gradient Button component
+const MeshGradientButton = memo(function MeshGradientButton({
+    mesh,
+    isSelected,
+    isPremium,
+    onClick,
+}: {
+    mesh: { name: string; css: string };
+    isSelected: boolean;
+    isPremium: boolean;
+    onClick: () => void;
+}) {
+    return (
+        <button
+            onClick={onClick}
+            className={cn(
+                'relative w-full aspect-square rounded-lg transition-all overflow-hidden group',
+                isSelected
+                    ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
+                    : 'hover:scale-105'
+            )}
+            style={{ background: mesh.css, backgroundColor: '#0f172a' }}
+            title={isPremium ? `${mesh.name} (PRO)` : mesh.name}
+        >
+            {isSelected && (
+                <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
+            )}
+            {isPremium && (
+                <Crown className="absolute top-0.5 right-0.5 w-3 h-3 text-orange-500 drop-shadow" />
+            )}
+            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/80 px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
+                {mesh.name}
+            </span>
+        </button>
+    );
+});
+
+// Memoized Font Button component
+const FontButton = memo(function FontButton({
+    font,
+    isSelected,
+    isPremium,
+    onClick,
+}: {
+    font: { name: string; fontFamily: string };
+    isSelected: boolean;
+    isPremium: boolean;
+    onClick: () => void;
+}) {
+    return (
+        <button
+            onClick={onClick}
+            className={cn(
+                'w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-all group relative',
+                isSelected
+                    ? 'bg-primary text-primary-foreground'
+                    : 'hover:bg-muted/80'
+            )}
+        >
+            {/* Font Preview */}
+            <span
+                className={cn(
+                    'text-base leading-none w-6 text-center',
+                    !isSelected && 'text-muted-foreground group-hover:text-foreground'
+                )}
+                style={{ fontFamily: font.fontFamily }}
+            >
+                Aa
+            </span>
+            {/* Font Name */}
+            <span
+                className="flex-1 text-xs truncate"
+                style={{ fontFamily: font.fontFamily }}
+            >
+                {font.name}
+            </span>
+            {/* PRO Badge or Check Icon */}
+            {isPremium ? (
+                <Crown className="w-3 h-3 shrink-0 text-orange-500" />
+            ) : isSelected ? (
+                <Check className="w-3 h-3 shrink-0" />
+            ) : null}
+        </button>
+    );
+});
 
 export function BackgroundPicker() {
     const {
@@ -108,6 +264,27 @@ export function BackgroundPicker() {
     const FREE_MESH_GRADIENTS = 5;   // First 5 out of 15+
     const FREE_FONTS = 10;           // First 10 fonts (Popular category)
 
+    // Memoized click handlers to prevent recreation on each render
+    const handleColorClick = useCallback((color: string) => {
+        setBackgroundColor(color);
+    }, [setBackgroundColor]);
+
+    const handleGradientClick = useCallback((colors: [string, string], angle: number) => {
+        setGradient(colors, angle);
+    }, [setGradient]);
+
+    const handleMeshClick = useCallback((css: string) => {
+        setMeshGradient(css);
+    }, [setMeshGradient]);
+
+    const handleUpdateGradientColors = useCallback((colors: [string, string], angle: number) => {
+        updateGradientColors(colors, angle);
+    }, [updateGradientColors]);
+
+    const handleUpdateBackgroundColor = useCallback((color: string) => {
+        updateBackgroundColor(color);
+    }, [updateBackgroundColor]);
+
     return (
         <div className="space-y-4">
             <Label className="text-muted-foreground text-xs uppercase tracking-wider">
@@ -197,27 +374,15 @@ export function BackgroundPicker() {
                         Colors ({isPro ? SOLID_COLORS.length : `${FREE_SOLID_COLORS} free`})
                     </Label>
                     <div className="grid grid-cols-8 gap-1.5">
-                            {SOLID_COLORS.map((color, index) => {
-                                const isPremium = index >= FREE_SOLID_COLORS && !isPro;
-                                return (
-                                    <button
-                                        key={color}
-                                        onClick={() => setBackgroundColor(color)}
-                                        className={cn(
-                                            'w-full aspect-square rounded-md border-2 transition-all relative',
-                                            backgroundColor === color
-                                                ? 'border-foreground/80 scale-110 z-10'
-                                                : 'border-transparent hover:scale-105'
-                                        )}
-                                        style={{ backgroundColor: color }}
-                                        title={isPremium ? `${color} (PRO)` : color}
-                                    >
-                                        {isPremium && (
-                                            <Crown className="absolute -top-1 -right-1 w-2.5 h-2.5 text-orange-500" />
-                                        )}
-                                    </button>
-                                );
-                            })}
+                            {SOLID_COLORS.map((color, index) => (
+                                <ColorButton
+                                    key={color}
+                                    color={color}
+                                    isSelected={backgroundColor === color}
+                                    isPremium={index >= FREE_SOLID_COLORS && !isPro}
+                                    onClick={() => handleColorClick(color)}
+                                />
+                            ))}
                     </div>
 
                     {/* Custom Color Picker & Input */}
@@ -321,41 +486,19 @@ export function BackgroundPicker() {
                             Gradient Presets ({isPro ? PRESET_GRADIENTS.length : `${FREE_GRADIENTS} free`})
                         </Label>
                         <div className="grid grid-cols-6 gap-2">
-                                {PRESET_GRADIENTS.map((gradient, index) => {
-                                    // Only show as selected if it's a regular gradient (not mesh) AND colors match
-                                    const isSelected =
-                                        isGradientActive &&
-                                        gradientColors[0] === gradient.colors[0] &&
-                                        gradientColors[1] === gradient.colors[1];
-                                    const isPremiumGradient = index >= FREE_GRADIENTS && !isPro;
-
-                                    return (
-                                        <button
-                                            key={gradient.name}
-                                            onClick={() => setGradient(gradient.colors, gradient.angle)}
-                                            className={cn(
-                                                'relative w-full aspect-square rounded-lg transition-all group',
-                                                isSelected
-                                                    ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
-                                                    : 'hover:scale-105'
-                                            )}
-                                            style={{
-                                                background: `linear-gradient(${gradient.angle}deg, ${gradient.colors[0]}, ${gradient.colors[1]})`,
-                                            }}
-                                            title={isPremiumGradient ? `${gradient.name} (PRO)` : gradient.name}
-                                        >
-                                            {isSelected && (
-                                                <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
-                                            )}
-                                            {isPremiumGradient && (
-                                                <Crown className="absolute top-0.5 right-0.5 w-3 h-3 text-orange-500 drop-shadow" />
-                                            )}
-                                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/80 px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
-                                                {gradient.name}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
+                                {PRESET_GRADIENTS.map((gradient, index) => (
+                                    <GradientPresetButton
+                                        key={gradient.name}
+                                        gradient={gradient}
+                                        isSelected={
+                                            isGradientActive &&
+                                            gradientColors[0] === gradient.colors[0] &&
+                                            gradientColors[1] === gradient.colors[1]
+                                        }
+                                        isPremium={index >= FREE_GRADIENTS && !isPro}
+                                        onClick={() => handleGradientClick(gradient.colors, gradient.angle)}
+                                    />
+                                ))}
                         </div>
                     </div>
 
@@ -382,35 +525,15 @@ export function BackgroundPicker() {
                             Mesh Gradients ({isPro ? MESH_GRADIENTS.length : `${FREE_MESH_GRADIENTS} free`})
                         </Label>
                         <div className="grid grid-cols-5 gap-2">
-                                {MESH_GRADIENTS.map((mesh, index) => {
-                                    // Only show as selected if it's a mesh type AND the CSS matches
-                                    const isSelected = isMeshActive && meshGradientCSS === mesh.css;
-                                    const isPremiumMesh = index >= FREE_MESH_GRADIENTS && !isPro;
-                                    return (
-                                        <button
-                                            key={mesh.name}
-                                            onClick={() => setMeshGradient(mesh.css)}
-                                            className={cn(
-                                                'relative w-full aspect-square rounded-lg transition-all overflow-hidden group',
-                                                isSelected
-                                                    ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
-                                                    : 'hover:scale-105'
-                                            )}
-                                            style={{ background: mesh.css, backgroundColor: '#0f172a' }}
-                                            title={isPremiumMesh ? `${mesh.name} (PRO)` : mesh.name}
-                                        >
-                                            {isSelected && (
-                                                <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
-                                            )}
-                                            {isPremiumMesh && (
-                                                <Crown className="absolute top-0.5 right-0.5 w-3 h-3 text-orange-500 drop-shadow" />
-                                            )}
-                                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/80 px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
-                                                {mesh.name}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
+                                {MESH_GRADIENTS.map((mesh, index) => (
+                                    <MeshGradientButton
+                                        key={mesh.name}
+                                        mesh={mesh}
+                                        isSelected={isMeshActive && meshGradientCSS === mesh.css}
+                                        isPremium={index >= FREE_MESH_GRADIENTS && !isPro}
+                                        onClick={() => handleMeshClick(mesh.css)}
+                                    />
+                                ))}
                         </div>
                     </div>
                 </div>
@@ -652,47 +775,15 @@ export function BackgroundPicker() {
                                         No fonts found
                                     </div>
                                 ) : (
-                                    filteredFonts.map((font, index) => {
-                                        const isSelected = textPatternFontFamily === font.fontFamily;
-                                        // Premium if: non-popular category OR popular category beyond first 8 fonts
-                                        const isPremiumFont = (fontCategory !== 'popular' || index >= FREE_FONTS) && !isPro;
-                                        return (
-                                            <button
-                                                key={font.fontFamily}
-                                                onClick={() => handleFontSelection(font.fontFamily)}
-                                                className={cn(
-                                                    'w-full flex items-center gap-2 px-2 py-1.5 rounded text-left transition-all group relative',
-                                                    isSelected
-                                                        ? 'bg-primary text-primary-foreground'
-                                                        : 'hover:bg-muted/80'
-                                                )}
-                                            >
-                                                {/* Font Preview */}
-                                                <span
-                                                    className={cn(
-                                                        'text-base leading-none w-6 text-center',
-                                                        !isSelected && 'text-muted-foreground group-hover:text-foreground'
-                                                    )}
-                                                    style={{ fontFamily: font.fontFamily }}
-                                                >
-                                                    Aa
-                                                </span>
-                                                {/* Font Name */}
-                                                <span
-                                                    className="flex-1 text-xs truncate"
-                                                    style={{ fontFamily: font.fontFamily }}
-                                                >
-                                                    {font.name}
-                                                </span>
-                                                {/* PRO Badge or Check Icon */}
-                                                {isPremiumFont ? (
-                                                    <Crown className="w-3 h-3 shrink-0 text-orange-500" />
-                                                ) : isSelected ? (
-                                                    <Check className="w-3 h-3 shrink-0" />
-                                                ) : null}
-                                            </button>
-                                        );
-                                    })
+                                    filteredFonts.map((font, index) => (
+                                        <FontButton
+                                            key={font.fontFamily}
+                                            font={font}
+                                            isSelected={textPatternFontFamily === font.fontFamily}
+                                            isPremium={(fontCategory !== 'popular' || index >= FREE_FONTS) && !isPro}
+                                            onClick={() => handleFontSelection(font.fontFamily)}
+                                        />
+                                    ))
                                 )}
                             </div>
                         </div>
@@ -785,17 +876,12 @@ export function BackgroundPicker() {
                         <Label className="text-muted-foreground text-xs">{waveSplitFlipped ? 'Top' : 'Bottom'} Half (Solid)</Label>
                         <div className="grid grid-cols-8 gap-1.5">
                             {SOLID_COLORS.map((color) => (
-                                <button
+                                <ColorButton
                                     key={color}
-                                    onClick={() => updateBackgroundColor(color)}
-                                    className={cn(
-                                        'w-full aspect-square rounded-md border-2 transition-all',
-                                        backgroundColor === color
-                                            ? 'border-foreground/80 scale-110 z-10'
-                                            : 'border-transparent hover:scale-105'
-                                    )}
-                                    style={{ backgroundColor: color }}
-                                    title={color}
+                                    color={color}
+                                    isSelected={backgroundColor === color}
+                                    isPremium={false}
+                                    onClick={() => handleUpdateBackgroundColor(color)}
                                 />
                             ))}
                         </div>
@@ -905,35 +991,18 @@ export function BackgroundPicker() {
                                 Gradient Presets ({PRESET_GRADIENTS.length})
                             </Label>
                             <div className="grid grid-cols-6 gap-2">
-                                {PRESET_GRADIENTS.map((gradient) => {
-                                    const isSelected =
-                                        gradientColors[0] === gradient.colors[0] &&
-                                        gradientColors[1] === gradient.colors[1];
-
-                                    return (
-                                        <button
-                                            key={gradient.name}
-                                            onClick={() => updateGradientColors(gradient.colors, gradient.angle)}
-                                            className={cn(
-                                                'relative w-full aspect-square rounded-lg transition-all group',
-                                                isSelected
-                                                    ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
-                                                    : 'hover:scale-105'
-                                            )}
-                                            style={{
-                                                background: `linear-gradient(${gradient.angle}deg, ${gradient.colors[0]}, ${gradient.colors[1]})`,
-                                            }}
-                                            title={gradient.name}
-                                        >
-                                            {isSelected && (
-                                                <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
-                                            )}
-                                            <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/80 px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
-                                                {gradient.name}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
+                                {PRESET_GRADIENTS.map((gradient) => (
+                                    <GradientPresetButton
+                                        key={gradient.name}
+                                        gradient={gradient}
+                                        isSelected={
+                                            gradientColors[0] === gradient.colors[0] &&
+                                            gradientColors[1] === gradient.colors[1]
+                                        }
+                                        isPremium={false}
+                                        onClick={() => handleUpdateGradientColors(gradient.colors, gradient.angle)}
+                                    />
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -1081,35 +1150,18 @@ export function BackgroundPicker() {
                             Gradient Presets ({PRESET_GRADIENTS.length})
                         </Label>
                         <div className="grid grid-cols-6 gap-2">
-                            {PRESET_GRADIENTS.map((gradient) => {
-                                const isSelected =
-                                    gradientColors[0] === gradient.colors[0] &&
-                                    gradientColors[1] === gradient.colors[1];
-
-                                return (
-                                    <button
-                                        key={gradient.name}
-                                        onClick={() => updateGradientColors(gradient.colors, gradient.angle)}
-                                        className={cn(
-                                            'relative w-full aspect-square rounded-lg transition-all group',
-                                            isSelected
-                                                ? 'ring-2 ring-foreground ring-offset-2 ring-offset-background scale-105'
-                                                : 'hover:scale-105'
-                                        )}
-                                        style={{
-                                            background: `linear-gradient(${gradient.angle}deg, ${gradient.colors[0]}, ${gradient.colors[1]})`,
-                                        }}
-                                        title={gradient.name}
-                                    >
-                                        {isSelected && (
-                                            <Check className="absolute inset-0 m-auto w-4 h-4 text-white drop-shadow-lg" />
-                                        )}
-                                        <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white bg-black/80 px-1 py-0.5 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity truncate">
-                                            {gradient.name}
-                                        </span>
-                                    </button>
-                                );
-                            })}
+                            {PRESET_GRADIENTS.map((gradient) => (
+                                <GradientPresetButton
+                                    key={gradient.name}
+                                    gradient={gradient}
+                                    isSelected={
+                                        gradientColors[0] === gradient.colors[0] &&
+                                        gradientColors[1] === gradient.colors[1]
+                                    }
+                                    isPremium={false}
+                                    onClick={() => handleUpdateGradientColors(gradient.colors, gradient.angle)}
+                                />
+                            ))}
                         </div>
                     </div>
 

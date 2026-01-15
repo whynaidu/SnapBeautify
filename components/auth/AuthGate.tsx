@@ -29,6 +29,18 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
+// Mobile detection hook for performance optimization
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  return isMobile;
+}
+
 interface AuthGateProps {
   children: React.ReactNode;
 }
@@ -48,8 +60,12 @@ const floatingIcons = [
   { icon: Wand2, x: '90%', y: '45%', delay: 2 },
 ];
 
-// Animated background blob
-function AnimatedBlob({ className }: { className?: string }) {
+// Animated background blob - static on mobile for performance
+function AnimatedBlob({ className, isMobile }: { className?: string; isMobile?: boolean }) {
+  // On mobile, render a static blob without animations
+  if (isMobile) {
+    return <div className={className} style={{ borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%' }} />;
+  }
   return (
     <motion.div
       className={className}
@@ -67,8 +83,19 @@ function AnimatedBlob({ className }: { className?: string }) {
   );
 }
 
-// Floating icon component
-function FloatingIcon({ icon: Icon, x, y, delay }: { icon: React.ComponentType<{ className?: string }>; x: string; y: string; delay: number }) {
+// Floating icon component - static on mobile for performance
+function FloatingIcon({ icon: Icon, x, y, delay, isMobile }: { icon: React.ComponentType<{ className?: string }>; x: string; y: string; delay: number; isMobile?: boolean }) {
+  // On mobile, render a static icon without animations
+  if (isMobile) {
+    return (
+      <div
+        className="absolute text-zinc-300 dark:text-zinc-700 opacity-40"
+        style={{ left: x, top: y }}
+      >
+        <Icon className="w-6 h-6" />
+      </div>
+    );
+  }
   return (
     <motion.div
       className="absolute text-zinc-300 dark:text-zinc-700"
@@ -92,8 +119,8 @@ function FloatingIcon({ icon: Icon, x, y, delay }: { icon: React.ComponentType<{
   );
 }
 
-// Pre-generated particle positions for stable rendering
-const particleData = Array.from({ length: 20 }, (_, i) => ({
+// Pre-generated particle positions for stable rendering (reduced count for performance)
+const particleData = Array.from({ length: 10 }, (_, i) => ({
   id: i,
   left: `${(i * 17 + 5) % 100}%`,
   top: `${(i * 23 + 10) % 100}%`,
@@ -101,8 +128,11 @@ const particleData = Array.from({ length: 20 }, (_, i) => ({
   delay: (i % 4) * 0.5,
 }));
 
-// Particle effect
-function Particles() {
+// Particle effect - disabled on mobile for performance
+function Particles({ isMobile }: { isMobile?: boolean }) {
+  // Skip particles entirely on mobile
+  if (isMobile) return null;
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {particleData.map((particle) => (
@@ -135,6 +165,7 @@ function AuthGateInner({ children }: AuthGateProps) {
   const { isAuthenticated, isLoading, signIn, signUp, signInWithGoogle, signInWithGithub } = useAuth();
   const searchParams = useSearchParams();
   const fromLogout = searchParams.get('fromLogout') === 'true';
+  const isMobile = useIsMobile(); // For disabling heavy animations on mobile
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -294,7 +325,7 @@ function AuthGateInner({ children }: AuthGateProps) {
     if (emailSent) {
       return (
         <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center p-4 overflow-hidden">
-          <Particles />
+          <Particles isMobile={isMobile} />
           <motion.div
             className="w-full max-w-md relative z-10"
             initial={{ opacity: 0, y: 40, scale: 0.9 }}
@@ -410,16 +441,16 @@ function AuthGateInner({ children }: AuthGateProps) {
           </div>
 
           {/* Animated blobs */}
-          <AnimatedBlob className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-zinc-200/50 to-zinc-300/50 dark:from-zinc-800/50 dark:to-zinc-700/50 blur-3xl" />
-          <AnimatedBlob className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-br from-zinc-300/30 to-zinc-200/30 dark:from-zinc-700/30 dark:to-zinc-800/30 blur-3xl" />
+          <AnimatedBlob isMobile={isMobile} className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-zinc-200/50 to-zinc-300/50 dark:from-zinc-800/50 dark:to-zinc-700/50 blur-3xl" />
+          <AnimatedBlob isMobile={isMobile} className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-br from-zinc-300/30 to-zinc-200/30 dark:from-zinc-700/30 dark:to-zinc-800/30 blur-3xl" />
 
           {/* Floating icons */}
           {floatingIcons.map((item, index) => (
-            <FloatingIcon key={index} {...item} />
+            <FloatingIcon key={index} {...item} isMobile={isMobile} />
           ))}
 
           {/* Particles */}
-          <Particles />
+          <Particles isMobile={isMobile} />
 
           <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20">
             {/* Logo with animation */}
@@ -545,7 +576,7 @@ function AuthGateInner({ children }: AuthGateProps) {
         <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative">
           {/* Mobile particles */}
           <div className="lg:hidden">
-            <Particles />
+            <Particles isMobile={isMobile} />
           </div>
 
           <motion.div

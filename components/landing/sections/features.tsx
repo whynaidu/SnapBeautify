@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
 import { Section } from '../layout/section'
 import { Badge } from '../shared/badge'
 import { FadeIn } from '../animations/fade-in'
@@ -27,12 +28,24 @@ import {
   FileImage,
 } from 'lucide-react'
 
+// Mobile detection hook for disabling heavy animations
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  return isMobile;
+}
+
 interface Feature {
   icon: LucideIcon
   title: string
   description: string
   gradient: string
-  animation: React.FC
+  animation: React.FC<{ isMobile: boolean }>
 }
 
 // Pre-generated sparkle positions for stable rendering
@@ -46,7 +59,25 @@ const sparklePositions = [
 ]
 
 // Animation: Background Removal - Layers peeling away
-function BackgroundRemovalAnim() {
+function BackgroundRemovalAnim({ isMobile }: { isMobile: boolean }) {
+  // Static version for mobile
+  if (isMobile) {
+    return (
+      <div className="relative w-full h-full min-h-[160px] flex items-center justify-center">
+        <div className="absolute w-24 h-24 rounded-xl bg-zinc-300 dark:bg-zinc-700 translate-x-2 translate-y-2 opacity-50" />
+        <div className="absolute w-20 h-20 rounded-xl bg-zinc-400 dark:bg-zinc-600 translate-x-1 translate-y-1 opacity-70" />
+        <div className="relative w-16 h-16 rounded-xl bg-black dark:bg-white flex items-center justify-center z-10">
+          <Image className="w-7 h-7 text-white dark:text-black" />
+        </div>
+        <div className="absolute bottom-4 right-4 z-20">
+          <div className="w-8 h-8 rounded-full bg-black dark:bg-white flex items-center justify-center">
+            <Wand2 className="w-4 h-4 text-white dark:text-black" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-full min-h-[160px] sm:min-h-[200px] flex items-center justify-center">
       {/* Background layer */}
@@ -62,41 +93,27 @@ function BackgroundRemovalAnim() {
         transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
       />
       {/* Foreground - the subject */}
-      <motion.div
-        className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-xl sm:rounded-2xl bg-black dark:bg-white flex items-center justify-center z-10"
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
+      <div className="relative w-16 h-16 sm:w-24 sm:h-24 rounded-xl sm:rounded-2xl bg-black dark:bg-white flex items-center justify-center z-10">
         <Image className="w-7 h-7 sm:w-10 sm:h-10 text-white dark:text-black" />
-      </motion.div>
-      {/* Wand */}
-      <motion.div
-        className="absolute bottom-4 right-4 sm:bottom-2 sm:right-2 z-20"
-        animate={{ rotate: [0, 15, -15, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
+      </div>
+      {/* Wand - static */}
+      <div className="absolute bottom-4 right-4 sm:bottom-2 sm:right-2 z-20">
         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black dark:bg-white flex items-center justify-center">
           <Wand2 className="w-4 h-4 sm:w-5 sm:h-5 text-white dark:text-black" />
         </div>
-      </motion.div>
-      {/* Sparkles */}
-      {sparklePositions.map((pos, i) => (
-        <motion.div
-          key={i}
-          className="absolute"
-          style={pos}
-          animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-        >
+      </div>
+      {/* Static sparkles */}
+      {sparklePositions.slice(0, 3).map((pos, i) => (
+        <div key={i} className="absolute opacity-50" style={pos}>
           <Sparkles className="w-4 h-4 text-zinc-400" />
-        </motion.div>
+        </div>
       ))}
     </div>
   )
 }
 
 // Animation: Smart Enhancement - Color bars rising
-function EnhancementAnim() {
+function EnhancementAnim({ isMobile }: { isMobile: boolean }) {
   const bars = [
     { height: '40%', delay: 0, color: 'bg-red-400' },
     { height: '60%', delay: 0.1, color: 'bg-orange-400' },
@@ -105,6 +122,20 @@ function EnhancementAnim() {
     { height: '50%', delay: 0.4, color: 'bg-blue-400' },
     { height: '65%', delay: 0.5, color: 'bg-purple-400' },
   ]
+
+  // Static version for mobile
+  if (isMobile) {
+    return (
+      <div className="relative w-full h-full min-h-[160px] flex items-end justify-center gap-1.5 pb-6">
+        {bars.map((bar, i) => (
+          <div key={i} className={cn('w-4 rounded-t-lg', bar.color)} style={{ height: bar.height }} />
+        ))}
+        <div className="absolute top-3 right-3">
+          <Sparkles className="w-4 h-4 text-zinc-400" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-full min-h-[160px] sm:min-h-[200px] flex items-end justify-center gap-1.5 sm:gap-2 pb-6 sm:pb-8">
@@ -117,30 +148,37 @@ function EnhancementAnim() {
           transition={{ duration: 2, repeat: Infinity, delay: bar.delay, ease: 'easeInOut' }}
         />
       ))}
-      {/* Sparkle overlay */}
-      <motion.div
-        className="absolute top-3 right-3 sm:top-4 sm:right-4"
-        animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-        transition={{ duration: 3, repeat: Infinity }}
-      >
+      {/* Static sparkle */}
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
         <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-zinc-400" />
-      </motion.div>
+      </div>
     </div>
   )
 }
 
 // Animation: Shadow Detection - Sun casting shadow
-function ShadowAnim() {
+function ShadowAnim({ isMobile }: { isMobile: boolean }) {
+  // Static version for mobile
+  if (isMobile) {
+    return (
+      <div className="relative w-full h-full min-h-[160px] flex items-center justify-center">
+        <div className="absolute top-3 right-3">
+          <SunMedium className="w-8 h-8 text-yellow-400" />
+        </div>
+        <div className="relative">
+          <div className="w-16 h-20 rounded-lg bg-black dark:bg-white" />
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-zinc-400 dark:bg-zinc-600 rounded-full blur-sm opacity-50" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-full min-h-[160px] sm:min-h-[200px] flex items-center justify-center">
-      {/* Sun */}
-      <motion.div
-        className="absolute top-3 right-3 sm:top-4 sm:right-4"
-        animate={{ scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
+      {/* Sun - static */}
+      <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
         <SunMedium className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-400" />
-      </motion.div>
+      </div>
 
       {/* Object */}
       <div className="relative">
@@ -152,24 +190,18 @@ function ShadowAnim() {
         {/* Shadow */}
         <motion.div
           className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-zinc-400 dark:bg-zinc-600 rounded-full blur-sm"
-          animate={{
-            scaleX: [1, 1.3, 1],
-            opacity: [0.5, 0.3, 0.5],
-            x: ['-50%', '-40%', '-50%']
-          }}
+          animate={{ scaleX: [1, 1.3, 1], opacity: [0.5, 0.3, 0.5] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
       </div>
 
-      {/* Light rays - hidden on mobile */}
+      {/* Light rays - static, hidden on mobile */}
       <div className="hidden sm:block">
-        {[...Array(3)].map((_, i) => (
-          <motion.div
+        {[0, 1, 2].map((i) => (
+          <div
             key={i}
-            className="absolute top-8 right-12 w-24 h-0.5 bg-gradient-to-l from-yellow-400/50 to-transparent origin-right"
-            style={{ rotate: 30 + i * 15 }}
-            animate={{ scaleX: [0, 1, 0], opacity: [0, 0.5, 0] }}
-            transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+            className="absolute top-8 right-12 w-24 h-0.5 bg-gradient-to-l from-yellow-400/30 to-transparent origin-right"
+            style={{ transform: `rotate(${30 + i * 15}deg)` }}
           />
         ))}
       </div>
@@ -178,7 +210,37 @@ function ShadowAnim() {
 }
 
 // Animation: Batch Processing - Multiple cards processing
-function BatchAnim() {
+function BatchAnim({ isMobile }: { isMobile: boolean }) {
+  // Static version for mobile
+  if (isMobile) {
+    return (
+      <div className="relative w-full h-full min-h-[160px] flex items-center justify-center">
+        {/* Static stack of cards */}
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="absolute w-16 h-11 rounded-md bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 flex items-center justify-center"
+            style={{
+              left: `calc(50% - 32px + ${i * 6}px)`,
+              top: `calc(50% - 22px + ${i * 5}px)`,
+              zIndex: 4 - i,
+            }}
+          >
+            <Image className="w-5 h-5 text-zinc-500" />
+          </div>
+        ))}
+        {/* Static checkmarks */}
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-1">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+              <CheckCircle className="w-3 h-3 text-white" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-full min-h-[160px] sm:min-h-[200px] flex items-center justify-center">
       {/* Stack of cards */}
@@ -201,40 +263,52 @@ function BatchAnim() {
         </motion.div>
       ))}
 
-      {/* Processing indicator */}
-      <motion.div
-        className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-      >
-        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-zinc-300 dark:border-zinc-700 border-t-black dark:border-t-white" />
-      </motion.div>
-
-      {/* Checkmarks appearing */}
-      <motion.div
-        className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 flex flex-col gap-1"
-      >
+      {/* Static checkmarks */}
+      <div className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 flex flex-col gap-1">
         {[0, 1, 2].map((i) => (
-          <motion.div
-            key={i}
-            className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-green-500 flex items-center justify-center"
-            animate={{ scale: [0, 1, 1], opacity: [0, 1, 1] }}
-            transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2.5, delay: i * 0.3 }}
-          >
+          <div key={i} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-green-500 flex items-center justify-center">
             <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
-          </motion.div>
+          </div>
         ))}
-      </motion.div>
+      </div>
     </div>
   )
 }
 
 // Animation: Premium Templates - Grid shuffle
-function TemplatesAnim() {
+function TemplatesAnim({ isMobile }: { isMobile: boolean }) {
+  // Static version for mobile
+  if (isMobile) {
+    return (
+      <div className="relative w-full h-full min-h-[160px] flex items-center justify-center">
+        <div className="grid grid-cols-3 gap-1.5">
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div
+              key={i}
+              className={cn(
+                'w-8 h-8 rounded-md border border-zinc-300 dark:border-zinc-700',
+                i === 4 ? 'bg-black dark:bg-white' : 'bg-zinc-200 dark:bg-zinc-800'
+              )}
+            >
+              {i === 4 && (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Grid3X3 className="w-4 h-4 text-white dark:text-black" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-black dark:bg-white text-white dark:text-black text-[10px] font-bold">
+          50+
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-full min-h-[160px] sm:min-h-[200px] flex items-center justify-center">
       <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-        {[...Array(9)].map((_, i) => (
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <motion.div
             key={i}
             className={cn(
@@ -243,7 +317,6 @@ function TemplatesAnim() {
             )}
             animate={{
               scale: [1, i === 4 ? 1.1 : 0.95, 1],
-              rotate: [0, i % 2 === 0 ? 5 : -5, 0],
             }}
             transition={{ duration: 2, repeat: Infinity, delay: i * 0.1 }}
           >
@@ -255,20 +328,35 @@ function TemplatesAnim() {
           </motion.div>
         ))}
       </div>
-      {/* "50+" badge */}
-      <motion.div
-        className="absolute top-2 right-2 sm:top-4 sm:right-4 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-black dark:bg-white text-white dark:text-black text-[10px] sm:text-xs font-bold"
-        animate={{ scale: [1, 1.1, 1] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
-      >
+      {/* "50+" badge - static */}
+      <div className="absolute top-2 right-2 sm:top-4 sm:right-4 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full bg-black dark:bg-white text-white dark:text-black text-[10px] sm:text-xs font-bold">
         50+
-      </motion.div>
+      </div>
     </div>
   )
 }
 
 // Animation: No Watermark - Clean export
-function NoWatermarkAnim() {
+function NoWatermarkAnim({ isMobile }: { isMobile: boolean }) {
+  // Static version for mobile
+  if (isMobile) {
+    return (
+      <div className="relative w-full h-full min-h-[160px] flex items-center justify-center">
+        <div className="relative w-20 h-28 rounded-lg bg-black dark:bg-white overflow-hidden">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Image className="w-8 h-8 text-white dark:text-black" />
+          </div>
+          <div className="absolute bottom-1.5 right-1.5 w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
+            <BadgeCheck className="w-4 h-4 text-white" />
+          </div>
+        </div>
+        <div className="absolute top-6 left-6 px-1.5 py-0.5 rounded bg-red-500/20 border border-red-500/50">
+          <span className="text-[10px] text-red-500 line-through">Watermark</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-full min-h-[160px] sm:min-h-[200px] flex items-center justify-center">
       {/* Image card */}
@@ -280,33 +368,21 @@ function NoWatermarkAnim() {
         <div className="absolute inset-0 flex items-center justify-center">
           <Image className="w-8 h-8 sm:w-12 sm:h-12 text-white dark:text-black" />
         </div>
-        {/* Clean badge */}
-        <motion.div
-          className="absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-green-500 flex items-center justify-center"
-          animate={{ scale: [0, 1.2, 1] }}
-          transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-        >
+        {/* Clean badge - static */}
+        <div className="absolute bottom-1.5 right-1.5 sm:bottom-2 sm:right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-green-500 flex items-center justify-center">
           <BadgeCheck className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-        </motion.div>
+        </div>
       </motion.div>
 
-      {/* Crossed out watermark text */}
-      <motion.div
-        className="absolute top-6 left-6 sm:top-4 sm:left-4 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-red-500/20 border border-red-500/50"
-        animate={{ opacity: [1, 0.5, 1], scale: [1, 0.95, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
+      {/* Crossed out watermark text - static */}
+      <div className="absolute top-6 left-6 sm:top-4 sm:left-4 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded bg-red-500/20 border border-red-500/50">
         <span className="text-[10px] sm:text-xs text-red-500 line-through">Watermark</span>
-      </motion.div>
+      </div>
 
-      {/* Sparkle */}
-      <motion.div
-        className="absolute top-6 right-6 sm:top-8 sm:right-8"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-      >
+      {/* Sparkle - static */}
+      <div className="absolute top-6 right-6 sm:top-8 sm:right-8">
         <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400" />
-      </motion.div>
+      </div>
     </div>
   )
 }
@@ -360,15 +436,74 @@ function FeatureCard({
   feature,
   index,
   isLarge = false,
-  isWide = false
+  isWide = false,
+  isMobile = false
 }: {
   feature: Feature
   index: number
   isLarge?: boolean
   isWide?: boolean
+  isMobile?: boolean
 }) {
   const Icon = feature.icon
   const Animation = feature.animation
+
+  // Simplified card for mobile - no motion animations
+  if (isMobile) {
+    return (
+      <div
+        className={cn(
+          'group relative rounded-2xl overflow-hidden h-full',
+          'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800'
+        )}
+      >
+        <div className={cn(
+          'relative h-full flex',
+          isLarge ? 'flex-col' : isWide ? 'flex-col' : 'flex-col'
+        )}>
+          {/* Animation area */}
+          <div className={cn(
+            'relative',
+            isLarge ? 'h-48' : isWide ? 'h-40' : 'h-40'
+          )}>
+            <Animation isMobile={true} />
+          </div>
+
+          {/* Content area */}
+          <div className="p-4 flex flex-col justify-center">
+            {/* Icon */}
+            <div
+              className={cn(
+                'rounded-xl bg-black dark:bg-white flex items-center justify-center mb-3',
+                isLarge ? 'w-11 h-11' : 'w-10 h-10'
+              )}
+            >
+              <Icon className={cn(
+                'text-white dark:text-black',
+                isLarge ? 'w-5 h-5' : 'w-5 h-5'
+              )} />
+            </div>
+
+            {/* Title */}
+            <h3 className={cn(
+              'font-bold text-black dark:text-white mb-1',
+              isLarge ? 'text-xl' : 'text-base'
+            )}>
+              {feature.title}
+            </h3>
+
+            {/* Description */}
+            <p className={cn(
+              'text-zinc-600 dark:text-zinc-400 leading-relaxed',
+              isLarge ? 'text-sm' : 'text-xs'
+            )}>
+              {feature.description}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -381,7 +516,6 @@ function FeatureCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      whileHover={{ y: -8 }}
     >
       {/* Gradient background */}
       <div className={cn(
@@ -398,7 +532,7 @@ function FeatureCard({
           'relative',
           isLarge ? 'h-48 sm:h-64 lg:h-72' : isWide ? 'h-40 sm:h-auto sm:w-1/2' : 'h-40 sm:h-48'
         )}>
-          <Animation />
+          <Animation isMobile={false} />
         </div>
 
         {/* Content area */}
@@ -406,20 +540,18 @@ function FeatureCard({
           'p-4 sm:p-6 flex flex-col justify-center',
           isLarge ? 'lg:p-8' : isWide ? 'sm:w-1/2' : ''
         )}>
-          {/* Icon */}
-          <motion.div
+          {/* Icon - static, no hover animation */}
+          <div
             className={cn(
               'rounded-xl sm:rounded-2xl bg-black dark:bg-white flex items-center justify-center mb-3 sm:mb-4',
               isLarge ? 'w-11 h-11 sm:w-14 sm:h-14' : 'w-10 h-10 sm:w-12 sm:h-12'
             )}
-            whileHover={{ scale: 1.1, rotate: 5 }}
-            transition={{ duration: 0.2 }}
           >
             <Icon className={cn(
               'text-white dark:text-black',
               isLarge ? 'w-5 h-5 sm:w-7 sm:h-7' : 'w-5 h-5 sm:w-6 sm:h-6'
             )} />
-          </motion.div>
+          </div>
 
           {/* Title */}
           <h3 className={cn(
@@ -437,16 +569,15 @@ function FeatureCard({
             {feature.description}
           </p>
 
-          {/* Learn more link for large card */}
+          {/* Learn more link for large card - static */}
           {isLarge && (
-            <motion.a
+            <a
               href="#"
               className="inline-flex items-center gap-2 mt-3 sm:mt-4 text-black dark:text-white font-semibold text-sm sm:text-base"
-              whileHover={{ x: 5 }}
             >
               Learn more
               <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </motion.a>
+            </a>
           )}
         </div>
       </div>
@@ -456,6 +587,8 @@ function FeatureCard({
 }
 
 export function FeaturesSection() {
+  const isMobile = useIsMobile();
+
   return (
     <Section id="features" className="relative overflow-hidden">
       {/* Background - simplified, no rotation animations */}
@@ -497,23 +630,23 @@ export function FeaturesSection() {
 
         {/* Large Featured Card - AI Background Removal */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-          <FeatureCard feature={features[0]} index={0} isLarge />
+          <FeatureCard feature={features[0]} index={0} isLarge isMobile={isMobile} />
 
           {/* Right side: 2 cards stacked + 1 wide card - on mobile this becomes a single column */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-            <FeatureCard feature={features[1]} index={1} />
-            <FeatureCard feature={features[2]} index={2} />
+            <FeatureCard feature={features[1]} index={1} isMobile={isMobile} />
+            <FeatureCard feature={features[2]} index={2} isMobile={isMobile} />
             {/* Wide card - full width on mobile, spans 2 cols on sm+ */}
             <div className="sm:col-span-2">
-              <FeatureCard feature={features[3]} index={3} isWide />
+              <FeatureCard feature={features[3]} index={3} isWide isMobile={isMobile} />
             </div>
           </div>
         </div>
 
         {/* Bottom Row: 2 cards - stacks on mobile */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-          <FeatureCard feature={features[4]} index={4} />
-          <FeatureCard feature={features[5]} index={5} />
+          <FeatureCard feature={features[4]} index={4} isMobile={isMobile} />
+          <FeatureCard feature={features[5]} index={5} isMobile={isMobile} />
         </div>
       </div>
 

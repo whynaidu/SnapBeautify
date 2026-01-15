@@ -614,7 +614,7 @@ export function Canvas() {
                         className="rounded-2xl shadow-2xl shadow-black/20 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/5"
                     />
 
-                    {/* Premium Watermark Overlay */}
+                    {/* Premium Watermark Overlay - CSS-based pattern (no DOM elements) */}
                     {showWatermark && (
                         <div
                             className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl"
@@ -625,32 +625,14 @@ export function Canvas() {
                                 transformOrigin: 'top left',
                             }}
                         >
-                            {/* Diagonal watermark pattern */}
+                            {/* CSS-based repeating watermark pattern using SVG data URI */}
                             <div
                                 className="absolute inset-0"
                                 style={{
-                                    background: 'repeating-linear-gradient(45deg, transparent, transparent 80px, rgba(0, 0, 0, 0.08) 80px, rgba(0, 0, 0, 0.08) 160px)',
+                                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='100'%3E%3Ctext x='50%25' y='50%25' font-family='system-ui, sans-serif' font-size='14' font-weight='bold' fill='%23000' fill-opacity='0.15' text-anchor='middle' dominant-baseline='middle' transform='rotate(-30, 100, 50)'%3ESNAPBEAUTIFY PRO%3C/text%3E%3C/svg%3E")`,
+                                    backgroundRepeat: 'repeat',
                                 }}
                             />
-
-                            {/* Repeating watermark text */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div
-                                    className="absolute w-[200%] h-[200%] flex flex-wrap items-center justify-center gap-16"
-                                    style={{
-                                        transform: 'rotate(-30deg)',
-                                    }}
-                                >
-                                    {Array.from({ length: 25 }).map((_, i) => (
-                                        <div
-                                            key={i}
-                                            className="text-2xl font-bold text-zinc-900/20 dark:text-white/20 whitespace-nowrap select-none"
-                                        >
-                                            SNAPBEAUTIFY PRO
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
 
                             {/* Premium features badge at bottom */}
                             <div className="absolute bottom-4 left-4 right-4 flex justify-center">
