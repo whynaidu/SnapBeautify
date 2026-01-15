@@ -82,23 +82,37 @@ export function Header() {
     const targetId = href.replace('#', '')
     const targetElement = document.getElementById(targetId)
 
-    if (targetElement) {
-      const headerOffset = 80 // Account for fixed header
-      const elementPosition = targetElement.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.scrollY - headerOffset
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      })
-
-      // Update active section immediately for better UX
-      setActiveSection(targetId)
+    // Close mobile menu first if open
+    const wasMenuOpen = isMobileMenuOpen
+    if (wasMenuOpen) {
+      setIsMobileMenuOpen(false)
     }
 
-    // Close mobile menu if open
-    setIsMobileMenuOpen(false)
-  }, [])
+    // Scroll function
+    const scrollToTarget = () => {
+      if (targetElement) {
+        const headerOffset = 80 // Account for fixed header
+        const elementPosition = targetElement.getBoundingClientRect().top
+        const offsetPosition = elementPosition + window.scrollY - headerOffset
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        })
+
+        // Update active section immediately for better UX
+        setActiveSection(targetId)
+      }
+    }
+
+    // If mobile menu was open, wait for it to close before scrolling
+    // This prevents layout shift issues during scroll calculation
+    if (wasMenuOpen) {
+      setTimeout(scrollToTarget, 100)
+    } else {
+      scrollToTarget()
+    }
+  }, [isMobileMenuOpen])
 
   return (
     <header
