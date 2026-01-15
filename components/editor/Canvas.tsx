@@ -14,12 +14,15 @@ import { checkPremiumFeaturesUsed } from '@/lib/subscription/feature-gates';
 export function Canvas() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const dragPreviewRef = useRef<HTMLDivElement>(null);
     const [displayScale, setDisplayScale] = useState(1);
     const [isDragging, setIsDragging] = useState(false);
     const [draggedTextId, setDraggedTextId] = useState<string | null>(null);
     const [alignmentGuides, setAlignmentGuides] = useState({ showCenterX: false, showCenterY: false });
     const rafIdRef = useRef<number | null>(null);
     const pendingUpdateRef = useRef<{ x: number; y: number } | null>(null);
+    // Track final drag position for commit on drag end (avoids store updates during drag)
+    const finalDragPositionRef = useRef<{ x: number; y: number } | null>(null);
 
     // Get subscription status
     const { isPro } = useSubscription();
@@ -400,7 +403,7 @@ export function Canvas() {
         return { x: snappedX, y: snappedY };
     }, []);
 
-    // RAF-based batched update for smooth text dragging on mobile
+    // Immediate visual update for smooth text dragging - uses HTML overlay instead of store updates
     const batchedUpdateTextPosition = useCallback((x: number, y: number, textId: string) => {
         // Store the pending update
         pendingUpdateRef.current = { x, y };
@@ -410,17 +413,24 @@ export function Canvas() {
             return; // Already scheduled, will use latest position
         }
 
-        // Schedule update for next frame
+        // Schedule update for next frame - update HTML overlay directly (no store update = no re-renders)
         rafIdRef.current = requestAnimationFrame(() => {
             const pending = pendingUpdateRef.current;
-            if (pending && textId) {
+            if (pending && textId && dragPreviewRef.current) {
                 const snapped = snapToCenter(pending.x, pending.y);
-                updateTextOverlay(textId, { x: snapped.x, y: snapped.y });
+                // Store final position for commit on drag end
+                finalDragPositionRef.current = { x: snapped.x, y: snapped.y };
+
+                // Update HTML overlay position immediately (transform is GPU-accelerated)
+                // Use canvasWidth/Height * displayScale for correct pixel positioning
+                const previewX = (snapped.x / 100) * canvasWidth * displayScale;
+                const previewY = (snapped.y / 100) * canvasHeight * displayScale;
+                dragPreviewRef.current.style.transform = `translate(${previewX}px, ${previewY}px) translate(-50%, -50%)`;
             }
             rafIdRef.current = null;
             pendingUpdateRef.current = null;
         });
-    }, [snapToCenter, updateTextOverlay]);
+    }, [snapToCenter, canvasWidth, canvasHeight, displayScale]);
 
     // Cleanup RAF on unmount
     useEffect(() => {
@@ -495,6 +505,14 @@ export function Canvas() {
     }, [isDragging, draggedTextId, batchedUpdateTextPosition, textHitboxes]);
 
     const handleCanvasMouseUp = useCallback(() => {
+        // Commit final position to store on drag end (only update that triggers re-render)
+        if (draggedTextId && finalDragPositionRef.current) {
+            updateTextOverlay(draggedTextId, {
+                x: finalDragPositionRef.current.x,
+                y: finalDragPositionRef.current.y
+            });
+            finalDragPositionRef.current = null;
+        }
         setIsDragging(false);
         setDraggedTextId(null);
         setAlignmentGuides({ showCenterX: false, showCenterY: false });
@@ -502,16 +520,24 @@ export function Canvas() {
         requestAnimationFrame(() => {
             throttledRender();
         });
-    }, [throttledRender]);
+    }, [throttledRender, draggedTextId, updateTextOverlay]);
 
     const handleCanvasMouseLeave = useCallback(() => {
         if (canvasRef.current) {
             canvasRef.current.style.cursor = 'default';
         }
+        // Commit final position if dragging was in progress
+        if (draggedTextId && finalDragPositionRef.current) {
+            updateTextOverlay(draggedTextId, {
+                x: finalDragPositionRef.current.x,
+                y: finalDragPositionRef.current.y
+            });
+            finalDragPositionRef.current = null;
+        }
         setIsDragging(false);
         setDraggedTextId(null);
         setAlignmentGuides({ showCenterX: false, showCenterY: false });
-    }, []);
+    }, [draggedTextId, updateTextOverlay]);
 
     // Touch event handlers for mobile - uses cached hitboxes for performance
     const handleCanvasTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
@@ -563,6 +589,14 @@ export function Canvas() {
     }, [isDragging, draggedTextId, batchedUpdateTextPosition]);
 
     const handleCanvasTouchEnd = useCallback(() => {
+        // Commit final position to store on drag end (only update that triggers re-render)
+        if (draggedTextId && finalDragPositionRef.current) {
+            updateTextOverlay(draggedTextId, {
+                x: finalDragPositionRef.current.x,
+                y: finalDragPositionRef.current.y
+            });
+            finalDragPositionRef.current = null;
+        }
         setIsDragging(false);
         setDraggedTextId(null);
         setAlignmentGuides({ showCenterX: false, showCenterY: false });
@@ -570,7 +604,7 @@ export function Canvas() {
         requestAnimationFrame(() => {
             throttledRender();
         });
-    }, [throttledRender]);
+    }, [throttledRender, draggedTextId, updateTextOverlay]);
 
     return (
         <div
@@ -673,6 +707,32 @@ export function Canvas() {
                             }}
                         />
                     )}
+                    {/* Drag Preview Overlay - immediate visual feedback during text dragging */}
+                    {isDragging && draggedTextId && (() => {
+                        const draggedText = textOverlays.find(t => t.id === draggedTextId);
+                        if (!draggedText) return null;
+                        return (
+                            <div
+                                ref={dragPreviewRef}
+                                className="absolute pointer-events-none z-20 will-change-transform"
+                                style={{
+                                    top: 0,
+                                    left: 0,
+                                    // Initial position from store, will be updated via ref during drag
+                                    transform: `translate(${(draggedText.x / 100) * canvasWidth * displayScale}px, ${(draggedText.y / 100) * canvasHeight * displayScale}px) translate(-50%, -50%)`,
+                                    fontFamily: draggedText.fontFamily || 'Inter, sans-serif',
+                                    fontSize: `${(draggedText.fontSize || 24) * displayScale}px`,
+                                    fontWeight: draggedText.fontWeight || 400,
+                                    color: draggedText.color || '#000000',
+                                    opacity: 0.9,
+                                    textShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                    whiteSpace: 'nowrap',
+                                }}
+                            >
+                                {draggedText.text}
+                            </div>
+                        );
+                    })()}
                     {isCropping && originalImage && (
                         <CropOverlay
                             canvasWidth={originalImage.width}
