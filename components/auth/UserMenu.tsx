@@ -172,7 +172,7 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative flex items-center gap-1.5 sm:gap-2 h-9 pl-0.5 pr-1.5 sm:pr-3 rounded-full border border-zinc-700 bg-transparent hover:bg-zinc-800 transition-colors">
+        <button className="relative flex items-center gap-1.5 sm:gap-2 h-8.5 pl-0.5 pr-0.5 sm:pr-3 rounded-full border border-zinc-700 bg-transparent hover:bg-zinc-800 transition-colors">
           <UserAvatar src={avatarUrl} name={displayName} size="sm" />
           <span className="max-w-[100px] truncate text-sm hidden sm:inline">
             {displayName}
