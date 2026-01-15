@@ -52,11 +52,11 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
         settings: {
             backgroundType: 'solid',
             backgroundColor: '#18181b',
-            padding: 150,         // Premium setting
-            shadowBlur: 35,       // Premium setting
-            shadowOpacity: 40,    // Premium setting
-            borderRadius: 20,     // Premium setting
-            imageScale: 0.72,     // Within range
+            padding: 96,          // Free tier preset
+            shadowBlur: 20,       // Free tier default
+            shadowOpacity: 50,    // Free tier default
+            borderRadius: 24,     // Free tier preset
+            imageScale: 0.72,     // Within free range
         },
     },
     {
@@ -116,6 +116,82 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             imageScale: 0.73,     // Within range
         },
     },
+    {
+        id: 'minimal-sage',
+        name: 'Sage',
+        description: 'Soft sage green background',
+        category: 'minimal',
+        preview: {
+            backgroundType: 'solid',
+            backgroundColor: '#94a3b8',
+        },
+        settings: {
+            backgroundType: 'solid',
+            backgroundColor: '#94a3b8',
+            padding: 140,
+            shadowBlur: 22,
+            shadowOpacity: 28,
+            borderRadius: 14,
+            imageScale: 0.74,
+        },
+    },
+    {
+        id: 'minimal-blush',
+        name: 'Blush',
+        description: 'Soft pink blush background',
+        category: 'minimal',
+        preview: {
+            backgroundType: 'solid',
+            backgroundColor: '#fce7f3',
+        },
+        settings: {
+            backgroundType: 'solid',
+            backgroundColor: '#fce7f3',
+            padding: 135,
+            shadowBlur: 20,
+            shadowOpacity: 25,
+            borderRadius: 12,
+            imageScale: 0.75,
+        },
+    },
+    {
+        id: 'minimal-midnight',
+        name: 'Midnight',
+        description: 'Deep midnight blue background',
+        category: 'minimal',
+        preview: {
+            backgroundType: 'solid',
+            backgroundColor: '#020617',
+        },
+        settings: {
+            backgroundType: 'solid',
+            backgroundColor: '#020617',
+            padding: 160,
+            shadowBlur: 35,
+            shadowOpacity: 50,
+            borderRadius: 18,
+            imageScale: 0.7,
+        },
+    },
+    {
+        id: 'minimal-sand',
+        name: 'Sand',
+        description: 'Warm sand background',
+        category: 'minimal',
+        preview: {
+            backgroundType: 'solid',
+            backgroundColor: '#fef3c7',
+        },
+        settings: {
+            backgroundType: 'solid',
+            backgroundColor: '#fef3c7',
+            padding: 138,
+            shadowBlur: 22,
+            shadowOpacity: 26,
+            borderRadius: 14,
+            imageScale: 0.74,
+        },
+    },
 
     // ===== VIBRANT GRADIENTS =====
     {
@@ -159,6 +235,27 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             shadowOpacity: 50,    // Free tier default
             borderRadius: 24,     // Free tier preset
             imageScale: 0.8,      // Within free range (50-150%)
+        },
+    },
+    {
+        id: 'vibrant-mint',
+        name: 'Mint Fresh',
+        description: 'Teal to green gradient',
+        category: 'vibrant',
+        preview: {
+            backgroundType: 'gradient',
+            gradientColors: ['#14b8a6', '#22c55e'],
+            gradientAngle: 135,
+        },
+        settings: {
+            backgroundType: 'gradient',
+            gradientColors: ['#14b8a6', '#22c55e'],
+            gradientAngle: 135,
+            padding: 64,          // Free tier preset
+            shadowBlur: 20,       // Free tier default
+            shadowOpacity: 50,    // Free tier default
+            borderRadius: 12,     // Free tier preset
+            imageScale: 0.75,     // Within free range
         },
     },
     {
@@ -212,27 +309,6 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             shadowOpacity: 35,
             borderRadius: 18,
             imageScale: 0.72,
-        },
-    },
-    {
-        id: 'vibrant-mint',
-        name: 'Mint Fresh',
-        description: 'Teal to green gradient',
-        category: 'vibrant',
-        preview: {
-            backgroundType: 'gradient',
-            gradientColors: ['#14b8a6', '#22c55e'],
-            gradientAngle: 135,
-        },
-        settings: {
-            backgroundType: 'gradient',
-            gradientColors: ['#14b8a6', '#22c55e'],
-            gradientAngle: 135,
-            padding: 155,
-            shadowBlur: 25,
-            shadowOpacity: 30,
-            borderRadius: 16,
-            imageScale: 0.74,
         },
     },
     {
@@ -309,6 +385,90 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             imageScale: 0.74,
         },
     },
+    {
+        id: 'vibrant-aurora',
+        name: 'Aurora',
+        description: 'Teal to purple aurora gradient',
+        category: 'vibrant',
+        preview: {
+            backgroundType: 'gradient',
+            gradientColors: ['#06b6d4', '#a855f7'],
+            gradientAngle: 135,
+        },
+        settings: {
+            backgroundType: 'gradient',
+            gradientColors: ['#06b6d4', '#a855f7'],
+            gradientAngle: 135,
+            padding: 165,
+            shadowBlur: 30,
+            shadowOpacity: 38,
+            borderRadius: 20,
+            imageScale: 0.72,
+        },
+    },
+    {
+        id: 'vibrant-raspberry',
+        name: 'Raspberry',
+        description: 'Pink to red raspberry gradient',
+        category: 'vibrant',
+        preview: {
+            backgroundType: 'gradient',
+            gradientColors: ['#ec4899', '#dc2626'],
+            gradientAngle: 135,
+        },
+        settings: {
+            backgroundType: 'gradient',
+            gradientColors: ['#ec4899', '#dc2626'],
+            gradientAngle: 135,
+            padding: 160,
+            shadowBlur: 28,
+            shadowOpacity: 35,
+            borderRadius: 18,
+            imageScale: 0.73,
+        },
+    },
+    {
+        id: 'vibrant-tropical',
+        name: 'Tropical',
+        description: 'Green to yellow tropical gradient',
+        category: 'vibrant',
+        preview: {
+            backgroundType: 'gradient',
+            gradientColors: ['#22c55e', '#facc15'],
+            gradientAngle: 135,
+        },
+        settings: {
+            backgroundType: 'gradient',
+            gradientColors: ['#22c55e', '#facc15'],
+            gradientAngle: 135,
+            padding: 158,
+            shadowBlur: 26,
+            shadowOpacity: 32,
+            borderRadius: 18,
+            imageScale: 0.73,
+        },
+    },
+    {
+        id: 'vibrant-lavender',
+        name: 'Lavender',
+        description: 'Soft lavender purple gradient',
+        category: 'vibrant',
+        preview: {
+            backgroundType: 'gradient',
+            gradientColors: ['#c084fc', '#f0abfc'],
+            gradientAngle: 135,
+        },
+        settings: {
+            backgroundType: 'gradient',
+            gradientColors: ['#c084fc', '#f0abfc'],
+            gradientAngle: 135,
+            padding: 155,
+            shadowBlur: 24,
+            shadowOpacity: 30,
+            borderRadius: 16,
+            imageScale: 0.74,
+        },
+    },
 
     // ===== PROFESSIONAL =====
     {
@@ -357,10 +517,10 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             backgroundType: 'gradient',
             gradientColors: ['#3b82f6', '#1d4ed8'],
             gradientAngle: 180,
-            padding: 140,
-            shadowBlur: 15,
-            shadowOpacity: 20,
-            borderRadius: 8,
+            padding: 140,         // Premium setting
+            shadowBlur: 15,       // Premium setting
+            shadowOpacity: 20,    // Premium setting
+            borderRadius: 8,      // Premium setting
             imageScale: 0.75,
         },
     },
@@ -378,10 +538,10 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             backgroundType: 'gradient',
             gradientColors: ['#334155', '#1e293b'],
             gradientAngle: 180,
-            padding: 145,
-            shadowBlur: 22,
-            shadowOpacity: 35,
-            borderRadius: 10,
+            padding: 145,         // Premium setting
+            shadowBlur: 22,       // Premium setting
+            shadowOpacity: 35,    // Premium setting
+            borderRadius: 10,     // Premium setting
             imageScale: 0.74,
         },
     },
@@ -399,9 +559,9 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             backgroundType: 'gradient',
             gradientColors: ['#059669', '#047857'],
             gradientAngle: 135,
-            padding: 150,
-            shadowBlur: 20,
-            shadowOpacity: 28,
+            padding: 150,         // Premium setting
+            shadowBlur: 20,       // Premium setting
+            shadowOpacity: 28,    // Premium setting
             borderRadius: 12,
             imageScale: 0.73,
             textOverlays: [
@@ -491,6 +651,80 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             imageScale: 0.74,
         },
     },
+    {
+        id: 'professional-teal',
+        name: 'Teal',
+        description: 'Professional teal gradient',
+        category: 'professional',
+        preview: {
+            backgroundType: 'gradient',
+            gradientColors: ['#0d9488', '#0f766e'],
+            gradientAngle: 135,
+        },
+        settings: {
+            backgroundType: 'gradient',
+            gradientColors: ['#0d9488', '#0f766e'],
+            gradientAngle: 135,
+            padding: 148,
+            shadowBlur: 22,
+            shadowOpacity: 28,
+            borderRadius: 14,
+            imageScale: 0.74,
+        },
+    },
+    {
+        id: 'professional-graphite',
+        name: 'Graphite',
+        description: 'Dark graphite professional gradient',
+        category: 'professional',
+        preview: {
+            backgroundType: 'gradient',
+            gradientColors: ['#374151', '#1f2937'],
+            gradientAngle: 180,
+        },
+        settings: {
+            backgroundType: 'gradient',
+            gradientColors: ['#374151', '#1f2937'],
+            gradientAngle: 180,
+            padding: 150,
+            shadowBlur: 24,
+            shadowOpacity: 35,
+            borderRadius: 12,
+            imageScale: 0.73,
+        },
+    },
+    {
+        id: 'professional-sky',
+        name: 'Sky',
+        description: 'Light sky blue professional gradient',
+        category: 'professional',
+        preview: {
+            backgroundType: 'gradient',
+            gradientColors: ['#0284c7', '#0369a1'],
+            gradientAngle: 135,
+        },
+        settings: {
+            backgroundType: 'gradient',
+            gradientColors: ['#0284c7', '#0369a1'],
+            gradientAngle: 135,
+            padding: 145,
+            shadowBlur: 20,
+            shadowOpacity: 25,
+            borderRadius: 10,
+            imageScale: 0.75,
+            textOverlays: [
+                {
+                    text: 'BUSINESS',
+                    x: 50,
+                    y: 90,
+                    color: '#ffffff',
+                    fontSize: 66,
+                    fontFamily: 'Inter, sans-serif',
+                    fontWeight: 700,
+                },
+            ],
+        },
+    },
 
     // ===== CREATIVE MESH GRADIENTS =====
     {
@@ -505,9 +739,9 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
         settings: {
             backgroundType: 'mesh',
             meshGradientCSS: 'radial-gradient(at 40% 20%, #4f46e5 0px, transparent 50%), radial-gradient(at 80% 0%, #f472b6 0px, transparent 50%), radial-gradient(at 0% 50%, #0ea5e9 0px, transparent 50%), radial-gradient(at 80% 50%, #22c55e 0px, transparent 50%), radial-gradient(at 0% 100%, #f97316 0px, transparent 50%), radial-gradient(at 80% 100%, #8b5cf6 0px, transparent 50%)',
-            padding: 180,
-            shadowBlur: 35,
-            shadowOpacity: 40,
+            padding: 180,         // Premium setting
+            shadowBlur: 35,       // Premium setting
+            shadowOpacity: 40,    // Premium setting
             borderRadius: 24,
             imageScale: 0.65,
         },
@@ -554,10 +788,10 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
         settings: {
             backgroundType: 'mesh',
             meshGradientCSS: 'radial-gradient(at 0% 0%, #f97316 0px, transparent 50%), radial-gradient(at 100% 0%, #ec4899 0px, transparent 50%), radial-gradient(at 50% 100%, #8b5cf6 0px, transparent 50%)',
-            padding: 165,
-            shadowBlur: 32,
-            shadowOpacity: 38,
-            borderRadius: 20,
+            padding: 165,         // Premium setting
+            shadowBlur: 30,       // Premium setting
+            shadowOpacity: 35,    // Premium setting
+            borderRadius: 18,     // Premium setting
             imageScale: 0.68,
         },
     },
@@ -573,10 +807,10 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
         settings: {
             backgroundType: 'mesh',
             meshGradientCSS: 'radial-gradient(at 0% 50%, #0ea5e9 0px, transparent 50%), radial-gradient(at 100% 50%, #06b6d4 0px, transparent 50%), radial-gradient(at 50% 0%, #3b82f6 0px, transparent 50%), radial-gradient(at 50% 100%, #8b5cf6 0px, transparent 50%)',
-            padding: 175,
-            shadowBlur: 35,
-            shadowOpacity: 42,
-            borderRadius: 22,
+            padding: 160,         // Premium setting
+            shadowBlur: 28,       // Premium setting
+            shadowOpacity: 38,    // Premium setting
+            borderRadius: 20,     // Premium setting
             imageScale: 0.66,
         },
     },
@@ -627,6 +861,74 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             shadowOpacity: 35,
             borderRadius: 18,
             imageScale: 0.7,
+        },
+    },
+    {
+        id: 'creative-cotton-candy',
+        name: 'Cotton Candy',
+        description: 'Soft pink and blue mesh',
+        category: 'creative',
+        preview: {
+            backgroundType: 'mesh',
+            meshGradientCSS: 'radial-gradient(at 0% 0%, #f472b6 0px, transparent 50%), radial-gradient(at 100% 0%, #38bdf8 0px, transparent 50%), radial-gradient(at 50% 100%, #c084fc 0px, transparent 50%)',
+        },
+        settings: {
+            backgroundType: 'mesh',
+            meshGradientCSS: 'radial-gradient(at 0% 0%, #f472b6 0px, transparent 50%), radial-gradient(at 100% 0%, #38bdf8 0px, transparent 50%), radial-gradient(at 50% 100%, #c084fc 0px, transparent 50%)',
+            padding: 165,
+            shadowBlur: 28,
+            shadowOpacity: 32,
+            borderRadius: 20,
+            imageScale: 0.7,
+        },
+    },
+    {
+        id: 'creative-fire-mesh',
+        name: 'Fire Mesh',
+        description: 'Hot fire colors mesh',
+        category: 'creative',
+        preview: {
+            backgroundType: 'mesh',
+            meshGradientCSS: 'radial-gradient(at 20% 20%, #dc2626 0px, transparent 50%), radial-gradient(at 80% 20%, #f97316 0px, transparent 50%), radial-gradient(at 50% 80%, #facc15 0px, transparent 50%)',
+        },
+        settings: {
+            backgroundType: 'mesh',
+            meshGradientCSS: 'radial-gradient(at 20% 20%, #dc2626 0px, transparent 50%), radial-gradient(at 80% 20%, #f97316 0px, transparent 50%), radial-gradient(at 50% 80%, #facc15 0px, transparent 50%)',
+            padding: 170,
+            shadowBlur: 32,
+            shadowOpacity: 38,
+            borderRadius: 22,
+            imageScale: 0.68,
+        },
+    },
+    {
+        id: 'creative-galaxy',
+        name: 'Galaxy',
+        description: 'Deep galaxy purple mesh',
+        category: 'creative',
+        preview: {
+            backgroundType: 'mesh',
+            meshGradientCSS: 'radial-gradient(at 30% 30%, #4c1d95 0px, transparent 50%), radial-gradient(at 70% 20%, #7c3aed 0px, transparent 50%), radial-gradient(at 50% 80%, #2563eb 0px, transparent 50%)',
+        },
+        settings: {
+            backgroundType: 'mesh',
+            meshGradientCSS: 'radial-gradient(at 30% 30%, #4c1d95 0px, transparent 50%), radial-gradient(at 70% 20%, #7c3aed 0px, transparent 50%), radial-gradient(at 50% 80%, #2563eb 0px, transparent 50%)',
+            padding: 175,
+            shadowBlur: 35,
+            shadowOpacity: 42,
+            borderRadius: 24,
+            imageScale: 0.66,
+            textOverlays: [
+                {
+                    text: 'COSMIC',
+                    x: 50,
+                    y: 50,
+                    color: '#ffffff',
+                    fontSize: 84,
+                    fontFamily: 'Anton, sans-serif',
+                    fontWeight: 400,
+                },
+            ],
         },
     },
 
@@ -854,6 +1156,89 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
             ],
         },
     },
+    {
+        id: 'wave-mint',
+        name: 'Wave Mint',
+        description: 'Fresh mint wave',
+        category: 'wave',
+        preview: {
+            backgroundType: 'waveSplit',
+            gradientColors: ['#14b8a6', '#22c55e'],
+            backgroundColor: '#ecfdf5',
+            waveSplitFlipped: false,
+        },
+        settings: {
+            backgroundType: 'waveSplit',
+            gradientColors: ['#14b8a6', '#22c55e'],
+            gradientAngle: 135,
+            backgroundColor: '#ecfdf5',
+            waveSplitFlipped: false,
+            padding: 155,
+            shadowBlur: 24,
+            shadowOpacity: 28,
+            borderRadius: 16,
+            imageScale: 0.73,
+        },
+    },
+    {
+        id: 'wave-peach',
+        name: 'Wave Peach',
+        description: 'Soft peach wave',
+        category: 'wave',
+        preview: {
+            backgroundType: 'waveSplit',
+            gradientColors: ['#f97316', '#fbbf24'],
+            backgroundColor: '#fef3c7',
+            waveSplitFlipped: true,
+        },
+        settings: {
+            backgroundType: 'waveSplit',
+            gradientColors: ['#f97316', '#fbbf24'],
+            gradientAngle: 135,
+            backgroundColor: '#fef3c7',
+            waveSplitFlipped: true,
+            padding: 158,
+            shadowBlur: 24,
+            shadowOpacity: 28,
+            borderRadius: 16,
+            imageScale: 0.73,
+        },
+    },
+    {
+        id: 'wave-indigo',
+        name: 'Wave Indigo',
+        description: 'Deep indigo wave',
+        category: 'wave',
+        preview: {
+            backgroundType: 'waveSplit',
+            gradientColors: ['#4f46e5', '#7c3aed'],
+            backgroundColor: '#eef2ff',
+            waveSplitFlipped: false,
+        },
+        settings: {
+            backgroundType: 'waveSplit',
+            gradientColors: ['#4f46e5', '#7c3aed'],
+            gradientAngle: 135,
+            backgroundColor: '#eef2ff',
+            waveSplitFlipped: false,
+            padding: 162,
+            shadowBlur: 28,
+            shadowOpacity: 32,
+            borderRadius: 18,
+            imageScale: 0.72,
+            textOverlays: [
+                {
+                    text: 'CREATIVE',
+                    x: 50,
+                    y: 88,
+                    color: '#ffffff',
+                    fontSize: 68,
+                    fontFamily: 'Montserrat, sans-serif',
+                    fontWeight: 800,
+                },
+            ],
+        },
+    },
 
     // ===== TEXT PATTERN DESIGNS =====
     {
@@ -915,6 +1300,35 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
         },
     },
     {
+        id: 'text-launch',
+        name: 'Launch Text',
+        description: 'Red gradient with LAUNCH text',
+        category: 'text',
+        preview: {
+            backgroundType: 'textPattern',
+            gradientColors: ['#ef4444', '#f97316'],
+            gradientAngle: 135,
+            textPatternText: 'LAUNCH',
+        },
+        settings: {
+            backgroundType: 'textPattern',
+            gradientColors: ['#ef4444', '#f97316'],
+            gradientAngle: 135,
+            textPatternText: 'LAUNCH',
+            textPatternColor: '#ffffff',
+            textPatternOpacity: 0.1,
+            textPatternPositions: ['center'],       // Free tier position
+            textPatternFontFamily: 'Montserrat, sans-serif', // Free tier font
+            textPatternFontSize: 0.35,
+            textPatternFontWeight: 700,             // Free tier weight
+            padding: 64,          // Free tier preset
+            shadowBlur: 20,       // Free tier default
+            shadowOpacity: 50,    // Free tier default
+            borderRadius: 12,     // Free tier preset
+            imageScale: 0.7,      // Within free range
+        },
+    },
+    {
         id: 'text-brand',
         name: 'Brand Text',
         description: 'Orange to pink with BRAND text',
@@ -952,35 +1366,6 @@ export const TEMPLATE_PRESETS: TemplatePreset[] = [
                     fontWeight: 700,
                 },
             ],
-        },
-    },
-    {
-        id: 'text-launch',
-        name: 'Launch Text',
-        description: 'Red gradient with LAUNCH text',
-        category: 'text',
-        preview: {
-            backgroundType: 'textPattern',
-            gradientColors: ['#ef4444', '#f97316'],
-            gradientAngle: 135,
-            textPatternText: 'LAUNCH',
-        },
-        settings: {
-            backgroundType: 'textPattern',
-            gradientColors: ['#ef4444', '#f97316'],
-            gradientAngle: 135,
-            textPatternText: 'LAUNCH',
-            textPatternColor: '#ffffff',
-            textPatternOpacity: 0.1,
-            textPatternPositions: ['center'],
-            textPatternFontFamily: '"Archivo Black", sans-serif',
-            textPatternFontSize: 0.35,
-            textPatternFontWeight: 400,
-            padding: 170,
-            shadowBlur: 28,
-            shadowOpacity: 32,
-            borderRadius: 20,
-            imageScale: 0.7,
         },
     },
     {

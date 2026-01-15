@@ -133,7 +133,7 @@ const FEATURE_CONFIG: Record<FeatureId, {
   // Templates
   all_templates: {
     requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro to access all 47 premium templates',
+    upgradeMessage: 'Upgrade to Pro to access all 60+ premium templates',
   },
 };
 
@@ -265,11 +265,15 @@ export const FREE_TIER_LIMITS = {
   freeAspectRatios: ['free', '16:9', '1:1'] as const,
 
   // Template limits
-  freeTemplateCount: 6,       // 6 free templates
+  // Professional, Creative, and Wave categories are all premium
+  freeTemplateCount: 9,
   freeTemplates: [
-    'Pure White', 'Dark Slate',       // 2 from Minimal (actual names from templates.ts)
-    'Sunset Glow', 'Ocean Waves',     // 2 from Vibrant (actual names from templates.ts)
-    'Welcome Text', 'Creative Text'   // 2 from Text Pattern (actual names from templates.ts)
+    // 3 from Minimal
+    'Pure White', 'Dark Slate', 'Charcoal',
+    // 3 from Vibrant
+    'Sunset Glow', 'Ocean Waves', 'Mint Fresh',
+    // 3 from Text Pattern
+    'Welcome Text', 'Creative Text', 'Launch Text'
   ] as const,
 };
 
