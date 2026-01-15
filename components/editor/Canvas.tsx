@@ -733,23 +733,38 @@ export function Canvas() {
                     {isDragging && draggedTextId && (() => {
                         const draggedText = textOverlays.find(t => t.id === draggedTextId);
                         if (!draggedText) return null;
+
+                        // Build style object with gradient support
+                        const textStyle: React.CSSProperties = {
+                            top: 0,
+                            left: 0,
+                            // Initial position from store, will be updated via ref during drag
+                            transform: `translate(${(draggedText.x / 100) * canvasWidth * displayScale}px, ${(draggedText.y / 100) * canvasHeight * displayScale}px) translate(-50%, -50%)`,
+                            fontFamily: draggedText.fontFamily || 'Inter, sans-serif',
+                            fontSize: `${(draggedText.fontSize || 24) * displayScale}px`,
+                            fontWeight: draggedText.fontWeight || 400,
+                            opacity: 0.9,
+                            textShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                            whiteSpace: 'nowrap',
+                        };
+
+                        // Apply gradient or solid color
+                        if (draggedText.useGradient && draggedText.gradientColors) {
+                            const angle = draggedText.gradientAngle ?? 90;
+                            textStyle.background = `linear-gradient(${angle}deg, ${draggedText.gradientColors[0]}, ${draggedText.gradientColors[1]})`;
+                            textStyle.WebkitBackgroundClip = 'text';
+                            textStyle.backgroundClip = 'text';
+                            textStyle.WebkitTextFillColor = 'transparent';
+                            textStyle.color = 'transparent';
+                        } else {
+                            textStyle.color = draggedText.color || '#000000';
+                        }
+
                         return (
                             <div
                                 ref={dragPreviewRef}
                                 className="absolute pointer-events-none z-20 will-change-transform"
-                                style={{
-                                    top: 0,
-                                    left: 0,
-                                    // Initial position from store, will be updated via ref during drag
-                                    transform: `translate(${(draggedText.x / 100) * canvasWidth * displayScale}px, ${(draggedText.y / 100) * canvasHeight * displayScale}px) translate(-50%, -50%)`,
-                                    fontFamily: draggedText.fontFamily || 'Inter, sans-serif',
-                                    fontSize: `${(draggedText.fontSize || 24) * displayScale}px`,
-                                    fontWeight: draggedText.fontWeight || 400,
-                                    color: draggedText.color || '#000000',
-                                    opacity: 0.9,
-                                    textShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                                    whiteSpace: 'nowrap',
-                                }}
+                                style={textStyle}
                             >
                                 {draggedText.text}
                             </div>
