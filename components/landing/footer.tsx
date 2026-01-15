@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Container } from './layout/container'
@@ -88,6 +88,16 @@ export function Footer() {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [message, setMessage] = useState('')
+  const statusResetTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (statusResetTimeoutRef.current) {
+        clearTimeout(statusResetTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -116,10 +126,15 @@ export function Footer() {
         setStatus('success')
         setMessage(data.message)
         setEmail('')
+        // Clear any existing timeout before starting new one
+        if (statusResetTimeoutRef.current) {
+          clearTimeout(statusResetTimeoutRef.current)
+        }
         // Reset to idle after 5 seconds
-        setTimeout(() => {
+        statusResetTimeoutRef.current = setTimeout(() => {
           setStatus('idle')
           setMessage('')
+          statusResetTimeoutRef.current = null
         }, 5000)
       } else {
         setStatus('error')

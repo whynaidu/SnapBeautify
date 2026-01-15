@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
 import { Section } from '../layout/section'
 import { Badge } from '../shared/badge'
 import { FadeIn } from '../animations/fade-in'
@@ -17,15 +18,15 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// Step 1: Upload Animation - Files flying into a box
-function UploadAnimation() {
+// Step 1: Upload Animation - Files flying into a box (pauses when off-screen)
+function UploadAnimation({ isInView }: { isInView: boolean }) {
   return (
     <div className="relative w-full h-48 flex items-center justify-center">
       {/* Central upload box */}
       <motion.div
         className="relative w-24 h-24 rounded-2xl border-2 border-dashed border-zinc-400 dark:border-zinc-600 flex items-center justify-center bg-zinc-100 dark:bg-zinc-800"
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        animate={isInView ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+        transition={{ duration: 2, repeat: isInView ? Infinity : 0 }}
       >
         <Upload className="w-8 h-8 text-zinc-500" />
       </motion.div>
@@ -41,15 +42,15 @@ function UploadAnimation() {
           key={i}
           className="absolute"
           initial={{ x: file.x * 2, y: file.y * 2, opacity: 0, rotate: file.rotate }}
-          animate={{
+          animate={isInView ? {
             x: [file.x * 2, 0],
             y: [file.y * 2, 0],
             opacity: [0, 1, 1, 0],
             scale: [0.5, 1, 1, 0.3],
-          }}
+          } : { opacity: 0 }}
           transition={{
             duration: 2.5,
-            repeat: Infinity,
+            repeat: isInView ? Infinity : 0,
             delay: file.delay,
             ease: 'easeInOut',
           }}
@@ -61,22 +62,22 @@ function UploadAnimation() {
       {/* Pulse ring */}
       <motion.div
         className="absolute w-32 h-32 rounded-2xl border border-zinc-300 dark:border-zinc-700"
-        animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        animate={isInView ? { scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] } : { scale: 1, opacity: 0.5 }}
+        transition={{ duration: 2, repeat: isInView ? Infinity : 0 }}
       />
     </div>
   )
 }
 
-// Step 2: Magic Animation - Wand with sparkles and transformation
-function MagicAnimation() {
+// Step 2: Magic Animation - Wand with sparkles and transformation (pauses when off-screen)
+function MagicAnimation({ isInView }: { isInView: boolean }) {
   return (
     <div className="relative w-full h-48 flex items-center justify-center">
       {/* Before image (faded) */}
       <motion.div
         className="absolute left-8 w-16 h-16 rounded-lg bg-zinc-300 dark:bg-zinc-700 flex items-center justify-center"
-        animate={{ opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        animate={isInView ? { opacity: [0.3, 0.5, 0.3] } : { opacity: 0.3 }}
+        transition={{ duration: 2, repeat: isInView ? Infinity : 0 }}
       >
         <Image className="w-6 h-6 text-zinc-500" />
       </motion.div>
@@ -84,8 +85,8 @@ function MagicAnimation() {
       {/* Central wand */}
       <motion.div
         className="relative z-10"
-        animate={{ rotate: [0, 10, -10, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        animate={isInView ? { rotate: [0, 10, -10, 0] } : { rotate: 0 }}
+        transition={{ duration: 2, repeat: isInView ? Infinity : 0, ease: 'easeInOut' }}
       >
         <div className="w-16 h-16 rounded-full bg-black dark:bg-white flex items-center justify-center">
           <Wand2 className="w-8 h-8 text-white dark:text-black" />
@@ -102,13 +103,13 @@ function MagicAnimation() {
             key={i}
             className="absolute"
             style={{ left: `calc(50% + ${x}px)`, top: `calc(50% + ${y}px)` }}
-            animate={{
+            animate={isInView ? {
               scale: [0, 1, 0],
               opacity: [0, 1, 0],
-            }}
+            } : { scale: 0, opacity: 0 }}
             transition={{
               duration: 1.5,
-              repeat: Infinity,
+              repeat: isInView ? Infinity : 0,
               delay: i * 0.15,
             }}
           >
@@ -120,8 +121,8 @@ function MagicAnimation() {
       {/* After image (enhanced) */}
       <motion.div
         className="absolute right-8 w-16 h-16 rounded-lg bg-black dark:bg-white flex items-center justify-center"
-        animate={{ opacity: [0.5, 1, 0.5], scale: [0.95, 1.05, 0.95] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        animate={isInView ? { opacity: [0.5, 1, 0.5], scale: [0.95, 1.05, 0.95] } : { opacity: 0.5, scale: 1 }}
+        transition={{ duration: 2, repeat: isInView ? Infinity : 0 }}
       >
         <Image className="w-6 h-6 text-white dark:text-black" />
       </motion.div>
@@ -129,16 +130,16 @@ function MagicAnimation() {
       {/* Transformation line */}
       <motion.div
         className="absolute top-1/2 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-zinc-300 via-black dark:via-white to-zinc-300"
-        animate={{ scaleX: [0, 1, 0], opacity: [0, 1, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        animate={isInView ? { scaleX: [0, 1, 0], opacity: [0, 1, 0] } : { scaleX: 0, opacity: 0 }}
+        transition={{ duration: 2, repeat: isInView ? Infinity : 0 }}
         style={{ originX: 0 }}
       />
     </div>
   )
 }
 
-// Step 3: Download Animation - File coming down with checkmark
-function DownloadAnimation() {
+// Step 3: Download Animation - File coming down with checkmark (pauses when off-screen)
+function DownloadAnimation({ isInView }: { isInView: boolean }) {
   return (
     <div className="relative w-full h-48 flex items-center justify-center">
       {/* Download container */}
@@ -146,14 +147,14 @@ function DownloadAnimation() {
         {/* File */}
         <motion.div
           className="w-20 h-24 rounded-lg bg-black dark:bg-white flex flex-col items-center justify-center relative overflow-hidden"
-          animate={{ y: [0, 5, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          animate={isInView ? { y: [0, 5, 0] } : { y: 0 }}
+          transition={{ duration: 2, repeat: isInView ? Infinity : 0 }}
         >
           <Image className="w-8 h-8 text-white dark:text-black mb-2" />
           <motion.div
             className="absolute bottom-0 left-0 right-0 h-1 bg-green-500"
-            animate={{ scaleX: [0, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            animate={isInView ? { scaleX: [0, 1] } : { scaleX: 0 }}
+            transition={{ duration: 1.5, repeat: isInView ? Infinity : 0 }}
             style={{ originX: 0 }}
           />
         </motion.div>
@@ -161,8 +162,8 @@ function DownloadAnimation() {
         {/* Checkmark badge */}
         <motion.div
           className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center"
-          animate={{ scale: [0, 1.2, 1] }}
-          transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+          animate={isInView ? { scale: [0, 1.2, 1] } : { scale: 1 }}
+          transition={{ duration: 0.5, repeat: isInView ? Infinity : 0, repeatDelay: 2 }}
         >
           <Check className="w-4 h-4 text-white" />
         </motion.div>
@@ -174,10 +175,10 @@ function DownloadAnimation() {
           key={i}
           className="absolute"
           style={{ top: -20 - i * 15 }}
-          animate={{ y: [0, 80], opacity: [1, 0] }}
+          animate={isInView ? { y: [0, 80], opacity: [1, 0] } : { y: 0, opacity: 0 }}
           transition={{
             duration: 1,
-            repeat: Infinity,
+            repeat: isInView ? Infinity : 0,
             delay: i * 0.3,
             ease: 'easeIn',
           }}
@@ -195,8 +196,8 @@ function DownloadAnimation() {
             left: i === 0 ? '10%' : i === 1 ? '75%' : '60%',
             top: i === 0 ? '20%' : i === 1 ? '30%' : '70%',
           }}
-          animate={{ y: [0, -5, 0], opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+          animate={isInView ? { y: [0, -5, 0], opacity: [0.5, 1, 0.5] } : { y: 0, opacity: 0.5 }}
+          transition={{ duration: 2, repeat: isInView ? Infinity : 0, delay: i * 0.3 }}
         >
           {format}
         </motion.div>
@@ -205,7 +206,17 @@ function DownloadAnimation() {
   )
 }
 
-const steps = [
+// Animation component type
+type AnimationComponent = React.ComponentType<{ isInView: boolean }>
+
+const steps: {
+  number: string
+  icon: typeof Upload
+  title: string
+  description: string
+  animation: AnimationComponent
+  color: string
+}[] = [
   {
     number: '01',
     icon: Upload,
@@ -282,8 +293,12 @@ function FlowConnector({ index }: { index: number }) {
 }
 
 export function HowItWorksSection() {
+  // Track viewport visibility to pause animations when off-screen
+  const sectionRef = useRef(null)
+  const isInView = useInView(sectionRef, { once: false, margin: '-100px' })
+
   return (
-    <Section id="how-it-works" className="relative overflow-hidden">
+    <Section id="how-it-works" className="relative overflow-hidden" ref={sectionRef}>
       {/* Background */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-white dark:bg-black" />
@@ -402,7 +417,7 @@ export function HowItWorksSection() {
                       step.color
                     )} />
                     <div className="relative bg-zinc-100/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8">
-                      <Animation />
+                      <Animation isInView={isInView} />
                     </div>
                   </motion.div>
                 </motion.div>
@@ -427,8 +442,8 @@ export function HowItWorksSection() {
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             Try It Now — It's Free
             <motion.span
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
+              animate={isInView ? { x: [0, 5, 0] } : { x: 0 }}
+              transition={{ duration: 1.5, repeat: isInView ? Infinity : 0 }}
             >
               →
             </motion.span>

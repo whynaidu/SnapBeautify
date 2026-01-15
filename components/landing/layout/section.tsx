@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import { cn } from '@/lib/utils'
 import { Container } from './container'
 
@@ -9,15 +10,16 @@ interface SectionProps {
   background?: 'default' | 'muted'
 }
 
-export function Section({
+export const Section = forwardRef<HTMLElement, SectionProps>(function Section({
   children,
   className,
   containerSize = 'default',
   id,
   background = 'default',
-}: SectionProps) {
+}, ref) {
   return (
     <section
+      ref={ref}
       id={id}
       className={cn(
         'py-16 md:py-24 lg:py-32',
@@ -31,4 +33,4 @@ export function Section({
       <Container size={containerSize}>{children}</Container>
     </section>
   )
-}
+})

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Header } from './Header';
 import { Canvas } from './Canvas';
 import { ControlPanel } from './ControlPanel';
@@ -37,15 +37,30 @@ function EditorBackground() {
 export function Editor() {
     const [isMobile, setIsMobile] = useState(false);
     const { originalImage, isCropping } = useEditorStore();
+    const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         const checkMobile = () => {
             setIsMobile(window.innerWidth < 768);
         };
 
+        // Throttled resize handler - only update every 150ms
+        const handleResize = () => {
+            if (resizeTimeoutRef.current) return;
+            resizeTimeoutRef.current = setTimeout(() => {
+                checkMobile();
+                resizeTimeoutRef.current = null;
+            }, 150);
+        };
+
         checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            if (resizeTimeoutRef.current) {
+                clearTimeout(resizeTimeoutRef.current);
+            }
+        };
     }, []);
 
     return (

@@ -11,6 +11,9 @@ import { retryWithBackoff, validateImageFile, handleError, getUserFriendlyError,
 import { logger, analytics } from '@/lib/utils/logger';
 import { measureImageLoad } from '@/lib/utils/performance';
 
+// Supported formats - defined outside component to prevent re-creation on each render
+const SUPPORTED_FORMATS = ['PNG', 'JPG', 'WebP', 'GIF'] as const;
+
 export function DropZone() {
     const { setImage, originalImage } = useEditorStore();
 
@@ -218,7 +221,7 @@ export function DropZone() {
                     )}>
                         <span className="text-xs font-medium">Supports:</span>
                         <div className="flex gap-1.5">
-                            {['PNG', 'JPG', 'WebP', 'GIF'].map((format) => (
+                            {SUPPORTED_FORMATS.map((format) => (
                                 <span
                                     key={format}
                                     className={cn(

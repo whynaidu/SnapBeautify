@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -45,40 +45,41 @@ export function ExportBar() {
     const hasUnlimitedExports = checkFeature('unlimited_exports').hasAccess;
     const hasWebpExport = checkFeature('webp_export').hasAccess;
 
-    // Show upgrade modal for premium features
-    const handleShowUpgradeModal = (feature: string) => {
+    // Get store setters early for memoized callbacks
+    const { setExportFormat, setExportScale } = useEditorStore();
+
+    // Memoized: Show upgrade modal for premium features
+    const handleShowUpgradeModal = useCallback((feature: string) => {
         showUpgradeModal({ feature });
-    };
+    }, []);
 
-    // Check if a scale is premium (3x and 4x are Pro only)
-    const isPremiumScale = (scale: ExportScale) => scale >= 3 && !has4kExport;
+    // Memoized: Check if a scale is premium (3x and 4x are Pro only)
+    const isPremiumScale = useCallback((scale: ExportScale) => scale >= 3 && !has4kExport, [has4kExport]);
 
-    // Check if a format is premium (WebP is Pro only)
-    const isPremiumFormat = (format: ExportFormat) => format === 'webp' && !hasWebpExport;
+    // Memoized: Check if a format is premium (WebP is Pro only)
+    const isPremiumFormat = useCallback((format: ExportFormat) => format === 'webp' && !hasWebpExport, [hasWebpExport]);
 
-    // Handle scale selection with premium check
-    const handleScaleChange = (scale: ExportScale) => {
-        if (isPremiumScale(scale)) {
-            handleShowUpgradeModal('4k_export');
+    // Memoized: Handle scale selection with premium check
+    const handleScaleChange = useCallback((scale: ExportScale) => {
+        if (scale >= 3 && !has4kExport) {
+            showUpgradeModal({ feature: '4k_export' });
             return;
         }
         setExportScale(scale);
-    };
+    }, [has4kExport, setExportScale]);
 
-    // Handle format selection with premium check
-    const handleFormatChange = (format: ExportFormat) => {
-        if (isPremiumFormat(format)) {
-            handleShowUpgradeModal('webp_export');
+    // Memoized: Handle format selection with premium check
+    const handleFormatChange = useCallback((format: ExportFormat) => {
+        if (format === 'webp' && !hasWebpExport) {
+            showUpgradeModal({ feature: 'webp_export' });
             return;
         }
         setExportFormat(format);
-    };
+    }, [hasWebpExport, setExportFormat]);
 
     const {
         exportFormat,
         exportScale,
-        setExportFormat,
-        setExportScale,
         originalImage,
         backgroundType,
         backgroundColor,
