@@ -23,6 +23,8 @@ export function Canvas() {
     const pendingUpdateRef = useRef<{ x: number; y: number } | null>(null);
     // Track final drag position for commit on drag end (avoids store updates during drag)
     const finalDragPositionRef = useRef<{ x: number; y: number } | null>(null);
+    // Track which text ID should be excluded from canvas rendering (shown via HTML overlay instead)
+    const excludedTextIdRef = useRef<string | null>(null);
 
     // Get subscription status
     const { isPro } = useSubscription();
@@ -223,6 +225,12 @@ export function Canvas() {
             return;
         }
 
+        // Filter out the dragged text from canvas rendering (it's shown via HTML overlay instead)
+        const excludeId = excludedTextIdRef.current;
+        const textOverlaysToRender = excludeId
+            ? params.textOverlays.filter(t => t.id !== excludeId)
+            : params.textOverlays;
+
         await measureRender(
             'canvas:render',
             async () => {
@@ -257,7 +265,7 @@ export function Canvas() {
                     rotation: params.rotation,
                     targetWidth: params.canvasWidth,
                     targetHeight: params.canvasHeight,
-                    textOverlays: params.textOverlays,
+                    textOverlays: textOverlaysToRender,
                 });
             },
             {
@@ -464,10 +472,14 @@ export function Canvas() {
                 setDraggedTextId(hitbox.id);
                 selectTextOverlay(hitbox.id);
                 canvas.style.cursor = 'grabbing';
+                // Exclude this text from canvas rendering (will show via HTML overlay instead)
+                excludedTextIdRef.current = hitbox.id;
+                // Re-render canvas without the dragged text
+                throttledRender();
                 break;
             }
         }
-    }, [textHitboxes, selectTextOverlay]);
+    }, [textHitboxes, selectTextOverlay, throttledRender]);
 
     const handleCanvasMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
         if (!canvasRef.current) return;
@@ -513,6 +525,8 @@ export function Canvas() {
             });
             finalDragPositionRef.current = null;
         }
+        // Clear excluded text so canvas renders it again
+        excludedTextIdRef.current = null;
         setIsDragging(false);
         setDraggedTextId(null);
         setAlignmentGuides({ showCenterX: false, showCenterY: false });
@@ -534,6 +548,8 @@ export function Canvas() {
             });
             finalDragPositionRef.current = null;
         }
+        // Clear excluded text so canvas renders it again
+        excludedTextIdRef.current = null;
         setIsDragging(false);
         setDraggedTextId(null);
         setAlignmentGuides({ showCenterX: false, showCenterY: false });
@@ -566,10 +582,14 @@ export function Canvas() {
                 setIsDragging(true);
                 setDraggedTextId(hitbox.id);
                 selectTextOverlay(hitbox.id);
+                // Exclude this text from canvas rendering (will show via HTML overlay instead)
+                excludedTextIdRef.current = hitbox.id;
+                // Re-render canvas without the dragged text
+                throttledRender();
                 break;
             }
         }
-    }, [textHitboxes, selectTextOverlay]);
+    }, [textHitboxes, selectTextOverlay, throttledRender]);
 
     const handleCanvasTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
         if (!isDragging || !draggedTextId || !canvasRef.current) return;
@@ -597,6 +617,8 @@ export function Canvas() {
             });
             finalDragPositionRef.current = null;
         }
+        // Clear excluded text so canvas renders it again
+        excludedTextIdRef.current = null;
         setIsDragging(false);
         setDraggedTextId(null);
         setAlignmentGuides({ showCenterX: false, showCenterY: false });
