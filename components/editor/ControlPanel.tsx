@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Palette, Square, Sun, Frame, Type, Sparkles } from 'lucide-react';
 import { BackgroundPicker } from '@/components/controls/BackgroundPicker';
@@ -25,6 +27,7 @@ const tabs = [
 
 export function ControlPanel() {
     const { originalImage } = useEditorStore();
+    const [activeTab, setActiveTab] = useState('templates');
 
     if (!originalImage) {
         return (
@@ -41,7 +44,7 @@ export function ControlPanel() {
 
     return (
         <div className="w-80 bg-white dark:bg-zinc-900 border-l border-zinc-200/50 dark:border-zinc-800/50 flex flex-col h-full">
-            <Tabs defaultValue="templates" className="w-full flex flex-col flex-1 overflow-hidden">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col flex-1 overflow-hidden">
                 {/* Tab navigation */}
                 <div className="p-3 border-b border-zinc-200/50 dark:border-zinc-800/50 flex-shrink-0">
                     <TabsList className="w-full grid grid-cols-6 bg-zinc-100 dark:bg-zinc-800/80 rounded-xl h-11 p-1 gap-0.5">
@@ -50,15 +53,21 @@ export function ControlPanel() {
                                 key={tab.value}
                                 value={tab.value}
                                 className={cn(
-                                    'rounded-lg h-full transition-all duration-200',
-                                    'data-[state=active]:bg-white dark:data-[state=active]:bg-zinc-700',
-                                    'data-[state=active]:shadow-sm',
+                                    'relative rounded-lg h-full transition-colors duration-200',
                                     'data-[state=inactive]:text-zinc-500 dark:data-[state=inactive]:text-zinc-400',
                                     'data-[state=active]:text-zinc-900 dark:data-[state=active]:text-white',
                                     'hover:text-zinc-900 dark:hover:text-white'
                                 )}
                             >
-                                <tab.icon className="w-4 h-4" />
+                                {/* Sliding highlight background */}
+                                {activeTab === tab.value && (
+                                    <motion.div
+                                        layoutId="controlPanelActiveTab"
+                                        className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-lg shadow-sm"
+                                        transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                                    />
+                                )}
+                                <tab.icon className="w-4 h-4 relative z-10" />
                             </TabsTrigger>
                         ))}
                     </TabsList>
