@@ -172,12 +172,19 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 h-8.5 px-0.5 sm:h-9 sm:pl-0.5 sm:pr-3 rounded-full border border-zinc-700 bg-transparent hover:bg-zinc-800 transition-colors">
+        <button className="relative flex items-center gap-1.5 sm:gap-2 h-9 pl-0.5 pr-1.5 sm:pr-3 rounded-full border border-zinc-700 bg-transparent hover:bg-zinc-800 transition-colors">
           <UserAvatar src={avatarUrl} name={displayName} size="sm" />
           <span className="max-w-[100px] truncate text-sm hidden sm:inline">
             {displayName}
           </span>
-          {isPro && <Crown className="w-3.5 h-3.5 text-orange-500" />}
+          {isPro && (
+            <>
+              {/* Desktop crown - inline */}
+              <Crown className="w-3.5 h-3.5 text-orange-500 hidden sm:block" />
+              {/* Mobile crown - small badge positioned on avatar */}
+              <Crown className="w-3 h-3 text-orange-500 sm:hidden absolute -top-0.5 -right-0.5 bg-zinc-900 rounded-full p-0.5 box-content border border-zinc-700" />
+            </>
+          )}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64 rounded-xl bg-zinc-900/95 backdrop-blur-xl border-zinc-800">
