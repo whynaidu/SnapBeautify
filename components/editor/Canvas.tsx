@@ -111,9 +111,109 @@ export function Canvas() {
     // Check if mobile for performance optimizations
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
-    // Create a memoized render function
+    // Cache text hitboxes to avoid expensive recalculations on every mouse move
+    // Only recalculates when textOverlays or canvas dimensions change
+    const textHitboxes = useMemo(() => {
+        if (!canvasRef.current || textOverlays.length === 0) return [];
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return [];
+
+        return textOverlays.map(overlay => {
+            ctx.font = `${overlay.fontWeight} ${overlay.fontSize}px ${overlay.fontFamily}`;
+            const metrics = ctx.measureText(overlay.text);
+            const textWidthPx = metrics.width;
+            const textHeightPx = overlay.fontSize * 1.2;
+            const textWidthPercent = canvas.width > 0 ? (textWidthPx / canvas.width) * 100 : 0;
+            const textHeightPercent = canvas.height > 0 ? (textHeightPx / canvas.height) * 100 : 0;
+
+            return {
+                id: overlay.id,
+                x: overlay.x,
+                y: overlay.y,
+                hitboxWidth: textWidthPercent + 5,
+                hitboxHeight: textHeightPercent + 5,
+            };
+        });
+    }, [textOverlays, canvasWidth, canvasHeight]);
+
+    // Store render parameters in a ref to avoid recreating performRender on every state change
+    // This prevents throttle tracking from resetting
+    const renderParamsRef = useRef({
+        originalImage,
+        backgroundType,
+        backgroundColor,
+        gradientColors,
+        gradientAngle,
+        meshGradientCSS,
+        textPatternText,
+        textPatternColor,
+        textPatternOpacity,
+        textPatternPositions,
+        textPatternFontFamily,
+        textPatternFontSize,
+        textPatternFontWeight,
+        textPatternRows,
+        waveSplitFlipped,
+        logoPatternImage,
+        logoPatternOpacity,
+        logoPatternSize,
+        logoPatternSpacing,
+        padding,
+        shadowBlur,
+        shadowOpacity,
+        shadowColor,
+        borderRadius,
+        frameType,
+        imageScale,
+        rotation,
+        canvasWidth,
+        canvasHeight,
+        textOverlays,
+    });
+
+    // Update ref whenever params change (doesn't trigger re-render)
+    useEffect(() => {
+        renderParamsRef.current = {
+            originalImage,
+            backgroundType,
+            backgroundColor,
+            gradientColors,
+            gradientAngle,
+            meshGradientCSS,
+            textPatternText,
+            textPatternColor,
+            textPatternOpacity,
+            textPatternPositions,
+            textPatternFontFamily,
+            textPatternFontSize,
+            textPatternFontWeight,
+            textPatternRows,
+            waveSplitFlipped,
+            logoPatternImage,
+            logoPatternOpacity,
+            logoPatternSize,
+            logoPatternSpacing,
+            padding,
+            shadowBlur,
+            shadowOpacity,
+            shadowColor,
+            borderRadius,
+            frameType,
+            imageScale,
+            rotation,
+            canvasWidth,
+            canvasHeight,
+            textOverlays,
+        };
+    });
+
+    // Create a stable render function that reads from ref
+    // This prevents throttle from resetting on every state change
     const performRender = useCallback(async () => {
-        if (!canvasRef.current || !originalImage) return;
+        const params = renderParamsRef.current;
+        if (!canvasRef.current || !params.originalImage) return;
 
         // On mobile during drag, skip expensive renders for better performance
         if (isMobile && isDragging) {
@@ -125,47 +225,62 @@ export function Canvas() {
             async () => {
                 await renderCanvas({
                     canvas: canvasRef.current!,
-                    image: originalImage,
-                    backgroundType,
-                    backgroundColor,
-                    gradientColors,
-                    gradientAngle,
-                    meshGradientCSS,
-                    textPatternText,
-                    textPatternColor,
-                    textPatternOpacity,
-                    textPatternPositions,
-                    textPatternFontFamily,
-                    textPatternFontSize,
-                    textPatternFontWeight,
-                    textPatternRows,
-                    waveSplitFlipped,
-                    logoPatternImage,
-                    logoPatternOpacity,
-                    logoPatternSize,
-                    logoPatternSpacing,
-                    padding,
-                    shadowBlur,
-                    shadowOpacity,
-                    shadowColor,
-                    borderRadius,
-                    frameType,
-                    imageScale,
-                    rotation,
-                    targetWidth: canvasWidth,
-                    targetHeight: canvasHeight,
-                    textOverlays,
+                    image: params.originalImage!,
+                    backgroundType: params.backgroundType,
+                    backgroundColor: params.backgroundColor,
+                    gradientColors: params.gradientColors,
+                    gradientAngle: params.gradientAngle,
+                    meshGradientCSS: params.meshGradientCSS,
+                    textPatternText: params.textPatternText,
+                    textPatternColor: params.textPatternColor,
+                    textPatternOpacity: params.textPatternOpacity,
+                    textPatternPositions: params.textPatternPositions,
+                    textPatternFontFamily: params.textPatternFontFamily,
+                    textPatternFontSize: params.textPatternFontSize,
+                    textPatternFontWeight: params.textPatternFontWeight,
+                    textPatternRows: params.textPatternRows,
+                    waveSplitFlipped: params.waveSplitFlipped,
+                    logoPatternImage: params.logoPatternImage,
+                    logoPatternOpacity: params.logoPatternOpacity,
+                    logoPatternSize: params.logoPatternSize,
+                    logoPatternSpacing: params.logoPatternSpacing,
+                    padding: params.padding,
+                    shadowBlur: params.shadowBlur,
+                    shadowOpacity: params.shadowOpacity,
+                    shadowColor: params.shadowColor,
+                    borderRadius: params.borderRadius,
+                    frameType: params.frameType,
+                    imageScale: params.imageScale,
+                    rotation: params.rotation,
+                    targetWidth: params.canvasWidth,
+                    targetHeight: params.canvasHeight,
+                    textOverlays: params.textOverlays,
                 });
             },
             {
-                canvasWidth,
-                canvasHeight,
-                frameType,
+                canvasWidth: params.canvasWidth,
+                canvasHeight: params.canvasHeight,
+                frameType: params.frameType,
             }
         );
+    }, [isMobile, isDragging]); // Minimal dependencies - reads from ref for everything else
+
+    // Throttle the render function - 33ms on mobile (30fps), 16ms on desktop (60fps)
+    // Mobile devices struggle with 60fps canvas rendering, 30fps is much smoother
+    const throttledRender = useThrottle(performRender, isMobile ? 33 : 16);
+
+    // Re-render canvas when any setting changes (throttled)
+    // Skip rendering when in crop mode or when actively dragging (for better drag performance)
+    // Note: throttledRender is now stable, so adding dependencies here won't reset throttle
+    useEffect(() => {
+        if (!isCropping && !isDragging) {
+            throttledRender();
+        }
     }, [
-        isMobile,
+        throttledRender,
+        isCropping,
         isDragging,
+        // Trigger render on state changes (values read from ref inside performRender)
         originalImage,
         backgroundType,
         backgroundColor,
@@ -197,18 +312,6 @@ export function Canvas() {
         canvasHeight,
         textOverlays,
     ]);
-
-    // Throttle the render function - 33ms on mobile (30fps), 16ms on desktop (60fps)
-    // Mobile devices struggle with 60fps canvas rendering, 30fps is much smoother
-    const throttledRender = useThrottle(performRender, isMobile ? 33 : 16);
-
-    // Re-render canvas when any setting changes (throttled)
-    // Skip rendering when in crop mode or when actively dragging (for better drag performance)
-    useEffect(() => {
-        if (!isCropping && !isDragging) {
-            throttledRender();
-        }
-    }, [throttledRender, isCropping, isDragging]);
 
     // Render raw image when in crop mode
     useEffect(() => {
@@ -328,51 +431,33 @@ export function Canvas() {
         };
     }, []);
 
-    // Handle text overlay dragging
+    // Handle text overlay dragging - uses cached hitboxes for performance
     const handleCanvasMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-        if (!canvasRef.current || textOverlays.length === 0) return;
+        if (!canvasRef.current || textHitboxes.length === 0) return;
 
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
 
-        // Get canvas context for text measurement
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        // Check if click is on any text overlay (in reverse order, top to bottom)
-        for (let i = textOverlays.length - 1; i >= 0; i--) {
-            const overlay = textOverlays[i];
-
-            // Measure actual text dimensions
-            ctx.font = `${overlay.fontWeight} ${overlay.fontSize}px ${overlay.fontFamily}`;
-            const metrics = ctx.measureText(overlay.text);
-
-            // Calculate text width and height in percentage of canvas
-            const textWidthPx = metrics.width;
-            const textHeightPx = overlay.fontSize * 1.2; // Approximate height with some padding
-            const textWidthPercent = (textWidthPx / canvas.width) * 100;
-            const textHeightPercent = (textHeightPx / canvas.height) * 100;
-
-            // Add some padding to make it easier to click
-            const hitboxWidth = textWidthPercent + 5;
-            const hitboxHeight = textHeightPercent + 5;
+        // Check if click is on any text overlay using cached hitboxes (reverse order, top to bottom)
+        for (let i = textHitboxes.length - 1; i >= 0; i--) {
+            const hitbox = textHitboxes[i];
 
             if (
-                x >= overlay.x - hitboxWidth / 2 &&
-                x <= overlay.x + hitboxWidth / 2 &&
-                y >= overlay.y - hitboxHeight / 2 &&
-                y <= overlay.y + hitboxHeight / 2
+                x >= hitbox.x - hitbox.hitboxWidth / 2 &&
+                x <= hitbox.x + hitbox.hitboxWidth / 2 &&
+                y >= hitbox.y - hitbox.hitboxHeight / 2 &&
+                y <= hitbox.y + hitbox.hitboxHeight / 2
             ) {
                 setIsDragging(true);
-                setDraggedTextId(overlay.id);
-                selectTextOverlay(overlay.id);
+                setDraggedTextId(hitbox.id);
+                selectTextOverlay(hitbox.id);
                 canvas.style.cursor = 'grabbing';
                 break;
             }
         }
-    }, [textOverlays, selectTextOverlay]);
+    }, [textHitboxes, selectTextOverlay]);
 
     const handleCanvasMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
         if (!canvasRef.current) return;
@@ -382,38 +467,23 @@ export function Canvas() {
         const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
         const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
 
-        // If dragging, update position with snapping
+        // If dragging, update position with RAF batching (same as touch events)
         if (isDragging && draggedTextId) {
-            const snapped = snapToCenter(x, y);
-            updateTextOverlay(draggedTextId, { x: snapped.x, y: snapped.y });
+            batchedUpdateTextPosition(x, y, draggedTextId);
             return;
         }
 
-        // If not dragging, check if hovering over any text to show grab cursor
-        if (textOverlays.length > 0) {
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return;
-
+        // If not dragging, check if hovering over any text to show grab cursor (using cached hitboxes)
+        if (textHitboxes.length > 0) {
             let isOverText = false;
-            for (let i = textOverlays.length - 1; i >= 0; i--) {
-                const overlay = textOverlays[i];
-
-                ctx.font = `${overlay.fontWeight} ${overlay.fontSize}px ${overlay.fontFamily}`;
-                const metrics = ctx.measureText(overlay.text);
-
-                const textWidthPx = metrics.width;
-                const textHeightPx = overlay.fontSize * 1.2;
-                const textWidthPercent = (textWidthPx / canvas.width) * 100;
-                const textHeightPercent = (textHeightPx / canvas.height) * 100;
-
-                const hitboxWidth = textWidthPercent + 5;
-                const hitboxHeight = textHeightPercent + 5;
+            for (let i = textHitboxes.length - 1; i >= 0; i--) {
+                const hitbox = textHitboxes[i];
 
                 if (
-                    x >= overlay.x - hitboxWidth / 2 &&
-                    x <= overlay.x + hitboxWidth / 2 &&
-                    y >= overlay.y - hitboxHeight / 2 &&
-                    y <= overlay.y + hitboxHeight / 2
+                    x >= hitbox.x - hitbox.hitboxWidth / 2 &&
+                    x <= hitbox.x + hitbox.hitboxWidth / 2 &&
+                    y >= hitbox.y - hitbox.hitboxHeight / 2 &&
+                    y <= hitbox.y + hitbox.hitboxHeight / 2
                 ) {
                     isOverText = true;
                     break;
@@ -422,13 +492,17 @@ export function Canvas() {
 
             canvas.style.cursor = isOverText ? 'grab' : 'default';
         }
-    }, [isDragging, draggedTextId, updateTextOverlay, textOverlays, snapToCenter]);
+    }, [isDragging, draggedTextId, batchedUpdateTextPosition, textHitboxes]);
 
     const handleCanvasMouseUp = useCallback(() => {
         setIsDragging(false);
         setDraggedTextId(null);
         setAlignmentGuides({ showCenterX: false, showCenterY: false });
-    }, []);
+        // Trigger a final render after drag ends
+        requestAnimationFrame(() => {
+            throttledRender();
+        });
+    }, [throttledRender]);
 
     const handleCanvasMouseLeave = useCallback(() => {
         if (canvasRef.current) {
@@ -439,9 +513,9 @@ export function Canvas() {
         setAlignmentGuides({ showCenterX: false, showCenterY: false });
     }, []);
 
-    // Touch event handlers for mobile
+    // Touch event handlers for mobile - uses cached hitboxes for performance
     const handleCanvasTouchStart = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
-        if (!canvasRef.current || textOverlays.length === 0) return;
+        if (!canvasRef.current || textHitboxes.length === 0) return;
 
         // Prevent default touch behavior and scrolling
         e.preventDefault();
@@ -453,37 +527,23 @@ export function Canvas() {
         const x = ((touch.clientX - rect.left) / rect.width) * 100;
         const y = ((touch.clientY - rect.top) / rect.height) * 100;
 
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        // Check if touch is on any text overlay
-        for (let i = textOverlays.length - 1; i >= 0; i--) {
-            const overlay = textOverlays[i];
-
-            ctx.font = `${overlay.fontWeight} ${overlay.fontSize}px ${overlay.fontFamily}`;
-            const metrics = ctx.measureText(overlay.text);
-
-            const textWidthPx = metrics.width;
-            const textHeightPx = overlay.fontSize * 1.2;
-            const textWidthPercent = (textWidthPx / canvas.width) * 100;
-            const textHeightPercent = (textHeightPx / canvas.height) * 100;
-
-            const hitboxWidth = textWidthPercent + 5;
-            const hitboxHeight = textHeightPercent + 5;
+        // Check if touch is on any text overlay using cached hitboxes
+        for (let i = textHitboxes.length - 1; i >= 0; i--) {
+            const hitbox = textHitboxes[i];
 
             if (
-                x >= overlay.x - hitboxWidth / 2 &&
-                x <= overlay.x + hitboxWidth / 2 &&
-                y >= overlay.y - hitboxHeight / 2 &&
-                y <= overlay.y + hitboxHeight / 2
+                x >= hitbox.x - hitbox.hitboxWidth / 2 &&
+                x <= hitbox.x + hitbox.hitboxWidth / 2 &&
+                y >= hitbox.y - hitbox.hitboxHeight / 2 &&
+                y <= hitbox.y + hitbox.hitboxHeight / 2
             ) {
                 setIsDragging(true);
-                setDraggedTextId(overlay.id);
-                selectTextOverlay(overlay.id);
+                setDraggedTextId(hitbox.id);
+                selectTextOverlay(hitbox.id);
                 break;
             }
         }
-    }, [textOverlays, selectTextOverlay]);
+    }, [textHitboxes, selectTextOverlay]);
 
     const handleCanvasTouchMove = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
         if (!isDragging || !draggedTextId || !canvasRef.current) return;

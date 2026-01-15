@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Header } from './Header';
 import { Canvas } from './Canvas';
 import { ControlPanel } from './ControlPanel';
@@ -11,7 +10,7 @@ import { CropActionButtons } from './CropActionButtons';
 import { KeyboardShortcuts } from '@/components/shared/KeyboardShortcuts';
 import { useEditorStore } from '@/lib/store/editor-store';
 
-// Animated background component matching landing page
+// Lightweight static background - no animations for performance
 function EditorBackground() {
     return (
         <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
@@ -27,30 +26,10 @@ function EditorBackground() {
                 }}
             />
 
-            {/* Large gradient orbs */}
-            <motion.div
-                className="absolute -top-64 -left-64 w-[600px] h-[600px] rounded-full bg-violet-500/10 dark:bg-violet-400/5 blur-3xl"
-                animate={{
-                    x: [0, 50, 0],
-                    y: [0, 30, 0],
-                }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <motion.div
-                className="absolute -bottom-64 -right-64 w-[600px] h-[600px] rounded-full bg-pink-500/10 dark:bg-pink-400/5 blur-3xl"
-                animate={{
-                    x: [0, -50, 0],
-                    y: [0, -30, 0],
-                }}
-                transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <motion.div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-blue-500/5 dark:bg-blue-400/3 blur-3xl"
-                animate={{
-                    scale: [1, 1.1, 1],
-                }}
-                transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-            />
+            {/* Static gradient orbs - no animations */}
+            <div className="absolute -top-64 -left-64 w-[600px] h-[600px] rounded-full bg-violet-500/10 dark:bg-violet-400/5 blur-3xl" />
+            <div className="absolute -bottom-64 -right-64 w-[600px] h-[600px] rounded-full bg-pink-500/10 dark:bg-pink-400/5 blur-3xl" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-blue-500/5 dark:bg-blue-400/3 blur-3xl" />
         </div>
     );
 }
@@ -82,14 +61,9 @@ export function Editor() {
                     <Canvas />
                     {/* Desktop: Show sidebar only when image is loaded (hide when cropping), Mobile: Hide (use bottom sheet) */}
                     {originalImage && !isCropping && (
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.3 }}
-                            className="hidden md:block h-full"
-                        >
+                        <div className="hidden md:block h-full">
                             <ControlPanel />
-                        </motion.div>
+                        </div>
                     )}
                 </div>
 

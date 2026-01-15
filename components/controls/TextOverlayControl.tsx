@@ -10,7 +10,7 @@ import { FREE_TIER_LIMITS, FREE_FONTS } from '@/lib/subscription/feature-gates';
 import { Plus, Trash2, Type, Copy, Search, Check, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FONTS_BY_CATEGORY, FONT_CATEGORIES, FontCategory } from '@/lib/constants/fonts';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 
 export function TextOverlayControl() {
     const {
@@ -53,6 +53,24 @@ export function TextOverlayControl() {
 
     const [selectedFontCategory, setSelectedFontCategory] = useState<FontCategory>(getInitialCategory);
     const [fontSearch, setFontSearch] = useState('');
+    const [debouncedFontSearch, setDebouncedFontSearch] = useState('');
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Debounce font search to avoid filtering on every keystroke
+    useEffect(() => {
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+        debounceTimerRef.current = setTimeout(() => {
+            setDebouncedFontSearch(fontSearch);
+        }, 150); // 150ms debounce for responsive yet performant search
+
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, [fontSearch]);
 
     // Check if user can add more overlays (for display, not blocking)
     const canAddOverlay = isPro || textOverlays.length < MAX_FREE_OVERLAYS;
@@ -75,17 +93,19 @@ export function TextOverlayControl() {
         if (category && category !== selectedFontCategory) {
             setSelectedFontCategory(category);
             setFontSearch('');
+            setDebouncedFontSearch('');
         }
     };
 
-    // Filter fonts based on search
+    // Filter fonts based on debounced search (avoids recalculating on every keystroke)
     const filteredFonts = useMemo(() => {
         const fonts = FONTS_BY_CATEGORY[selectedFontCategory];
-        if (!fontSearch.trim()) return fonts;
+        if (!debouncedFontSearch.trim()) return fonts;
+        const searchLower = debouncedFontSearch.toLowerCase();
         return fonts.filter(font =>
-            font.name.toLowerCase().includes(fontSearch.toLowerCase())
+            font.name.toLowerCase().includes(searchLower)
         );
-    }, [selectedFontCategory, fontSearch]);
+    }, [selectedFontCategory, debouncedFontSearch]);
 
     return (
         <div className="space-y-4">
@@ -369,6 +389,7 @@ export function TextOverlayControl() {
                                         onClick={() => {
                                             setSelectedFontCategory(category);
                                             setFontSearch('');
+                                            setDebouncedFontSearch('');
                                         }}
                                         className={cn(
                                             'px-2.5 py-1 rounded-full text-[10px] font-medium transition-all relative',

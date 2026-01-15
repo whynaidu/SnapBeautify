@@ -16,7 +16,8 @@ const ALL_PADDING_PRESETS = [32, 48, 64, 96, 128];
 export function PaddingControl() {
     const { padding, setPadding } = useEditorStore();
     const [localPadding, setLocalPadding] = useState(padding);
-    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const rafIdRef = useRef<number | null>(null);
+    const pendingValueRef = useRef<number | null>(null);
 
     // Subscription access (for PRO badge only)
     const { isPro } = useSubscription();
@@ -33,24 +34,28 @@ export function PaddingControl() {
         setLocalPadding(padding);
     }, [padding]);
 
-    // Cleanup timer on unmount
+    // Cleanup RAF on unmount
     useEffect(() => {
         return () => {
-            if (debounceTimerRef.current) {
-                clearTimeout(debounceTimerRef.current);
+            if (rafIdRef.current !== null) {
+                cancelAnimationFrame(rafIdRef.current);
             }
         };
     }, []);
 
-    // Debounced update to store - only update every 100ms during slider drag
-    const debouncedSetPadding = useCallback((value: number) => {
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
+    // RAF-based update for smooth slider interaction (better than setTimeout debounce)
+    const rafSetPadding = useCallback((value: number) => {
+        pendingValueRef.current = value;
 
-        debounceTimerRef.current = setTimeout(() => {
-            setPadding(value);
-        }, 100); // 100ms debounce for smooth dragging
+        // If RAF already scheduled, it will use the latest value
+        if (rafIdRef.current !== null) return;
+
+        rafIdRef.current = requestAnimationFrame(() => {
+            if (pendingValueRef.current !== null) {
+                setPadding(pendingValueRef.current);
+            }
+            rafIdRef.current = null;
+        });
     }, [setPadding]);
 
     const handlePaddingChange = (value: number) => {
@@ -60,8 +65,8 @@ export function PaddingControl() {
 
     const handleSliderChange = (value: number) => {
         setLocalPadding(value);
-        // Use debounced update for smooth slider interaction
-        debouncedSetPadding(value);
+        // Use RAF-based update for smooth slider interaction
+        rafSetPadding(value);
     };
 
     const handleInputChange = (value: number) => {

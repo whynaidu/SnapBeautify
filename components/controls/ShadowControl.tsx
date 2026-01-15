@@ -26,7 +26,9 @@ export function ShadowControl() {
     const [localBlur, setLocalBlur] = useState(shadowBlur);
     const [localOpacity, setLocalOpacity] = useState(shadowOpacity);
     const [isEnabled, setIsEnabled] = useState(shadowBlur > 0);
-    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const rafIdRef = useRef<number | null>(null);
+    const pendingBlurRef = useRef<number | null>(null);
+    const pendingOpacityRef = useRef<number | null>(null);
 
     // Sync local state with store
     useEffect(() => {
@@ -38,37 +40,45 @@ export function ShadowControl() {
         setLocalOpacity(shadowOpacity);
     }, [shadowOpacity]);
 
-    // Cleanup timer on unmount
+    // Cleanup RAF on unmount
     useEffect(() => {
         return () => {
-            if (debounceTimerRef.current) {
-                clearTimeout(debounceTimerRef.current);
+            if (rafIdRef.current !== null) {
+                cancelAnimationFrame(rafIdRef.current);
             }
         };
     }, []);
 
-    // Debounced store updates
-    const debouncedUpdate = useCallback((updateFn: () => void) => {
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
-        debounceTimerRef.current = setTimeout(updateFn, 100);
-    }, []);
+    // RAF-based store updates for smooth slider interaction
+    const scheduleUpdate = useCallback(() => {
+        if (rafIdRef.current !== null) return;
+
+        rafIdRef.current = requestAnimationFrame(() => {
+            if (pendingBlurRef.current !== null) {
+                const value = pendingBlurRef.current;
+                setShadowBlur(value);
+                if (value > 0 && !isEnabled) setIsEnabled(true);
+                if (value === 0 && isEnabled) setIsEnabled(false);
+                pendingBlurRef.current = null;
+            }
+            if (pendingOpacityRef.current !== null) {
+                setShadowOpacity(pendingOpacityRef.current);
+                pendingOpacityRef.current = null;
+            }
+            rafIdRef.current = null;
+        });
+    }, [setShadowBlur, setShadowOpacity, isEnabled]);
 
     const handleBlurChange = (value: number) => {
         setLocalBlur(value);
-        debouncedUpdate(() => {
-            setShadowBlur(value);
-            if (value > 0 && !isEnabled) setIsEnabled(true);
-            if (value === 0 && isEnabled) setIsEnabled(false);
-        });
+        pendingBlurRef.current = value;
+        scheduleUpdate();
     };
 
     const handleOpacityChange = (value: number) => {
         setLocalOpacity(value);
-        debouncedUpdate(() => {
-            setShadowOpacity(value);
-        });
+        pendingOpacityRef.current = value;
+        scheduleUpdate();
     };
 
     const handleColorChange = (color: string) => {

@@ -44,10 +44,9 @@ export function MobileControlPanelV2() {
                 className={cn(
                     'fixed left-0 right-0 z-40',
                     'bottom-16', // Above ExportBar
-                    'bg-zinc-900/95 backdrop-blur-xl',
+                    'bg-zinc-900/98', // Removed backdrop-blur for performance
                     'border-t border-zinc-800',
-                    'shadow-lg',
-                    'transition-all duration-300'
+                    'shadow-lg'
                 )}
             >
                 {/* Tab Navigation */}
@@ -83,16 +82,21 @@ export function MobileControlPanelV2() {
                         'fixed left-0 right-0 z-39',
                         'bottom-[calc(4rem+3.5rem)]', // Above control bar + export bar
                         'max-h-[50vh]',
-                        'bg-zinc-900/98 backdrop-blur-xl',
+                        'bg-zinc-900/98', // Removed backdrop-blur for performance
                         'border-t border-zinc-800',
                         'rounded-t-3xl',
                         'shadow-2xl',
                         'overflow-hidden',
-                        'animate-in slide-in-from-bottom duration-300'
+                        // Use GPU-accelerated transform animation instead of layout-triggering slide-in
+                        'will-change-transform'
                     )}
+                    style={{
+                        // Use transform for GPU acceleration
+                        animation: 'slideUp 150ms ease-out forwards',
+                    }}
                 >
                     {/* Collapse Handle */}
-                    <div className="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur-xl">
+                    <div className="sticky top-0 z-10 bg-zinc-900/98">
                         <button
                             onClick={() => setActiveTab(null)}
                             className="w-full py-2 flex flex-col items-center gap-1 hover:bg-zinc-800/50 transition-colors"
