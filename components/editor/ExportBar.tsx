@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Copy, Download, ChevronDown, Check, Share2, Loader2, Crown, Lock } from 'lucide-react';
 import { useEditorStore } from '@/lib/store/editor-store';
+import { useAuth } from '@/lib/auth/context';
 import { useSubscription } from '@/lib/subscription/context';
 import { checkPremiumFeaturesUsed } from '@/lib/subscription/feature-gates';
 import {
@@ -38,6 +39,9 @@ export function ExportBar() {
     const [canShare, setCanShare] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
+
+    // Get user for export tracking
+    const { user } = useAuth();
 
     // Subscription for feature gating
     const { checkFeature, exportsRemaining, isPro, refresh: refreshSubscription } = useSubscription();
@@ -285,11 +289,16 @@ export function ExportBar() {
 
     // Increment export count on server
     const incrementExport = async () => {
+        if (!user?.id) {
+            logger.error('export:increment-failed', new Error('No user ID available'));
+            return;
+        }
+
         try {
             await fetch('/api/subscription/increment-export', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: '00000000-0000-0000-0000-000000000000' }),
+                body: JSON.stringify({ userId: user.id }),
             });
             // Refresh subscription to update export count display
             await refreshSubscription();

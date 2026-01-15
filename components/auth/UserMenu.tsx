@@ -26,7 +26,7 @@ function UserAvatar({ src, name, size = 'sm' }: { src?: string | null; name?: st
   const sizeClasses = size === 'sm' ? 'w-7 h-7' : 'w-10 h-10';
   const iconSize = size === 'sm' ? 'w-4 h-4' : 'w-5 h-5';
   // Only show ring on medium size (dropdown), not on small (header button)
-  const ringClasses = size === 'md' ? 'ring-2 ring-zinc-700' : '';
+  const ringClasses = size === 'md' ? 'ring-2 ring-zinc-300 dark:ring-zinc-700' : '';
 
   if (src) {
     return (
@@ -73,7 +73,7 @@ function SettingsMenuContent({
           Theme
         </DropdownMenuSubTrigger>
         <DropdownMenuPortal>
-          <DropdownMenuSubContent className="rounded-xl bg-zinc-900/95 backdrop-blur-xl border-zinc-800">
+          <DropdownMenuSubContent className="rounded-xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
             <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer">
               <Sun className="mr-2 h-4 w-4" />
               <span>Light</span>
@@ -157,7 +157,7 @@ export function UserMenu() {
             <span className="hidden sm:inline">Menu</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56 rounded-xl bg-zinc-900/95 backdrop-blur-xl border-zinc-800">
+        <DropdownMenuContent align="end" className="w-56 rounded-xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
           <DropdownMenuItem onClick={handleLogin} className="cursor-pointer">
             <User className="w-4 h-4 mr-2" />
             Sign In
@@ -172,7 +172,7 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative flex items-center gap-1.5 sm:gap-2 h-8.5 pl-0.5 pr-0.5 sm:pr-3 rounded-full border border-zinc-700 bg-transparent hover:bg-zinc-800 transition-colors">
+        <button className="relative flex items-center gap-1.5 sm:gap-2 h-8.5 pl-0.5 pr-0.5 sm:pr-3 rounded-full border border-zinc-300 dark:border-zinc-700 bg-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
           <UserAvatar src={avatarUrl} name={displayName} size="sm" />
           <span className="max-w-[100px] truncate text-sm hidden sm:inline">
             {displayName}
@@ -182,12 +182,12 @@ export function UserMenu() {
               {/* Desktop crown - inline */}
               <Crown className="w-3.5 h-3.5 text-orange-500 hidden sm:block" />
               {/* Mobile crown - small badge positioned on avatar */}
-              <Crown className="w-3 h-3 text-orange-500 sm:hidden absolute -top-0.5 -right-0.5 bg-zinc-900 rounded-full p-0.5 box-content border border-zinc-700" />
+              <Crown className="w-3 h-3 text-orange-500 sm:hidden absolute -top-0.5 -right-0.5 bg-white dark:bg-zinc-900 rounded-full p-0.5 box-content border border-zinc-300 dark:border-zinc-700" />
             </>
           )}
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64 rounded-xl bg-zinc-900/95 backdrop-blur-xl border-zinc-800">
+      <DropdownMenuContent align="end" className="w-64 rounded-xl bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border-zinc-200 dark:border-zinc-800">
         <DropdownMenuLabel>
           <div className="flex items-center gap-3">
             <UserAvatar src={avatarUrl} name={displayName} size="md" />

@@ -117,7 +117,7 @@ const FEATURE_CONFIG: Record<FeatureId, {
   },
   unlimited_exports: {
     requiredPlan: 'monthly',
-    upgradeMessage: 'Upgrade to Pro for unlimited exports (Free: 10/day)',
+    upgradeMessage: 'Upgrade to Pro for unlimited exports (Free: 5/day)',
   },
 
   // Aspect Ratios
@@ -229,7 +229,7 @@ export function getLockedFeatures(plan: SubscriptionPlan): FeatureId[] {
 // =============================================
 export const FREE_TIER_LIMITS = {
   // Export limits
-  exportsPerDay: 10,  // 10 exports per day for free users
+  exportsPerDay: 5,  // 5 exports per day for free users
 
   // Background limits
   solidColorCount: 24,        // First 24 colors (out of 72)
