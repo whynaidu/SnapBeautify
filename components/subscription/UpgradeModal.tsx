@@ -12,7 +12,7 @@ import {
   Crown,
   Gem,
   Shield,
-  Infinity,
+  Infinity as InfinityIcon,
   Image,
   Download,
   Palette
@@ -28,7 +28,7 @@ interface UpgradeModalProps {
 const proFeatures = [
   { icon: Palette, text: 'Premium backgrounds' },
   { icon: Image, text: 'No watermark' },
-  { icon: Infinity, text: 'Unlimited exports' },
+  { icon: InfinityIcon, text: 'Unlimited exports' },
   { icon: Download, text: '4K export quality' },
 ];
 
