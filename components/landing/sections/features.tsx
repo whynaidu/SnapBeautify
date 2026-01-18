@@ -1,11 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
 import { Section } from '../layout/section'
 import { Badge } from '../shared/badge'
 import { FadeIn } from '../animations/fade-in'
 import { cn } from '@/lib/utils'
+import { useIsMobile } from '@/lib/hooks/useWindowSize'
 import {
   Palette,
   Sparkles,
@@ -27,18 +27,6 @@ import {
   BadgeCheck,
   FileImage,
 } from 'lucide-react'
-
-// Mobile detection hook for disabling heavy animations
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-  return isMobile;
-}
 
 interface Feature {
   icon: LucideIcon

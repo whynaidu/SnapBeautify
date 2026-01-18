@@ -4,6 +4,7 @@ import { useAuth } from '@/lib/auth/context';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import {
   Sparkles,
   Loader2,
@@ -19,27 +20,106 @@ import {
   CheckCircle,
   Image,
   Wand2,
-  Star,
-  Layers,
-  Camera,
   Home
 } from 'lucide-react';
 import { GitHubIcon } from '@/components/ui/icons';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useReducer } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
-// Mobile detection hook for performance optimization
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-  return isMobile;
+// Dynamic imports for heavy animation components (reduces initial bundle)
+const AnimatedBlob = dynamic(
+  () => import('./AuthAnimations').then(mod => mod.AnimatedBlob),
+  { ssr: false }
+);
+const FloatingIcon = dynamic(
+  () => import('./AuthAnimations').then(mod => mod.FloatingIcon),
+  { ssr: false }
+);
+const Particles = dynamic(
+  () => import('./AuthAnimations').then(mod => mod.Particles),
+  { ssr: false }
+);
+
+// Static import for floatingIcons config (just data, not a component)
+import { floatingIcons } from './AuthAnimations';
+
+// Form state reducer for consolidated state management
+type AuthFormState = {
+  mode: 'login' | 'signup';
+  email: string;
+  password: string;
+  confirmPassword: string;
+  isSubmitting: boolean;
+  emailSent: boolean;
+  error: string | null;
+  showPassword: boolean;
+  showConfirmPassword: boolean;
+};
+
+type AuthFormAction =
+  | { type: 'SET_MODE'; payload: 'login' | 'signup' }
+  | { type: 'SET_EMAIL'; payload: string }
+  | { type: 'SET_PASSWORD'; payload: string }
+  | { type: 'SET_CONFIRM_PASSWORD'; payload: string }
+  | { type: 'SET_SUBMITTING'; payload: boolean }
+  | { type: 'SET_EMAIL_SENT'; payload: boolean }
+  | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'TOGGLE_SHOW_PASSWORD' }
+  | { type: 'TOGGLE_SHOW_CONFIRM_PASSWORD' }
+  | { type: 'RESET_FORM' }
+  | { type: 'SWITCH_MODE'; payload: 'login' | 'signup' };
+
+const initialFormState: AuthFormState = {
+  mode: 'login',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  isSubmitting: false,
+  emailSent: false,
+  error: null,
+  showPassword: false,
+  showConfirmPassword: false,
+};
+
+function authFormReducer(state: AuthFormState, action: AuthFormAction): AuthFormState {
+  switch (action.type) {
+    case 'SET_MODE':
+      return { ...state, mode: action.payload };
+    case 'SET_EMAIL':
+      return { ...state, email: action.payload };
+    case 'SET_PASSWORD':
+      return { ...state, password: action.payload };
+    case 'SET_CONFIRM_PASSWORD':
+      return { ...state, confirmPassword: action.payload };
+    case 'SET_SUBMITTING':
+      return { ...state, isSubmitting: action.payload };
+    case 'SET_EMAIL_SENT':
+      return { ...state, emailSent: action.payload };
+    case 'SET_ERROR':
+      return { ...state, error: action.payload };
+    case 'TOGGLE_SHOW_PASSWORD':
+      return { ...state, showPassword: !state.showPassword };
+    case 'TOGGLE_SHOW_CONFIRM_PASSWORD':
+      return { ...state, showConfirmPassword: !state.showConfirmPassword };
+    case 'RESET_FORM':
+      return { ...initialFormState };
+    case 'SWITCH_MODE':
+      return {
+        ...state,
+        mode: action.payload,
+        error: null,
+        password: '',
+        confirmPassword: '',
+        showPassword: false,
+        showConfirmPassword: false,
+      };
+    default:
+      return state;
+  }
 }
+import { useSearchParams } from 'next/navigation';
+import { useIsMobile } from '@/lib/hooks/useWindowSize';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
 interface AuthGateProps {
   children: React.ReactNode;
@@ -51,130 +131,28 @@ const features = [
   { icon: Image, title: 'Pro Quality', description: 'Professional results instantly' },
 ];
 
-// Floating icons for background decoration
-const floatingIcons = [
-  { icon: Star, x: '10%', y: '20%', delay: 0 },
-  { icon: Camera, x: '85%', y: '15%', delay: 0.5 },
-  { icon: Layers, x: '75%', y: '70%', delay: 1 },
-  { icon: Sparkles, x: '15%', y: '75%', delay: 1.5 },
-  { icon: Wand2, x: '90%', y: '45%', delay: 2 },
-];
-
-// Animated background blob - static on mobile for performance
-function AnimatedBlob({ className, isMobile }: { className?: string; isMobile?: boolean }) {
-  // On mobile, render a static blob without animations
-  if (isMobile) {
-    return <div className={className} style={{ borderRadius: '30% 70% 70% 30% / 30% 30% 70% 70%' }} />;
-  }
-  return (
-    <motion.div
-      className={className}
-      animate={{
-        scale: [1, 1.2, 1],
-        rotate: [0, 90, 180, 270, 360],
-        borderRadius: ['30% 70% 70% 30% / 30% 30% 70% 70%', '70% 30% 30% 70% / 70% 70% 30% 30%', '30% 70% 70% 30% / 30% 30% 70% 70%'],
-      }}
-      transition={{
-        duration: 20,
-        repeat: Infinity,
-        ease: 'linear',
-      }}
-    />
-  );
-}
-
-// Floating icon component - static on mobile for performance
-function FloatingIcon({ icon: Icon, x, y, delay, isMobile }: { icon: React.ComponentType<{ className?: string }>; x: string; y: string; delay: number; isMobile?: boolean }) {
-  // On mobile, render a static icon without animations
-  if (isMobile) {
-    return (
-      <div
-        className="absolute text-zinc-300 dark:text-zinc-700 opacity-40"
-        style={{ left: x, top: y }}
-      >
-        <Icon className="w-6 h-6" />
-      </div>
-    );
-  }
-  return (
-    <motion.div
-      className="absolute text-zinc-300 dark:text-zinc-700"
-      style={{ left: x, top: y }}
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{
-        opacity: [0.3, 0.6, 0.3],
-        scale: [1, 1.2, 1],
-        y: [0, -20, 0],
-        rotate: [0, 10, -10, 0],
-      }}
-      transition={{
-        duration: 6,
-        delay,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      }}
-    >
-      <Icon className="w-6 h-6" />
-    </motion.div>
-  );
-}
-
-// Pre-generated particle positions for stable rendering (reduced count for performance)
-const particleData = Array.from({ length: 10 }, (_, i) => ({
-  id: i,
-  left: `${(i * 17 + 5) % 100}%`,
-  top: `${(i * 23 + 10) % 100}%`,
-  duration: 3 + (i % 5) * 0.4,
-  delay: (i % 4) * 0.5,
-}));
-
-// Particle effect - disabled on mobile for performance
-function Particles({ isMobile }: { isMobile?: boolean }) {
-  // Skip particles entirely on mobile
-  if (isMobile) return null;
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particleData.map((particle) => (
-        <motion.div
-          key={particle.id}
-          className="absolute w-1 h-1 bg-zinc-400/30 dark:bg-zinc-600/30 rounded-full"
-          style={{
-            left: particle.left,
-            top: particle.top,
-          }}
-          animate={{
-            y: [0, -100, 0],
-            opacity: [0, 1, 0],
-            scale: [0, 1, 0],
-          }}
-          transition={{
-            duration: particle.duration,
-            delay: particle.delay,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 // Inner component that uses useSearchParams - must be wrapped in Suspense
 function AuthGateInner({ children }: AuthGateProps) {
   const { isAuthenticated, isLoading, signIn, signUp, signInWithGoogle, signInWithGithub } = useAuth();
   const searchParams = useSearchParams();
   const fromLogout = searchParams.get('fromLogout') === 'true';
   const isMobile = useIsMobile(); // For disabling heavy animations on mobile
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const reducedMotion = useReducedMotion(); // Respect user's motion preferences
+
+  // Consolidated form state using useReducer
+  const [formState, dispatch] = useReducer(authFormReducer, initialFormState);
+  const { mode, email, password, confirmPassword, isSubmitting, emailSent, error, showPassword, showConfirmPassword } = formState;
+
+  // Helper functions for dispatch
+  const setEmail = (payload: string) => dispatch({ type: 'SET_EMAIL', payload });
+  const setPassword = (payload: string) => dispatch({ type: 'SET_PASSWORD', payload });
+  const setConfirmPassword = (payload: string) => dispatch({ type: 'SET_CONFIRM_PASSWORD', payload });
+  const setIsSubmitting = (payload: boolean) => dispatch({ type: 'SET_SUBMITTING', payload });
+  const setEmailSent = (payload: boolean) => dispatch({ type: 'SET_EMAIL_SENT', payload });
+  const setError = (payload: string | null) => dispatch({ type: 'SET_ERROR', payload });
+  const toggleShowPassword = () => dispatch({ type: 'TOGGLE_SHOW_PASSWORD' });
+  const toggleShowConfirmPassword = () => dispatch({ type: 'TOGGLE_SHOW_CONFIRM_PASSWORD' });
+
   // Track if initial auth check is done to prevent flicker
   const [authCheckDone, setAuthCheckDone] = useState(fromLogout);
 
@@ -248,29 +226,18 @@ function AuthGateInner({ children }: AuthGateProps) {
   };
 
   const handleBackToLogin = () => {
-    setEmailSent(false);
-    setMode('login');
-    setPassword('');
-    setConfirmPassword('');
-    setError(null);
-    setShowPassword(false);
-    setShowConfirmPassword(false);
+    dispatch({ type: 'RESET_FORM' });
   };
 
   const handleModeSwitch = (newMode: 'login' | 'signup') => {
-    setMode(newMode);
-    setError(null);
-    setPassword('');
-    setConfirmPassword('');
-    setShowPassword(false);
-    setShowConfirmPassword(false);
+    dispatch({ type: 'SWITCH_MODE', payload: newMode });
   };
 
   // Show loading state until auth check is complete
   // Skip loader if coming from logout (authCheckDone is initialized to true in that case)
   if (!authCheckDone) {
     return (
-      <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center overflow-hidden">
+      <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center overflow-hidden" role="status" aria-live="polite" aria-label="Loading application">
         <motion.div
           className="flex flex-col items-center gap-6"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -278,7 +245,7 @@ function AuthGateInner({ children }: AuthGateProps) {
           transition={{ duration: 0.5 }}
         >
           {/* Animated rings */}
-          <div className="relative">
+          <div className="relative" aria-hidden="true">
             <motion.div
               className="absolute inset-0 w-24 h-24 rounded-full border-4 border-zinc-200 dark:border-zinc-800"
               animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
@@ -311,7 +278,7 @@ function AuthGateInner({ children }: AuthGateProps) {
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            <Loader2 className="w-5 h-5 animate-spin" />
+            <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
             <span className="text-lg font-medium">Loading SnapBeautify...</span>
           </motion.div>
         </motion.div>
@@ -325,7 +292,7 @@ function AuthGateInner({ children }: AuthGateProps) {
     if (emailSent) {
       return (
         <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center p-4 overflow-hidden">
-          <Particles isMobile={isMobile} />
+          <Particles isMobile={isMobile} reducedMotion={reducedMotion} />
           <motion.div
             className="w-full max-w-md relative z-10"
             initial={{ opacity: 0, y: 40, scale: 0.9 }}
@@ -441,16 +408,16 @@ function AuthGateInner({ children }: AuthGateProps) {
           </div>
 
           {/* Animated blobs */}
-          <AnimatedBlob isMobile={isMobile} className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-zinc-200/50 to-zinc-300/50 dark:from-zinc-800/50 dark:to-zinc-700/50 blur-3xl" />
-          <AnimatedBlob isMobile={isMobile} className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-br from-zinc-300/30 to-zinc-200/30 dark:from-zinc-700/30 dark:to-zinc-800/30 blur-3xl" />
+          <AnimatedBlob isMobile={isMobile} reducedMotion={reducedMotion} className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-zinc-200/50 to-zinc-300/50 dark:from-zinc-800/50 dark:to-zinc-700/50 blur-3xl" />
+          <AnimatedBlob isMobile={isMobile} reducedMotion={reducedMotion} className="absolute bottom-20 left-20 w-80 h-80 bg-gradient-to-br from-zinc-300/30 to-zinc-200/30 dark:from-zinc-700/30 dark:to-zinc-800/30 blur-3xl" />
 
           {/* Floating icons */}
           {floatingIcons.map((item, index) => (
-            <FloatingIcon key={index} {...item} isMobile={isMobile} />
+            <FloatingIcon key={index} {...item} isMobile={isMobile} reducedMotion={reducedMotion} />
           ))}
 
           {/* Particles */}
-          <Particles isMobile={isMobile} />
+          <Particles isMobile={isMobile} reducedMotion={reducedMotion} />
 
           <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20">
             {/* Logo with animation */}
@@ -576,7 +543,7 @@ function AuthGateInner({ children }: AuthGateProps) {
         <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative">
           {/* Mobile particles */}
           <div className="lg:hidden">
-            <Particles isMobile={isMobile} />
+            <Particles isMobile={isMobile} reducedMotion={reducedMotion} />
           </div>
 
           <motion.div
@@ -801,6 +768,8 @@ function AuthGateInner({ children }: AuthGateProps) {
                       className="pl-11 h-12 bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 rounded-xl focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent transition-all hover:border-zinc-300 dark:hover:border-zinc-700"
                       required
                       disabled={isSubmitting}
+                      autoComplete="email"
+                      spellCheck={false}
                     />
                   </div>
                 </div>
@@ -822,13 +791,15 @@ function AuthGateInner({ children }: AuthGateProps) {
                       required
                       disabled={isSubmitting}
                       minLength={6}
+                      autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                     />
                     <button
                       type="button"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={toggleShowPassword}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
                     </button>
                   </div>
                 </div>
@@ -864,14 +835,16 @@ function AuthGateInner({ children }: AuthGateProps) {
                         required={mode === 'signup'}
                         disabled={isSubmitting || mode === 'login'}
                         tabIndex={mode === 'signup' ? 0 : -1}
+                        autoComplete="new-password"
                       />
                       <button
                         type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        onClick={toggleShowConfirmPassword}
+                        aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
                         tabIndex={mode === 'signup' ? 0 : -1}
                       >
-                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showConfirmPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
                       </button>
                     </div>
                   </div>
@@ -982,17 +955,17 @@ function AuthGateInner({ children }: AuthGateProps) {
 // Loading fallback for Suspense - matches the AuthGate loading animation to prevent flicker
 function AuthGateLoading() {
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center overflow-hidden">
+    <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center overflow-hidden" role="status" aria-live="polite" aria-label="Loading application">
       <div className="flex flex-col items-center gap-6">
         {/* Static version of the animated rings (no motion to avoid hydration issues) */}
-        <div className="relative">
+        <div className="relative" aria-hidden="true">
           <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-zinc-200 dark:border-zinc-800 opacity-50" />
           <div className="relative w-24 h-24 rounded-2xl bg-black dark:bg-white flex items-center justify-center">
             <Sparkles className="w-12 h-12 text-white dark:text-black" />
           </div>
         </div>
         <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
-          <Loader2 className="w-5 h-5 animate-spin" />
+          <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
           <span className="text-lg font-medium">Loading SnapBeautify...</span>
         </div>
       </div>

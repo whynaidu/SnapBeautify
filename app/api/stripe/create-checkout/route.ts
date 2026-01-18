@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { STRIPE_PRICE_IDS } from '@/lib/subscription/pricing';
+import { verifyPaymentAuth, unauthorizedResponse } from '@/lib/auth/payment-auth';
+import { checkRateLimit, getClientIdentifier, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 
 // Initialize Stripe
 function getStripeInstance() {
@@ -15,6 +17,16 @@ function getStripeInstance() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const clientId = getClientIdentifier(request);
+    const rateLimit = checkRateLimit(`payment:stripe:${clientId}`, RATE_LIMIT_PRESETS.payment);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { planType, userId, email, successUrl, cancelUrl } = body;
 
@@ -23,6 +35,12 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required fields: planType, userId' },
         { status: 400 }
       );
+    }
+
+    // Verify authenticated user matches the userId
+    const auth = await verifyPaymentAuth(userId);
+    if (!auth.authenticated) {
+      return unauthorizedResponse(auth.error || 'Unauthorized', auth.error?.includes('Forbidden') ? 403 : 401);
     }
 
     // Validate plan type

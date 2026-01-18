@@ -11,9 +11,30 @@ import {
   updateAdminLastLogin,
   createAuditLog,
 } from '@/lib/admin/supabase';
+import { checkRateLimit, getClientIdentifier, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting for brute force protection
+    const clientId = getClientIdentifier(request);
+    const rateLimit = checkRateLimit(`admin:login:${clientId}`, RATE_LIMIT_PRESETS.auth);
+    if (!rateLimit.success) {
+      const retryAfter = Math.ceil((rateLimit.resetTime - Date.now()) / 1000);
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Too many login attempts. Please try again later.',
+          retryAfter,
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': String(retryAfter),
+          },
+        }
+      );
+    }
+
     const body = await request.json();
     const { email, password } = body;
 
@@ -34,7 +55,6 @@ export async function POST(request: NextRequest) {
 
     // Get admin user
     const admin = await getAdminByEmail(email);
-    console.log('Admin lookup result:', admin ? 'found' : 'not found', 'for email:', email);
 
     if (!admin) {
       return NextResponse.json(
@@ -52,9 +72,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
-    console.log('Password hash from DB:', admin.password_hash?.substring(0, 20) + '...');
     const isValidPassword = await verifyPassword(password, admin.password_hash);
-    console.log('Password verification result:', isValidPassword);
 
     if (!isValidPassword) {
       return NextResponse.json(

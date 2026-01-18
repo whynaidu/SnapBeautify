@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useCallback } from 'react';
+import useSWR, { mutate } from 'swr';
 import { useAuth } from '@/lib/auth/context';
 import { showAuthModal } from '@/lib/events';
 import { logger } from '@/lib/utils/logger';
@@ -25,6 +26,46 @@ declare global {
   }
 }
 
+// SWR fetcher with error handling
+const fetcher = async <T,>(url: string): Promise<T> => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${url}`);
+  }
+  return response.json();
+};
+
+// SWR configuration for pricing (static data, long cache)
+const PRICING_SWR_CONFIG = {
+  revalidateOnFocus: false,      // Pricing doesn't change often
+  revalidateOnReconnect: false,
+  dedupingInterval: 300000,      // 5 minutes deduplication
+  errorRetryCount: 3,
+};
+
+// SWR configuration for subscription status (user-specific, shorter cache)
+const STATUS_SWR_CONFIG = {
+  revalidateOnFocus: true,       // Revalidate when user returns to tab
+  revalidateOnReconnect: true,   // Revalidate on network reconnect
+  dedupingInterval: 60000,       // 1 minute deduplication
+  errorRetryCount: 3,
+};
+
+// Types for API responses
+interface PricingResponse extends PricingConfig {
+  annualSavings: number;
+  monthlyEquivalent: number;
+}
+
+interface SubscriptionStatusResponse {
+  isPro: boolean;
+  subscription: Subscription | null;
+  plan: SubscriptionPlan;
+  expiresAt: string | null;
+  exportCount: number;
+  exportsRemaining: number;
+}
+
 interface SubscriptionContextType extends UserSubscriptionState {
   pricing: PricingConfig | null;
   exportCount: number;
@@ -33,80 +74,60 @@ interface SubscriptionContextType extends UserSubscriptionState {
   checkFeature: (featureId: FeatureId) => { hasAccess: boolean; upgradeMessage?: string };
   initiateCheckout: (planType: 'monthly' | 'annual' | 'lifetime') => Promise<void>;
   openCustomerPortal: () => Promise<void>;
-  requireAuth: () => boolean; // Returns true if already authenticated
+  requireAuth: () => boolean;
 }
 
 const SubscriptionContext = createContext<SubscriptionContextType | null>(null);
 
 export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isPro, setIsPro] = useState(false);
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [plan, setPlan] = useState<SubscriptionPlan>('free');
-  const [expiresAt, setExpiresAt] = useState<Date | null>(null);
-  const [pricing, setPricing] = useState<PricingConfig | null>(null);
-  const [exportCount, setExportCount] = useState(0);
-  const [exportsRemaining, setExportsRemaining] = useState(FREE_TIER_LIMITS.exportsPerDay);
-
-  // Get current user ID
   const userId = user?.id;
 
-  // Fetch pricing configuration
-  const fetchPricing = useCallback(async () => {
-    try {
-      const response = await fetch('/api/subscription/pricing');
-      if (response.ok) {
-        const data = await response.json();
-        setPricing(data);
-      }
-    } catch (error) {
-      logger.error('subscription:pricing-fetch', error instanceof Error ? error : new Error(String(error)));
-    }
-  }, []);
+  // SWR for pricing - fetches immediately on mount (doesn't need auth)
+  // Benefits: automatic caching, deduplication across components, background revalidation
+  const {
+    data: pricingData,
+    isLoading: pricingLoading,
+  } = useSWR<PricingResponse>(
+    '/api/subscription/pricing',
+    fetcher,
+    PRICING_SWR_CONFIG
+  );
 
-  // Fetch subscription status
-  const fetchStatus = useCallback(async () => {
-    if (!userId) {
-      // Not logged in - reset to free tier
-      setIsPro(false);
-      setSubscription(null);
-      setPlan('free');
-      setExpiresAt(null);
-      setExportCount(0);
-      setExportsRemaining(FREE_TIER_LIMITS.exportsPerDay);
-      return;
-    }
+  // SWR for subscription status - only fetches when userId is available
+  // Benefits: automatic revalidation on focus, deduplication, error retry
+  const {
+    data: statusData,
+    isLoading: statusLoading,
+  } = useSWR<SubscriptionStatusResponse>(
+    userId ? `/api/subscription/status?userId=${userId}` : null, // null key = don't fetch
+    fetcher,
+    STATUS_SWR_CONFIG
+  );
 
+  // Derive values from SWR data with fallbacks
+  const pricing = pricingData ?? null;
+  const isPro = statusData?.isPro ?? false;
+  const subscription = statusData?.subscription ?? null;
+  const plan: SubscriptionPlan = statusData?.plan ?? 'free';
+  const expiresAt = statusData?.expiresAt ? new Date(statusData.expiresAt) : null;
+  const exportCount = statusData?.exportCount ?? 0;
+  const exportsRemaining = statusData?.exportsRemaining ?? FREE_TIER_LIMITS.exportsPerDay;
+
+  // Combined loading state
+  const isLoading = authLoading || pricingLoading || (userId ? statusLoading : false);
+
+  // Refresh function - uses SWR's mutate for revalidation
+  const refresh = useCallback(async () => {
     try {
-      const response = await fetch(`/api/subscription/status?userId=${userId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setIsPro(data.isPro);
-        setSubscription(data.subscription);
-        setPlan(data.plan);
-        setExpiresAt(data.expiresAt ? new Date(data.expiresAt) : null);
-        setExportCount(data.exportCount || 0);
-        setExportsRemaining(data.exportsRemaining ?? FREE_TIER_LIMITS.exportsPerDay);
-      }
+      await Promise.all([
+        mutate('/api/subscription/pricing'),
+        userId ? mutate(`/api/subscription/status?userId=${userId}`) : Promise.resolve(),
+      ]);
     } catch (error) {
-      logger.error('subscription:status-fetch', error instanceof Error ? error : new Error(String(error)));
+      logger.error('subscription:refresh', error instanceof Error ? error : new Error(String(error)));
     }
   }, [userId]);
-
-  // Refresh all subscription data
-  const refresh = useCallback(async () => {
-    setIsLoading(true);
-    await Promise.all([fetchPricing(), fetchStatus()]);
-    setIsLoading(false);
-  }, [fetchPricing, fetchStatus]);
-
-  // Initial load and when auth changes
-  useEffect(() => {
-    if (!authLoading) {
-      refresh();
-    }
-  }, [refresh, authLoading, userId]);
 
   // Check if user has access to a feature
   const checkFeature = useCallback(
@@ -125,12 +146,11 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     if (isAuthenticated) {
       return true;
     }
-    // Dispatch event to open auth modal
     showAuthModal({ defaultTab: 'signup' });
     return false;
   }, [isAuthenticated]);
 
-  // Load Razorpay script
+  // Load Razorpay script (lazy loaded on checkout)
   const loadRazorpayScript = useCallback((): Promise<boolean> => {
     return new Promise((resolve) => {
       if (window.Razorpay) {
@@ -149,7 +169,6 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   // Initiate checkout based on gateway
   const initiateCheckout = useCallback(
     async (planType: 'monthly' | 'annual' | 'lifetime') => {
-      // Require authentication first
       if (!requireAuth()) {
         return;
       }
@@ -167,7 +186,6 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         }
 
         try {
-          // Lifetime uses one-time Order, others use Subscription
           const isLifetime = planType === 'lifetime';
           const apiEndpoint = isLifetime
             ? '/api/razorpay/create-order'
@@ -204,14 +222,12 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
             prefill: {
               email: user?.email || '',
             },
-            // Enable recurring for subscriptions (required for UPI AutoPay mandate)
             ...(isLifetime ? {} : { recurring: '1' as const }),
             notes: {
               userId,
               planType,
             },
             handler: async (response: RazorpayPaymentResponse) => {
-              // Verify payment - different endpoints for order vs subscription
               const verifyEndpoint = isLifetime
                 ? '/api/razorpay/verify-order'
                 : '/api/razorpay/verify';
@@ -228,8 +244,8 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
               });
 
               if (verifyResponse.ok) {
-                await refresh();
-                // Show success message
+                // Revalidate subscription status after successful payment
+                await mutate(`/api/subscription/status?userId=${userId}`);
                 window.dispatchEvent(new CustomEvent('subscription-success', {
                   detail: { plan: planType }
                 }));
@@ -247,7 +263,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
               ondismiss: () => {
                 logger.debug('subscription:razorpay-modal-closed');
               },
-              confirm_close: true, // Ask user to confirm before closing
+              confirm_close: true,
             },
           };
 
@@ -288,7 +304,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         }
       }
     },
-    [pricing, loadRazorpayScript, refresh, requireAuth, userId, user?.email]
+    [pricing, loadRazorpayScript, requireAuth, userId, user?.email]
   );
 
   // Open customer portal (Stripe only)
@@ -320,7 +336,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   }, [userId]);
 
   const value: SubscriptionContextType = {
-    isLoading: isLoading || authLoading,
+    isLoading,
     isPro,
     subscription,
     plan,

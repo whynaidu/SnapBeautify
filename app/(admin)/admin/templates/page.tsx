@@ -370,8 +370,9 @@ export default function AdminTemplatesPage() {
                       <TableRow key={template.id}>
                         <TableCell>
                           <div className="flex items-center gap-4">
+                            {/* Mini Template Preview */}
                             <div
-                              className="h-10 w-10 rounded-lg border flex items-center justify-center overflow-hidden shrink-0"
+                              className="w-16 h-12 rounded-lg border border-border overflow-hidden shrink-0 p-1"
                               style={{
                                 background: template.preview.backgroundType === 'solid'
                                   ? template.preview.backgroundColor
@@ -380,7 +381,22 @@ export default function AdminTemplatesPage() {
                                   : template.preview.meshGradientCSS || '#1e1e1e',
                               }}
                             >
-                              <LayoutTemplate className="h-4 w-4 text-white/50" />
+                              {/* Mini Mock Screenshot */}
+                              <div
+                                className="w-full h-full bg-white/90 dark:bg-zinc-200"
+                                style={{
+                                  borderRadius: `${Math.min(template.settings.borderRadius / 4, 4)}px`,
+                                  boxShadow: template.settings.shadowBlur > 0
+                                    ? `0 1px ${template.settings.shadowBlur / 10}px rgba(0,0,0,${template.settings.shadowOpacity})`
+                                    : 'none',
+                                }}
+                              >
+                                <div className="h-1.5 bg-zinc-200 dark:bg-zinc-300 rounded-t flex items-center px-0.5 gap-0.5">
+                                  <div className="w-0.5 h-0.5 rounded-full bg-red-400" />
+                                  <div className="w-0.5 h-0.5 rounded-full bg-yellow-400" />
+                                  <div className="w-0.5 h-0.5 rounded-full bg-green-400" />
+                                </div>
+                              </div>
                             </div>
                             <div>
                               <p className="font-medium">{template.name}</p>

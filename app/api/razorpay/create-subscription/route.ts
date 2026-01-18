@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { RAZORPAY_PLAN_IDS } from '@/lib/subscription/pricing';
+import { verifyPaymentAuth, unauthorizedResponse } from '@/lib/auth/payment-auth';
+import { checkRateLimit, getClientIdentifier, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 
 // Initialize Razorpay instance
 function getRazorpayInstance() {
@@ -8,20 +10,8 @@ function getRazorpayInstance() {
   const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim();
 
   if (!keyId || !keySecret) {
-    console.error('Razorpay credentials missing:', {
-      hasKeyId: !!keyId,
-      hasKeySecret: !!keySecret,
-      keyIdPrefix: keyId?.substring(0, 10)
-    });
     throw new Error('Razorpay credentials not configured');
   }
-
-  // Log key format for debugging (only prefix)
-  console.log('Razorpay init:', {
-    keyIdPrefix: keyId.substring(0, 12) + '...',
-    keyIdLength: keyId.length,
-    isTestMode: keyId.startsWith('rzp_test_')
-  });
 
   return new Razorpay({
     key_id: keyId,
@@ -31,6 +21,16 @@ function getRazorpayInstance() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const clientId = getClientIdentifier(request);
+    const rateLimit = checkRateLimit(`payment:subscription:${clientId}`, RATE_LIMIT_PRESETS.payment);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { planType, userId, email, name } = body;
 
@@ -39,6 +39,12 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required fields: planType, userId' },
         { status: 400 }
       );
+    }
+
+    // Verify authenticated user matches the userId
+    const auth = await verifyPaymentAuth(userId);
+    if (!auth.authenticated) {
+      return unauthorizedResponse(auth.error || 'Unauthorized', auth.error?.includes('Forbidden') ? 403 : 401);
     }
 
     // Validate plan type

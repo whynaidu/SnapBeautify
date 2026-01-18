@@ -550,9 +550,10 @@ export function ExportBar() {
                             size="sm"
                             onClick={handleShare}
                             disabled={!originalImage || isExporting}
+                            aria-label="Share image"
                             className={`gap-1.5 sm:gap-2 px-3 sm:px-4 rounded-full border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${!canExport ? 'border-amber-400 dark:border-amber-600' : ''}`}
                         >
-                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : !canExport ? <Lock className="w-4 h-4 text-amber-500" /> : <Share2 className="w-4 h-4" />}
+                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : !canExport ? <Lock className="w-4 h-4 text-amber-500" aria-hidden="true" /> : <Share2 className="w-4 h-4" aria-hidden="true" />}
                             <span className="hidden sm:inline text-sm font-medium">Share</span>
                         </Button>
                     )
@@ -563,9 +564,10 @@ export function ExportBar() {
                             size="sm"
                             onClick={handleCopy}
                             disabled={!originalImage || isExporting}
+                            aria-label="Copy to clipboard"
                             className={`gap-1.5 sm:gap-2 px-3 sm:px-4 rounded-full border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${!canExport ? 'border-amber-400 dark:border-amber-600' : ''}`}
                         >
-                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : !canExport ? <Lock className="w-4 h-4 text-amber-500" /> : <Copy className="w-4 h-4" />}
+                            {isExporting ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : !canExport ? <Lock className="w-4 h-4 text-amber-500" aria-hidden="true" /> : <Copy className="w-4 h-4" aria-hidden="true" />}
                             <span className="hidden sm:inline text-sm font-medium">Copy</span>
                         </Button>
                     )
@@ -575,13 +577,14 @@ export function ExportBar() {
                     size="sm"
                     onClick={handleDownload}
                     disabled={!originalImage || isExporting}
+                    aria-label={!canExport ? 'Upgrade to Pro' : 'Save image'}
                     className={`gap-1.5 sm:gap-2 px-4 sm:px-6 rounded-full font-semibold text-sm shadow-lg ${
                         !canExport
                             ? 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-amber-500/25'
                             : 'bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 shadow-black/10 dark:shadow-white/10'
                     }`}
                 >
-                    {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : !canExport ? <Crown className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+                    {isExporting ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> : !canExport ? <Crown className="w-4 h-4" aria-hidden="true" /> : <Download className="w-4 h-4" aria-hidden="true" />}
                     <span>{!canExport ? 'Upgrade' : 'Save'}</span>
                 </Button>
             </div>

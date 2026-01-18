@@ -1,6 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { incrementExportCount, hasProAccess } from '@/lib/subscription/supabase';
 import { FREE_TIER_LIMITS } from '@/lib/subscription/feature-gates';
+
+// Create Supabase client for auth verification
+async function getAuthenticatedUser() {
+  const cookieStore = await cookies();
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return null;
+  }
+
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+    },
+  });
+
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    return null;
+  }
+
+  return user;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,6 +52,22 @@ export async function POST(request: NextRequest) {
         newCount: 0,
         remaining: FREE_TIER_LIMITS.exportsPerDay,
       });
+    }
+
+    // Verify authenticated user matches requested userId
+    const authenticatedUser = await getAuthenticatedUser();
+    if (!authenticatedUser) {
+      return NextResponse.json(
+        { error: 'Unauthorized - please sign in' },
+        { status: 401 }
+      );
+    }
+
+    if (authenticatedUser.id !== userId) {
+      return NextResponse.json(
+        { error: 'Forbidden - cannot modify other user data' },
+        { status: 403 }
+      );
     }
 
     // Check if user is Pro - Pro users don't need to track exports

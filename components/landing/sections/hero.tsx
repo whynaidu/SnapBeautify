@@ -7,6 +7,7 @@ import { Badge } from '../shared/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '../layout/container'
 import { FadeIn } from '../animations/fade-in'
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion'
 import {
   Sparkles,
   ArrowRight,
@@ -20,8 +21,8 @@ import {
   ImageIcon
 } from 'lucide-react'
 
-// Simplified, performant animated background - drastically reduced from 55+ to ~6 animations
-function AnimatedBackground() {
+// Simplified, performant animated background - respects prefers-reduced-motion
+function AnimatedBackground({ reducedMotion }: { reducedMotion: boolean }) {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden">
       <div className="absolute inset-0 bg-white dark:bg-black" />
@@ -41,12 +42,16 @@ function AnimatedBackground() {
       <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-violet-500/15 dark:bg-violet-400/10 blur-3xl" />
       <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-pink-500/15 dark:bg-pink-400/10 blur-3xl" />
 
-      {/* Only animate on desktop - hidden completely on mobile */}
-      <motion.div
-        className="hidden lg:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-blue-500/10 dark:bg-blue-400/10 blur-3xl"
-        animate={{ scale: [1, 1.2, 1] }}
-        transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-      />
+      {/* Only animate on desktop when reduced motion is not preferred */}
+      {reducedMotion ? (
+        <div className="hidden lg:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-blue-500/10 dark:bg-blue-400/10 blur-3xl" />
+      ) : (
+        <motion.div
+          className="hidden lg:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-blue-500/10 dark:bg-blue-400/10 blur-3xl"
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+        />
+      )}
 
       {/* Static decorative rings - NO rotation, desktop only */}
       <div className="hidden lg:block absolute top-16 left-16 w-64 h-64 rounded-full border border-zinc-200/50 dark:border-zinc-700/50" />
@@ -197,70 +202,81 @@ function Stats() {
 }
 
 export function HeroSection() {
+  // Respect user's motion preferences for accessibility
+  const reducedMotion = useReducedMotion()
+
+  // Animation props - disabled when user prefers reduced motion
+  const hoverAnimation = reducedMotion ? {} : { scale: 1.05 }
+  const tapAnimation = reducedMotion ? {} : { scale: 0.95 }
+
   return (
     <section className="relative min-h-screen flex flex-col justify-center pt-24 pb-16 lg:pt-32 lg:pb-24">
-      {/* Animated Background */}
-      <AnimatedBackground />
+      {/* Animated Background - respects reduced motion */}
+      <AnimatedBackground reducedMotion={reducedMotion} />
 
       <Container className="relative z-10">
         {/* Hero content - Centered */}
         <div className="text-center mb-12 lg:mb-16">
           <FadeIn immediate>
             <Badge variant="default" className="mb-6">
-              <Sparkles className="w-3 h-3 mr-2" />
+              <Sparkles className="w-3 h-3 mr-2" aria-hidden="true" />
               Screenshot Beautification Made Simple
             </Badge>
           </FadeIn>
 
-          <FadeIn delay={0.1} immediate>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-black dark:text-white mb-6 max-w-4xl mx-auto">
+          <FadeIn delay={reducedMotion ? 0 : 0.1} immediate>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-black dark:text-white mb-6 max-w-4xl mx-auto text-balance">
               Make Your Screenshots{' '}
               <span className="relative">
                 <span className="text-zinc-500">Stunning</span>
-                <motion.span
-                  className="absolute -bottom-2 left-0 right-0 h-1 bg-black dark:bg-white rounded-full"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                />
+                {reducedMotion ? (
+                  <span className="absolute -bottom-2 left-0 right-0 h-1 bg-black dark:bg-white rounded-full" />
+                ) : (
+                  <motion.span
+                    className="absolute -bottom-2 left-0 right-0 h-1 bg-black dark:bg-white rounded-full"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.5, duration: 0.8 }}
+                  />
+                )}
               </span>
             </h1>
           </FadeIn>
 
-          <FadeIn delay={0.2} immediate>
-            <p className="text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl mx-auto leading-relaxed">
+          <FadeIn delay={reducedMotion ? 0 : 0.2} immediate>
+            <p className="text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl mx-auto leading-relaxed text-pretty">
               Transform screenshots into beautiful presentations with custom backgrounds, device frames,
               and professional styling — all in your browser, completely private.
             </p>
           </FadeIn>
 
-          <FadeIn delay={0.3} immediate>
+          <FadeIn delay={reducedMotion ? 0 : 0.3} immediate>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Link href="/app">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <motion.div whileHover={hoverAnimation} whileTap={tapAnimation}>
                   <Button
                     size="lg"
                     className="bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 h-14 px-8 text-base font-semibold rounded-full"
                   >
                     Start Beautifying Free
-                    <ArrowRight className="w-5 h-5 ml-2" />
+                    <ArrowRight className="w-5 h-5 ml-2" aria-hidden="true" />
                   </Button>
                 </motion.div>
               </Link>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div whileHover={hoverAnimation} whileTap={tapAnimation}>
                 <Button
                   variant="outline"
                   size="lg"
                   className="h-14 px-8 text-base font-semibold rounded-full border-zinc-300 dark:border-zinc-700"
                 >
-                  <Play className="w-5 h-5 mr-2 fill-current" />
+                  <Play className="w-5 h-5 mr-2 fill-current" aria-hidden="true" />
                   Watch Demo
                 </Button>
               </motion.div>
             </div>
           </FadeIn>
 
-          <FadeIn delay={0.4} immediate>
+          <FadeIn delay={reducedMotion ? 0 : 0.4} immediate>
             <p className="text-sm text-zinc-500 mb-12">
               ✓ No credit card required · ✓ Works on any device · ✓ 100% private
             </p>

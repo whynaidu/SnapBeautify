@@ -127,18 +127,19 @@ export function ShadowControl() {
                             )}
                         </Label>
                         <div className="flex items-center gap-2">
-                            <div className="relative group">
+                            <label className="relative group cursor-pointer rounded-full focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background">
                                 <div
-                                    className="w-8 h-8 rounded-full border-2 border-muted-foreground/50 cursor-pointer shadow-sm ring-1 ring-white/20"
+                                    className="w-8 h-8 rounded-full border-2 border-muted-foreground/50 shadow-sm ring-1 ring-white/20"
                                     style={{ backgroundColor: shadowColor }}
                                 />
                                 <input
                                     type="color"
                                     value={shadowColor}
                                     onChange={(e) => handleColorChange(e.target.value)}
-                                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                    className="sr-only"
+                                    aria-label="Shadow color picker"
                                 />
-                            </div>
+                            </label>
                             <Input
                                 value={shadowColor}
                                 onChange={(e) => handleColorChange(e.target.value)}

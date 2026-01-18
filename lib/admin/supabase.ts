@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { cache } from 'react';
 import {
   AdminUser,
   AdminSession,
@@ -213,7 +214,8 @@ export async function getTemplates(options?: {
   return { templates: data as Template[], total: count || 0 };
 }
 
-export async function getTemplateById(id: string): Promise<Template | null> {
+// Get template by ID (cached per request)
+export const getTemplateById = cache(async (id: string): Promise<Template | null> => {
   const client = getAdminClient();
   if (!client) return null;
 
@@ -225,7 +227,7 @@ export async function getTemplateById(id: string): Promise<Template | null> {
 
   if (error || !data) return null;
   return data as Template;
-}
+});
 
 export async function createTemplate(
   input: CreateTemplateInput,
@@ -648,7 +650,8 @@ export async function getUsers(options?: {
   }
 }
 
-export async function getUserById(userId: string): Promise<UserWithSubscription | null> {
+// Get user by ID (cached per request to avoid duplicate auth API calls)
+export const getUserById = cache(async (userId: string): Promise<UserWithSubscription | null> => {
   const client = getAdminClient();
   if (!client) return null;
 
@@ -699,7 +702,7 @@ export async function getUserById(userId: string): Promise<UserWithSubscription 
     console.error('Error fetching user by ID:', error);
     return null;
   }
-}
+});
 
 export async function grantProAccess(
   userId: string,
@@ -992,7 +995,8 @@ export async function getPayments(options?: {
 // AGGREGATE STATS
 // ============================================
 
-export async function getOverviewStats(): Promise<{
+// Get overview stats (cached per request - eliminates 6+ duplicate queries)
+export const getOverviewStats = cache(async (): Promise<{
   totalUsers: number;
   proUsers: number;
   freeUsers: number;
@@ -1001,7 +1005,7 @@ export async function getOverviewStats(): Promise<{
   todayNewUsers: number;
   activeSubscriptions: number;
   totalTemplates: number;
-}> {
+}> => {
   const client = getAdminClient();
   const defaultStats = {
     totalUsers: 0,
@@ -1079,4 +1083,4 @@ export async function getOverviewStats(): Promise<{
     console.error('Error fetching overview stats:', error);
     return defaultStats;
   }
-}
+});

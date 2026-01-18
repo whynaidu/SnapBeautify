@@ -36,11 +36,12 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
   const [gradientColor1, setGradientColor1] = useState('#667eea');
   const [gradientColor2, setGradientColor2] = useState('#764ba2');
   const [gradientAngle, setGradientAngle] = useState(135);
+  const [meshGradientCSS, setMeshGradientCSS] = useState('');
   const [padding, setPadding] = useState(64);
   const [shadowBlur, setShadowBlur] = useState(40);
-  const [shadowOpacity, setShadowOpacity] = useState(0.5);
+  const [shadowOpacity, setShadowOpacity] = useState(50); // Stored as 0-100
   const [borderRadius, setBorderRadius] = useState(24);
-  const [imageScale, setImageScale] = useState(100);
+  const [imageScale, setImageScale] = useState(0.75); // Stored as decimal (0.5-1.5)
 
   useEffect(() => {
     fetchTemplate();
@@ -71,11 +72,12 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
           setGradientColor2(t.settings.gradientColors[1]);
         }
         setGradientAngle(t.settings.gradientAngle || 135);
+        setMeshGradientCSS(t.settings.meshGradientCSS || t.preview.meshGradientCSS || '');
         setPadding(t.settings.padding);
         setShadowBlur(t.settings.shadowBlur);
-        setShadowOpacity(t.settings.shadowOpacity);
+        setShadowOpacity(t.settings.shadowOpacity); // Already 0-100
         setBorderRadius(t.settings.borderRadius);
-        setImageScale(t.settings.imageScale);
+        setImageScale(t.settings.imageScale); // Already decimal (0.5-1.5)
       } else {
         setError('Template not found');
       }
@@ -98,6 +100,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
         backgroundColor: backgroundType === 'solid' ? backgroundColor : undefined,
         gradientColors: backgroundType === 'gradient' ? [gradientColor1, gradientColor2] : undefined,
         gradientAngle: backgroundType === 'gradient' ? gradientAngle : undefined,
+        meshGradientCSS: backgroundType === 'mesh' ? meshGradientCSS : undefined,
         padding,
         shadowBlur,
         shadowOpacity,
@@ -111,6 +114,7 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
         backgroundColor: backgroundType === 'solid' ? backgroundColor : undefined,
         gradientColors: backgroundType === 'gradient' ? [gradientColor1, gradientColor2] : undefined,
         gradientAngle: backgroundType === 'gradient' ? gradientAngle : undefined,
+        meshGradientCSS: backgroundType === 'mesh' ? meshGradientCSS : undefined,
       };
 
       const updateData: UpdateTemplateInput = {
@@ -166,13 +170,19 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
   };
 
   // Get preview background style
-  const getPreviewStyle = () => {
+  const getPreviewStyle = (): React.CSSProperties => {
     if (backgroundType === 'solid') {
       return { backgroundColor };
     }
     if (backgroundType === 'gradient') {
       return {
         background: `linear-gradient(${gradientAngle}deg, ${gradientColor1}, ${gradientColor2})`,
+      };
+    }
+    if (backgroundType === 'mesh' && meshGradientCSS) {
+      return {
+        background: meshGradientCSS,
+        backgroundColor: '#0f172a',
       };
     }
     return { backgroundColor: '#1a1a2e' };
@@ -412,6 +422,21 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                     </div>
                   </>
                 )}
+
+                {backgroundType === 'mesh' && (
+                  <div className="space-y-2">
+                    <Label className="text-zinc-700 dark:text-zinc-300">Mesh Gradient CSS</Label>
+                    <textarea
+                      value={meshGradientCSS}
+                      onChange={(e) => setMeshGradientCSS(e.target.value)}
+                      placeholder="e.g., radial-gradient(at 40% 20%, hsla(28,100%,74%,1) 0px, transparent 50%), radial-gradient(at 80% 0%, hsla(189,100%,56%,1) 0px, transparent 50%)..."
+                      className="w-full h-32 px-3 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-black dark:text-white text-sm font-mono resize-none"
+                    />
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Enter CSS background property value for mesh gradients. Supports radial-gradient, linear-gradient, etc.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -446,13 +471,13 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-zinc-700 dark:text-zinc-300">Shadow Opacity: {(shadowOpacity * 100).toFixed(0)}%</Label>
+                  <Label className="text-zinc-700 dark:text-zinc-300">Shadow Opacity: {shadowOpacity}%</Label>
                   <input
                     type="range"
                     min="0"
                     max="100"
-                    value={shadowOpacity * 100}
-                    onChange={(e) => setShadowOpacity(parseInt(e.target.value) / 100)}
+                    value={shadowOpacity}
+                    onChange={(e) => setShadowOpacity(parseInt(e.target.value))}
                     className="w-full"
                   />
                 </div>
@@ -470,13 +495,13 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-zinc-700 dark:text-zinc-300">Image Scale: {imageScale}%</Label>
+                  <Label className="text-zinc-700 dark:text-zinc-300">Image Scale: {Math.round(imageScale * 100)}%</Label>
                   <input
                     type="range"
                     min="50"
                     max="150"
-                    value={imageScale}
-                    onChange={(e) => setImageScale(parseInt(e.target.value))}
+                    value={Math.round(imageScale * 100)}
+                    onChange={(e) => setImageScale(parseInt(e.target.value) / 100)}
                     className="w-full"
                   />
                 </div>
@@ -484,19 +509,85 @@ export default function EditTemplatePage({ params }: { params: Promise<{ id: str
 
               {/* Preview */}
               <div className="bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Preview</h3>
-                <div
-                  className="aspect-video rounded-xl overflow-hidden flex items-center justify-center"
-                  style={getPreviewStyle()}
-                >
+                <h3 className="text-lg font-semibold text-black dark:text-white mb-4">Live Preview</h3>
+
+                {/* Preview Container - simulates the actual canvas output */}
+                <div className="relative rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700">
+                  {/* Background Layer */}
                   <div
-                    className="w-3/4 aspect-video bg-white/10 backdrop-blur-sm"
+                    className="w-full"
                     style={{
-                      borderRadius: `${borderRadius}px`,
-                      boxShadow: `0 0 ${shadowBlur}px rgba(0,0,0,${shadowOpacity})`,
-                      transform: `scale(${imageScale / 100})`,
+                      ...getPreviewStyle(),
+                      aspectRatio: '16/10',
+                      padding: `${Math.max(padding / 4, 12)}px`, // Scale padding for preview
                     }}
-                  />
+                  >
+                    {/* Mock Screenshot Container */}
+                    <div
+                      className="relative w-full h-full flex items-center justify-center"
+                      style={{
+                        transform: `scale(${imageScale})`,
+                        transformOrigin: 'center center',
+                      }}
+                    >
+                      {/* Shadow Layer */}
+                      <div
+                        className="absolute inset-0 rounded-lg"
+                        style={{
+                          borderRadius: `${borderRadius}px`,
+                          boxShadow: shadowBlur > 0
+                            ? `0 ${shadowBlur * 0.3}px ${shadowBlur * 2}px rgba(0,0,0,${shadowOpacity / 100})`
+                            : 'none',
+                        }}
+                      />
+
+                      {/* Mock Screenshot */}
+                      <div
+                        className="relative w-full h-full overflow-hidden"
+                        style={{
+                          borderRadius: `${borderRadius}px`,
+                          background: 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)',
+                        }}
+                      >
+                        {/* Mock Browser Chrome */}
+                        <div className="h-6 bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700 flex items-center px-2 gap-1.5">
+                          <div className="w-2 h-2 rounded-full bg-red-400" />
+                          <div className="w-2 h-2 rounded-full bg-yellow-400" />
+                          <div className="w-2 h-2 rounded-full bg-green-400" />
+                          <div className="flex-1 mx-2">
+                            <div className="h-3 bg-zinc-200 dark:bg-zinc-700 rounded-sm" />
+                          </div>
+                        </div>
+
+                        {/* Mock Content */}
+                        <div className="p-3 space-y-2">
+                          <div className="h-3 bg-zinc-300 dark:bg-zinc-600 rounded w-3/4" />
+                          <div className="h-2 bg-zinc-200 dark:bg-zinc-700 rounded w-full" />
+                          <div className="h-2 bg-zinc-200 dark:bg-zinc-700 rounded w-5/6" />
+                          <div className="mt-3 grid grid-cols-2 gap-2">
+                            <div className="h-8 bg-zinc-200 dark:bg-zinc-700 rounded" />
+                            <div className="h-8 bg-zinc-200 dark:bg-zinc-700 rounded" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preview Info */}
+                <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
+                  <div className="bg-zinc-100 dark:bg-zinc-900 rounded-lg p-2 text-center">
+                    <div className="text-zinc-500 dark:text-zinc-400">Padding</div>
+                    <div className="font-medium text-black dark:text-white">{padding}px</div>
+                  </div>
+                  <div className="bg-zinc-100 dark:bg-zinc-900 rounded-lg p-2 text-center">
+                    <div className="text-zinc-500 dark:text-zinc-400">Shadow</div>
+                    <div className="font-medium text-black dark:text-white">{shadowBlur}px / {shadowOpacity}%</div>
+                  </div>
+                  <div className="bg-zinc-100 dark:bg-zinc-900 rounded-lg p-2 text-center">
+                    <div className="text-zinc-500 dark:text-zinc-400">Radius</div>
+                    <div className="font-medium text-black dark:text-white">{borderRadius}px</div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -205,3 +205,43 @@ export function EditorErrorBoundary({ children }: { children: ReactNode }) {
         </ErrorBoundary>
     );
 }
+
+/**
+ * Background controls error boundary - lightweight fallback for sidebar controls
+ */
+export function BackgroundControlsErrorBoundary({
+    children,
+    sectionName = 'Background controls'
+}: {
+    children: ReactNode;
+    sectionName?: string;
+}) {
+    return (
+        <ErrorBoundary
+            fallback={
+                <div className="p-4 bg-muted/30 rounded-lg border border-border text-center">
+                    <AlertCircle className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                        {sectionName} failed to load
+                    </p>
+                    <Button
+                        onClick={() => window.location.reload()}
+                        variant="ghost"
+                        size="sm"
+                        className="mt-2"
+                    >
+                        <RefreshCw className="w-3 h-3 mr-1" />
+                        Reload
+                    </Button>
+                </div>
+            }
+            onError={(error) => {
+                logger.error('background_controls_error', error, {
+                    context: sectionName,
+                });
+            }}
+        >
+            {children}
+        </ErrorBoundary>
+    );
+}

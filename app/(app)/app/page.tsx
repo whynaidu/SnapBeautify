@@ -1,6 +1,7 @@
 'use client'
 
 import { Editor } from '@/components/editor/Editor'
+import { FontLoader } from '@/components/FontLoader'
 import { Toaster } from 'sonner'
 import { useTheme } from 'next-themes'
 
@@ -9,6 +10,8 @@ export default function EditorPage() {
 
   return (
     <>
+      {/* Lazy load editor fonts only when editor is accessed (bundle optimization) */}
+      <FontLoader />
       <Editor />
       <Toaster
         position="top-center"

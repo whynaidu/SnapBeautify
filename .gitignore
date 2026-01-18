@@ -63,3 +63,6 @@ ios/App/build/
 ios/App/*.xcworkspace/xcuserdata/
 ios/App/*.xcodeproj/xcuserdata/
 ios/App/DerivedData/
+
+*storybook.log
+storybook-static

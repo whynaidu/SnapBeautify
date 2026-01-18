@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import { Header } from './Header';
 import { Canvas } from './Canvas';
 import { ControlPanel } from './ControlPanel';
@@ -9,6 +8,7 @@ import { MobileControlPanelV2 } from './MobileControlPanelV2';
 import { CropActionButtons } from './CropActionButtons';
 import { KeyboardShortcuts } from '@/components/shared/KeyboardShortcuts';
 import { useEditorStore } from '@/lib/store/editor-store';
+import { useIsMobile } from '@/lib/hooks/useWindowSize';
 
 // Lightweight static background - no animations for performance
 function EditorBackground() {
@@ -35,33 +35,9 @@ function EditorBackground() {
 }
 
 export function Editor() {
-    const [isMobile, setIsMobile] = useState(false);
+    // Use shared hook instead of individual resize listener (client-event-listeners optimization)
+    const isMobile = useIsMobile();
     const { originalImage, isCropping } = useEditorStore();
-    const resizeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
-
-        // Throttled resize handler - only update every 150ms
-        const handleResize = () => {
-            if (resizeTimeoutRef.current) return;
-            resizeTimeoutRef.current = setTimeout(() => {
-                checkMobile();
-                resizeTimeoutRef.current = null;
-            }, 150);
-        };
-
-        checkMobile();
-        window.addEventListener('resize', handleResize);
-        return () => {
-            window.removeEventListener('resize', handleResize);
-            if (resizeTimeoutRef.current) {
-                clearTimeout(resizeTimeoutRef.current);
-            }
-        };
-    }, []);
 
     return (
         <div className="h-screen w-full flex flex-col overflow-hidden supports-[height:100cqh]:h-[100cqh] supports-[height:100dvh]:h-[100dvh]">

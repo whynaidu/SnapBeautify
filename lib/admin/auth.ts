@@ -2,7 +2,13 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { AdminUser, AdminTokenPayload } from './types';
 
-const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || 'your-super-secret-admin-key-change-in-production';
+function getAdminJwtSecret(): string {
+  const secret = process.env.ADMIN_JWT_SECRET;
+  if (!secret) {
+    throw new Error('ADMIN_JWT_SECRET environment variable must be configured');
+  }
+  return secret;
+}
 const TOKEN_EXPIRY = '24h';
 const SALT_ROUNDS = 12;
 
@@ -31,7 +37,7 @@ export function generateAdminToken(admin: AdminUser): string {
     role: admin.role,
   };
 
-  return jwt.sign(payload, ADMIN_JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+  return jwt.sign(payload, getAdminJwtSecret(), { expiresIn: TOKEN_EXPIRY });
 }
 
 /**
@@ -39,7 +45,7 @@ export function generateAdminToken(admin: AdminUser): string {
  */
 export function verifyAdminToken(token: string): AdminTokenPayload | null {
   try {
-    const decoded = jwt.verify(token, ADMIN_JWT_SECRET) as AdminTokenPayload;
+    const decoded = jwt.verify(token, getAdminJwtSecret()) as AdminTokenPayload;
     return decoded;
   } catch {
     return null;

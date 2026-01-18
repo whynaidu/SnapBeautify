@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 import {
     BackgroundType,
     FrameType,
@@ -508,3 +509,125 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
 
     resetToDefaults: () => set(DEFAULT_STATE),
 }));
+
+// ============================================================================
+// OPTIMIZED SELECTORS
+// Use these instead of destructuring the whole store to prevent unnecessary re-renders
+// Example: const { backgroundType, backgroundColor } = useBackgroundState();
+// ============================================================================
+
+/** Selector for background-related state only */
+export const useBackgroundState = () =>
+    useEditorStore(
+        useShallow((state) => ({
+            backgroundType: state.backgroundType,
+            backgroundColor: state.backgroundColor,
+            gradientColors: state.gradientColors,
+            gradientAngle: state.gradientAngle,
+            meshGradientCSS: state.meshGradientCSS,
+            textPatternText: state.textPatternText,
+            textPatternColor: state.textPatternColor,
+            textPatternOpacity: state.textPatternOpacity,
+            textPatternPositions: state.textPatternPositions,
+            textPatternRows: state.textPatternRows,
+            textPatternFontFamily: state.textPatternFontFamily,
+            textPatternFontSize: state.textPatternFontSize,
+            textPatternFontWeight: state.textPatternFontWeight,
+            waveSplitFlipped: state.waveSplitFlipped,
+            logoPatternImage: state.logoPatternImage,
+            logoPatternOpacity: state.logoPatternOpacity,
+            logoPatternSize: state.logoPatternSize,
+            logoPatternSpacing: state.logoPatternSpacing,
+        }))
+    );
+
+/** Selector for background actions only */
+export const useBackgroundActions = () =>
+    useEditorStore(
+        useShallow((state) => ({
+            setBackgroundType: state.setBackgroundType,
+            setBackgroundColor: state.setBackgroundColor,
+            updateBackgroundColor: state.updateBackgroundColor,
+            setGradient: state.setGradient,
+            updateGradientColors: state.updateGradientColors,
+            setMeshGradient: state.setMeshGradient,
+            setTextPatternText: state.setTextPatternText,
+            toggleTextPatternPosition: state.toggleTextPatternPosition,
+            setTextPatternFontFamily: state.setTextPatternFontFamily,
+            setTextPatternFontSize: state.setTextPatternFontSize,
+            setTextPatternFontWeight: state.setTextPatternFontWeight,
+            setTextPatternRows: state.setTextPatternRows,
+            toggleWaveSplitFlip: state.toggleWaveSplitFlip,
+            setLogoPattern: state.setLogoPattern,
+            clearLogoPattern: state.clearLogoPattern,
+            setLogoPatternOpacity: state.setLogoPatternOpacity,
+            setLogoPatternSize: state.setLogoPatternSize,
+            setLogoPatternSpacing: state.setLogoPatternSpacing,
+        }))
+    );
+
+/** Selector for image-related state only */
+export const useImageState = () =>
+    useEditorStore(
+        useShallow((state) => ({
+            originalImage: state.originalImage,
+            imageDataUrl: state.imageDataUrl,
+            uncroppedImage: state.uncroppedImage,
+            uncroppedImageDataUrl: state.uncroppedImageDataUrl,
+            isCropping: state.isCropping,
+            cropArea: state.cropArea,
+        }))
+    );
+
+/** Selector for canvas dimensions */
+export const useCanvasDimensions = () =>
+    useEditorStore(
+        useShallow((state) => ({
+            canvasWidth: state.canvasWidth,
+            canvasHeight: state.canvasHeight,
+            aspectRatio: state.aspectRatio,
+        }))
+    );
+
+/** Selector for export settings */
+export const useExportSettings = () =>
+    useEditorStore(
+        useShallow((state) => ({
+            exportFormat: state.exportFormat,
+            exportScale: state.exportScale,
+        }))
+    );
+
+/** Selector for export actions */
+export const useExportActions = () =>
+    useEditorStore(
+        useShallow((state) => ({
+            setExportFormat: state.setExportFormat,
+            setExportScale: state.setExportScale,
+        }))
+    );
+
+/** Selector for styling state (shadow, border, padding) */
+export const useStylingState = () =>
+    useEditorStore(
+        useShallow((state) => ({
+            padding: state.padding,
+            shadowBlur: state.shadowBlur,
+            shadowOpacity: state.shadowOpacity,
+            shadowColor: state.shadowColor,
+            borderRadius: state.borderRadius,
+            imageScale: state.imageScale,
+            rotation: state.rotation,
+            frameType: state.frameType,
+            frameColor: state.frameColor,
+        }))
+    );
+
+/** Selector for text overlay state */
+export const useTextOverlayState = () =>
+    useEditorStore(
+        useShallow((state) => ({
+            textOverlays: state.textOverlays,
+            selectedTextOverlayId: state.selectedTextOverlayId,
+        }))
+    );

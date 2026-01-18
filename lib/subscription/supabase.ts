@@ -1,5 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { createBrowserClient } from '@supabase/ssr';
+import { cache } from 'react';
 import type { Subscription, SubscriptionPlan, SubscriptionStatus, PaymentProvider } from './types';
 
 // Subscription row type from database
@@ -97,8 +98,8 @@ export function transformSubscription(row: SubscriptionRow): Subscription {
   };
 }
 
-// Get user's active subscription
-export async function getUserSubscription(userId: string): Promise<Subscription | null> {
+// Get user's active subscription (cached per request to avoid duplicate queries)
+export const getUserSubscription = cache(async (userId: string): Promise<Subscription | null> => {
   const supabase = createServerClient();
   if (!supabase) return null;
 
@@ -116,10 +117,10 @@ export async function getUserSubscription(userId: string): Promise<Subscription 
   }
 
   return transformSubscription(data as SubscriptionRow);
-}
+});
 
-// Check if user has pro access
-export async function hasProAccess(userId: string): Promise<boolean> {
+// Check if user has pro access (cached per request)
+export const hasProAccess = cache(async (userId: string): Promise<boolean> => {
   const subscription = await getUserSubscription(userId);
 
   if (!subscription) {
@@ -140,7 +141,7 @@ export async function hasProAccess(userId: string): Promise<boolean> {
   }
 
   return false;
-}
+});
 
 // Upsert subscription (create or update)
 export async function upsertSubscription(
@@ -216,8 +217,8 @@ export async function logPayment(payment: PaymentInsert): Promise<boolean> {
   return !error;
 }
 
-// Get user's export count for today
-export async function getExportCount(userId: string): Promise<number> {
+// Get user's export count for today (cached per request)
+export const getExportCount = cache(async (userId: string): Promise<number> => {
   const supabase = createServerClient();
   if (!supabase) return 0;
 
@@ -237,7 +238,7 @@ export async function getExportCount(userId: string): Promise<number> {
   } catch {
     return 0;
   }
-}
+});
 
 // Increment user's export count
 export async function incrementExportCount(userId: string): Promise<number> {

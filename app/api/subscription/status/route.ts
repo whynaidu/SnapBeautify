@@ -1,7 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { getUserSubscription, hasProAccess, getExportCount } from '@/lib/subscription/supabase';
 import { FREE_TIER_LIMITS } from '@/lib/subscription/feature-gates';
 import type { SubscriptionStatusResponse } from '@/lib/subscription/types';
+
+// Create Supabase client for auth verification
+async function getAuthenticatedUser() {
+  const cookieStore = await cookies();
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return null;
+  }
+
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+    },
+  });
+
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    return null;
+  }
+
+  return user;
+}
 
 // Default response for when database is not available
 const DEFAULT_RESPONSE: SubscriptionStatusResponse & {
@@ -32,6 +62,22 @@ export async function GET(request: NextRequest) {
     if (!uuidRegex.test(userId)) {
       // Return default free tier for invalid user IDs (development mode)
       return NextResponse.json(DEFAULT_RESPONSE);
+    }
+
+    // Verify authenticated user matches requested userId
+    const authenticatedUser = await getAuthenticatedUser();
+    if (!authenticatedUser) {
+      return NextResponse.json(
+        { error: 'Unauthorized - please sign in' },
+        { status: 401 }
+      );
+    }
+
+    if (authenticatedUser.id !== userId) {
+      return NextResponse.json(
+        { error: 'Forbidden - cannot access other user data' },
+        { status: 403 }
+      );
     }
 
     const [subscription, isPro, exportCount] = await Promise.all([

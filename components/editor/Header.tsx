@@ -49,7 +49,7 @@ export function Header() {
                         whileTap={{ scale: 0.95 }}
                         className="w-10 h-10 rounded-xl bg-black dark:bg-white flex items-center justify-center shadow-lg shadow-black/10 dark:shadow-white/10"
                     >
-                        <Sparkles className="w-5 h-5 text-white dark:text-black" />
+                        <Sparkles className="w-5 h-5 text-white dark:text-black" aria-hidden="true" />
                     </motion.div>
                     <div className="hidden sm:block">
                         <span className="text-lg font-bold text-zinc-900 dark:text-white">SnapBeautify</span>
@@ -71,9 +71,10 @@ export function Header() {
                             size="sm"
                             onClick={handleCrop}
                             disabled={isCropping}
+                            aria-label="Crop image"
                             className="rounded-full text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 h-8 px-3"
                         >
-                            <Crop className="w-4 h-4 sm:mr-1.5" />
+                            <Crop className="w-4 h-4 sm:mr-1.5" aria-hidden="true" />
                             <span className="hidden sm:inline text-xs font-medium">Crop</span>
                         </Button>
                         {uncroppedImage && (
@@ -81,9 +82,10 @@ export function Header() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={handleRevertCrop}
+                                aria-label="Revert to original image"
                                 className="rounded-full text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 h-8 px-3"
                             >
-                                <Undo className="w-4 h-4 sm:mr-1.5" />
+                                <Undo className="w-4 h-4 sm:mr-1.5" aria-hidden="true" />
                                 <span className="hidden sm:inline text-xs font-medium">Revert</span>
                             </Button>
                         )}
@@ -91,9 +93,10 @@ export function Header() {
                             variant="ghost"
                             size="sm"
                             onClick={() => setShowResetDialog(true)}
+                            aria-label="Reset all settings"
                             className="rounded-full text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700 h-8 px-3"
                         >
-                            <RotateCcw className="w-4 h-4 sm:mr-1.5" />
+                            <RotateCcw className="w-4 h-4 sm:mr-1.5" aria-hidden="true" />
                             <span className="hidden sm:inline text-xs font-medium">Reset</span>
                         </Button>
                     </motion.div>

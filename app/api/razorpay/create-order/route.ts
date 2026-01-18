@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
+import { verifyPaymentAuth, unauthorizedResponse } from '@/lib/auth/payment-auth';
+import { checkRateLimit, getClientIdentifier, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 
 // Initialize Razorpay instance
 function getRazorpayInstance() {
@@ -18,6 +20,16 @@ function getRazorpayInstance() {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const clientId = getClientIdentifier(request);
+    const rateLimit = checkRateLimit(`payment:create:${clientId}`, RATE_LIMIT_PRESETS.payment);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { userId, email, name } = body;
 
@@ -26,6 +38,12 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required field: userId' },
         { status: 400 }
       );
+    }
+
+    // Verify authenticated user matches the userId
+    const auth = await verifyPaymentAuth(userId);
+    if (!auth.authenticated) {
+      return unauthorizedResponse(auth.error || 'Unauthorized', auth.error?.includes('Forbidden') ? 403 : 401);
     }
 
     const razorpay = getRazorpayInstance();
