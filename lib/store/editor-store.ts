@@ -15,7 +15,7 @@ import {
 } from '@/types/editor';
 import { calculateFrameOffsets } from '@/lib/canvas/layout';
 
-const DEFAULT_STATE: EditorState & { mobileControlsOpen: boolean } = {
+const DEFAULT_STATE: EditorState = {
     originalImage: null,
     imageDataUrl: null,
     uncroppedImage: null,
