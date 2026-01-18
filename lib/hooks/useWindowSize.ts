@@ -51,8 +51,9 @@ const subscribe = (callback: () => void) => {
 // Get current snapshot
 const getSnapshot = () => windowSize;
 
-// Server snapshot (SSR)
-const getServerSnapshot = () => ({ width: 0, height: 0 });
+// Server snapshot (SSR) - cached to avoid infinite loop
+const serverSnapshot = { width: 0, height: 0 };
+const getServerSnapshot = () => serverSnapshot;
 
 /**
  * useWindowSize - Shared hook for window dimensions
