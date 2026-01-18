@@ -44,15 +44,15 @@ export function MobileControlPanelV2() {
                 className={cn(
                     'fixed left-0 right-0 z-40',
                     'bottom-16', // Above ExportBar
-                    'bg-zinc-900/98', // Removed backdrop-blur for performance
-                    'border-t border-zinc-800',
+                    'bg-white/98 dark:bg-zinc-900/98', // Light/dark mode support
+                    'border-t border-zinc-200 dark:border-zinc-800',
                     'shadow-lg'
                 )}
             >
                 {/* Tab Navigation */}
                 <div className="px-3 py-2">
                     <Tabs value={activeTab || ''} className="w-full">
-                        <TabsList className="w-full grid grid-cols-6 bg-zinc-800/80 rounded-xl h-12 p-1 gap-0.5">
+                        <TabsList className="w-full grid grid-cols-6 bg-zinc-100 dark:bg-zinc-800/80 rounded-xl h-12 p-1 gap-0.5">
                             {tabs.map((tab) => (
                                 <TabsTrigger
                                     key={tab.value}
@@ -60,10 +60,10 @@ export function MobileControlPanelV2() {
                                     onClick={() => handleTabClick(tab.value)}
                                     className={cn(
                                         'rounded-lg h-full flex-col gap-0.5 transition-all duration-200',
-                                        'data-[state=active]:bg-zinc-700',
+                                        'data-[state=active]:bg-white data-[state=active]:dark:bg-zinc-700',
                                         'data-[state=active]:shadow-sm',
-                                        'data-[state=inactive]:text-zinc-400',
-                                        'data-[state=active]:text-white'
+                                        'data-[state=inactive]:text-zinc-500 data-[state=inactive]:dark:text-zinc-400',
+                                        'data-[state=active]:text-zinc-900 data-[state=active]:dark:text-white'
                                     )}
                                 >
                                     <tab.icon className="w-4 h-4" />
@@ -82,8 +82,8 @@ export function MobileControlPanelV2() {
                         'fixed left-0 right-0 z-39',
                         'bottom-[calc(4rem+3.5rem)]', // Above control bar + export bar
                         'max-h-[50vh]',
-                        'bg-zinc-900/98', // Removed backdrop-blur for performance
-                        'border-t border-zinc-800',
+                        'bg-white/98 dark:bg-zinc-900/98', // Light/dark mode support
+                        'border-t border-zinc-200 dark:border-zinc-800',
                         'rounded-t-3xl',
                         'shadow-2xl',
                         'overflow-hidden',
@@ -96,18 +96,18 @@ export function MobileControlPanelV2() {
                     }}
                 >
                     {/* Collapse Handle */}
-                    <div className="sticky top-0 z-10 bg-zinc-900/98">
+                    <div className="sticky top-0 z-10 bg-white/98 dark:bg-zinc-900/98">
                         <button
                             onClick={() => setActiveTab(null)}
-                            className="w-full py-2 flex flex-col items-center gap-1 hover:bg-zinc-800/50 transition-colors"
+                            className="w-full py-2 flex flex-col items-center gap-1 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-colors"
                         >
-                            <div className="w-10 h-1 rounded-full bg-zinc-700" />
-                            <ChevronDown className="w-4 h-4 text-zinc-500" />
+                            <div className="w-10 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                            <ChevronDown className="w-4 h-4 text-zinc-400 dark:text-zinc-500" />
                         </button>
                     </div>
 
                     {/* Scrollable Content */}
-                    <div className="overflow-y-auto max-h-[calc(50vh-3rem)] px-4 pb-4 scrollbar-thin scrollbar-thumb-zinc-700">
+                    <div className="overflow-y-auto max-h-[calc(50vh-3rem)] px-4 pb-4 scrollbar-thin">
                         {activeTab === 'templates' && <MemoizedTemplatePresets />}
                         {activeTab === 'background' && <MemoizedBackgroundPicker />}
                         {activeTab === 'frame' && <MemoizedFramePicker />}
@@ -116,13 +116,13 @@ export function MobileControlPanelV2() {
                         {activeTab === 'style' && (
                             <div className="space-y-4">
                                 <PaddingControl />
-                                <div className="border-t border-zinc-800/50 pt-4">
+                                <div className="border-t border-zinc-200/50 dark:border-zinc-800/50 pt-4">
                                     <BorderRadiusControl />
                                 </div>
-                                <div className="border-t border-zinc-800/50 pt-4">
+                                <div className="border-t border-zinc-200/50 dark:border-zinc-800/50 pt-4">
                                     <ScaleControl />
                                 </div>
-                                <div className="border-t border-zinc-800/50 pt-4">
+                                <div className="border-t border-zinc-200/50 dark:border-zinc-800/50 pt-4">
                                     <AspectRatioPicker />
                                 </div>
                             </div>

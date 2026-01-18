@@ -453,7 +453,7 @@ export function ExportBar() {
                             <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="rounded-xl bg-white/90 dark:bg-zinc-900/90 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                    <DropdownMenuContent align="start" className="rounded-xl bg-white/95 dark:bg-zinc-900/95 border-zinc-200 dark:border-zinc-800">
                         {(['png', 'jpeg', 'webp'] as ExportFormat[]).map((format) => (
                             <DropdownMenuItem
                                 key={format}
@@ -486,7 +486,7 @@ export function ExportBar() {
                             <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 opacity-50 hidden sm:block" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="rounded-xl bg-white/90 dark:bg-zinc-900/90 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                    <DropdownMenuContent align="start" className="rounded-xl bg-white/95 dark:bg-zinc-900/95 border-zinc-200 dark:border-zinc-800">
                         {([1, 2, 3, 4] as ExportScale[]).map((scale) => (
                             <DropdownMenuItem
                                 key={scale}
