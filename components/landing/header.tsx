@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Container } from './layout/container'
@@ -51,7 +50,7 @@ export function Header() {
 
     const observerOptions: IntersectionObserverInit = {
       root: null,
-      rootMargin: '-20% 0px -60% 0px', // Trigger when section is in the middle portion of viewport
+      rootMargin: '-20% 0px -60% 0px',
       threshold: 0,
     }
 
@@ -82,16 +81,14 @@ export function Header() {
     const targetId = href.replace('#', '')
     const targetElement = document.getElementById(targetId)
 
-    // Close mobile menu first if open
     const wasMenuOpen = isMobileMenuOpen
     if (wasMenuOpen) {
       setIsMobileMenuOpen(false)
     }
 
-    // Scroll function
     const scrollToTarget = () => {
       if (targetElement) {
-        const headerOffset = 80 // Account for fixed header
+        const headerOffset = 80
         const elementPosition = targetElement.getBoundingClientRect().top
         const offsetPosition = elementPosition + window.scrollY - headerOffset
 
@@ -100,13 +97,10 @@ export function Header() {
           behavior: 'smooth'
         })
 
-        // Update active section immediately for better UX
         setActiveSection(targetId)
       }
     }
 
-    // If mobile menu was open, wait for it to close before scrolling
-    // This prevents layout shift issues during scroll calculation
     if (wasMenuOpen) {
       setTimeout(scrollToTarget, 100)
     } else {
@@ -125,7 +119,6 @@ export function Header() {
       role="banner"
     >
       <Container>
-        {/* Skip to main content link for accessibility */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-black focus:text-white focus:rounded-lg"
@@ -133,7 +126,6 @@ export function Header() {
           Skip to main content
         </a>
         <nav className="flex items-center justify-between" aria-label="Main navigation">
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <Logo />
           </Link>
@@ -148,25 +140,12 @@ export function Header() {
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
                   className={cn(
-                    'relative px-4 py-2 rounded-full font-medium transition-all duration-300 text-sm',
+                    'relative px-4 py-2 rounded-full font-medium transition-all duration-200 text-sm',
                     isActive
-                      ? 'text-black dark:text-white'
-                      : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+                      ? 'text-black dark:text-white bg-zinc-100 dark:bg-zinc-800'
+                      : 'text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900'
                   )}
                 >
-                  {/* Active indicator background */}
-                  {isActive && (
-                    <motion.span
-                      layoutId="activeSection"
-                      className="absolute inset-0 bg-zinc-100 dark:bg-zinc-800 rounded-full -z-10"
-                      initial={false}
-                      transition={{
-                        type: 'spring',
-                        stiffness: 380,
-                        damping: 30,
-                      }}
-                    />
-                  )}
                   {link.label}
                 </a>
               )
@@ -210,65 +189,59 @@ export function Header() {
           </div>
         </nav>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              id="mobile-menu"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden mt-4 pb-4"
-              role="menu"
-              aria-label="Mobile navigation"
-            >
-              <div className="flex flex-col gap-1">
-                {navLinks.map((link) => {
-                  const isActive = activeSection === link.sectionId
-                  return (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      onClick={(e) => handleNavClick(e, link.href)}
-                      className={cn(
-                        'px-4 py-3 rounded-xl font-medium transition-all',
-                        isActive
-                          ? 'text-black dark:text-white bg-zinc-100 dark:bg-zinc-800'
-                          : 'text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900'
-                      )}
-                    >
-                      <div className="flex items-center justify-between">
-                        {link.label}
-                        {isActive && (
-                          <motion.span
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="w-2 h-2 rounded-full bg-black dark:bg-white"
-                          />
-                        )}
-                      </div>
-                    </a>
-                  )
-                })}
-                <div className="flex gap-4 pt-4 mt-2 border-t border-zinc-200 dark:border-zinc-800">
-                  <Link href="/app" className="flex-1">
-                    <Button variant="outline" size="sm" className="w-full border-zinc-300 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-black dark:hover:text-white">
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link href="/app" className="flex-1">
-                    <Button
-                      size="sm"
-                      className="w-full bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200"
-                    >
-                      Try Free
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
+        {/* Mobile Menu - CSS-only animation */}
+        <div
+          id="mobile-menu"
+          className={cn(
+            'md:hidden overflow-hidden transition-all duration-300 ease-out',
+            isMobileMenuOpen ? 'max-h-96 opacity-100 mt-4 pb-4' : 'max-h-0 opacity-0'
           )}
-        </AnimatePresence>
+          role="menu"
+          aria-label="Mobile navigation"
+          aria-hidden={!isMobileMenuOpen}
+        >
+          <div className="flex flex-col gap-1">
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.sectionId
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  tabIndex={isMobileMenuOpen ? 0 : -1}
+                  className={cn(
+                    'px-4 py-3 rounded-xl font-medium transition-all',
+                    isActive
+                      ? 'text-black dark:text-white bg-zinc-100 dark:bg-zinc-800'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-900'
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    {link.label}
+                    {isActive && (
+                      <span className="w-2 h-2 rounded-full bg-black dark:bg-white" />
+                    )}
+                  </div>
+                </a>
+              )
+            })}
+            <div className="flex gap-4 pt-4 mt-2 border-t border-zinc-200 dark:border-zinc-800">
+              <Link href="/app" className="flex-1" tabIndex={isMobileMenuOpen ? 0 : -1}>
+                <Button variant="outline" size="sm" className="w-full border-zinc-300 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-black dark:hover:text-white">
+                  Sign In
+                </Button>
+              </Link>
+              <Link href="/app" className="flex-1" tabIndex={isMobileMenuOpen ? 0 : -1}>
+                <Button
+                  size="sm"
+                  className="w-full bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200"
+                >
+                  Try Free
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
       </Container>
     </header>
   )
