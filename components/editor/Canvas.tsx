@@ -65,6 +65,7 @@ export function Canvas() {
         isCropping,
         exportFormat,
         exportScale,
+        mobileControlsOpen,
     } = useEditorStore();
 
     // Check if premium features are being used (for watermark)
@@ -348,9 +349,11 @@ export function Canvas() {
         const updateScale = () => {
             const container = containerRef.current!;
             // Account for actual padding values - mobile has more vertical padding
-            const isMobile = window.innerWidth < 768;
-            const horizontalPadding = isMobile ? 32 : 48; // p-4 (16px * 2) on mobile, p-6 (24px * 2) on desktop
-            const verticalPadding = isMobile ? 208 : 48; // pt-20 + pb-32 (80px + 128px) on mobile, p-6 on desktop
+            const isMobileDevice = window.innerWidth < 768;
+
+            // When mobile controls are open, use minimal padding since container is smaller
+            const horizontalPadding = isMobileDevice && mobileControlsOpen ? 16 : (isMobileDevice ? 32 : 48);
+            const verticalPadding = isMobileDevice && mobileControlsOpen ? 16 : (isMobileDevice ? 208 : 48);
 
             const containerWidth = container.clientWidth - horizontalPadding;
             const containerHeight = container.clientHeight - verticalPadding;
@@ -381,7 +384,7 @@ export function Canvas() {
         updateScale();
         window.addEventListener('resize', handleResize, { passive: true });
         return () => window.removeEventListener('resize', handleResize);
-    }, [canvasWidth, canvasHeight, originalImage, isCropping]);
+    }, [canvasWidth, canvasHeight, originalImage, isCropping, mobileControlsOpen]);
 
     // Helper function to snap to center and show alignment guides
     const snapToCenter = useCallback((x: number, y: number) => {
@@ -628,6 +631,9 @@ export function Canvas() {
         });
     }, [throttledRender, draggedTextId, updateTextOverlay]);
 
+    // Check if should show compact mode (mobile with controls open)
+    const showCompactCanvas = isMobile && mobileControlsOpen;
+
     return (
         <div
             ref={containerRef}
@@ -635,10 +641,20 @@ export function Canvas() {
                 'flex-1 flex items-center justify-center',
                 'overflow-hidden',
                 'relative',
-                // Increase bottom padding on mobile to prevent overlap with controls
-                // pt-20 for top spacing, pb-32 for bottom controls, on mobile
-                originalImage ? 'p-4 pt-20 pb-32 md:p-8' : 'p-6'
+                // Base padding
+                originalImage ? 'p-4 md:p-8' : 'p-6',
+                // Extra bottom padding on mobile when controls are closed
+                originalImage && isMobile && !mobileControlsOpen && 'pt-20 pb-32'
             )}
+            style={showCompactCanvas ? {
+                // When mobile controls open, limit height to top portion
+                maxHeight: 'calc(60vh - 7rem)',
+                paddingTop: '0.5rem',
+                paddingBottom: '0.5rem',
+                transition: 'max-height 200ms ease-out, padding 200ms ease-out',
+            } : {
+                transition: 'max-height 200ms ease-out, padding 200ms ease-out',
+            }}
         >
             {originalImage ? (
                 <div

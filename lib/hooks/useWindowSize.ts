@@ -1,11 +1,11 @@
 'use client';
 
-import { useSyncExternalStore, useCallback } from 'react';
+import { useSyncExternalStore } from 'react';
 
 // Shared state for window dimensions (singleton pattern)
 // Benefits: Single resize listener for entire app, automatic cleanup
 let windowSize = { width: 0, height: 0 };
-let listeners = new Set<() => void>();
+const listeners = new Set<() => void>();
 let isListening = false;
 
 // Throttled resize handler (16ms = ~60fps)
@@ -51,8 +51,9 @@ const subscribe = (callback: () => void) => {
 // Get current snapshot
 const getSnapshot = () => windowSize;
 
-// Server snapshot (SSR)
-const getServerSnapshot = () => ({ width: 0, height: 0 });
+// Server snapshot (SSR) - cached to avoid infinite loop
+const serverSnapshot = { width: 0, height: 0 };
+const getServerSnapshot = () => serverSnapshot;
 
 /**
  * useWindowSize - Shared hook for window dimensions

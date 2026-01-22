@@ -159,6 +159,9 @@ export interface EditorState {
     // Export
     exportFormat: ExportFormat;
     exportScale: ExportScale;
+
+    // Mobile UI
+    mobileControlsOpen: boolean;
 }
 
 export interface EditorActions {
@@ -207,4 +210,5 @@ export interface EditorActions {
     revertCrop: () => void;
     resetToDefaults: () => void;
     applyTemplate: (template: TemplatePreset) => void;
+    setMobileControlsOpen: (open: boolean) => void;
 }

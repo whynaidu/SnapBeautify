@@ -20,6 +20,7 @@ const DEFAULT_STATE: EditorState = {
     imageDataUrl: null,
     uncroppedImage: null,
     uncroppedImageDataUrl: null,
+    mobileControlsOpen: false,
     backgroundType: 'gradient',
     backgroundColor: '#0ea5e9',
     gradientColors: ['#0ea5e9', '#8b5cf6'], // "Ocean" - Free tier gradient (index 1)
@@ -508,6 +509,10 @@ export const useEditorStore = create<EditorState & EditorActions>((set, get) => 
     },
 
     resetToDefaults: () => set(DEFAULT_STATE),
+
+    // Mobile controls state
+    mobileControlsOpen: false,
+    setMobileControlsOpen: (open: boolean) => set({ mobileControlsOpen: open }),
 }));
 
 // ============================================================================
