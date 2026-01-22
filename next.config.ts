@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
   trailingSlash: isStatic,
   images: {
     unoptimized: isStatic,
+    // Enable modern image formats for better compression
+    formats: ['image/avif', 'image/webp'],
+    // Optimize image sizes
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     // Allow avatar images from OAuth providers
     remotePatterns: [
       {
@@ -53,9 +58,10 @@ const nextConfig: NextConfig = {
     // removeConsole: isProduction ? { exclude: ['error', 'warn'] } : false,
   },
 
-  // Experimental features
+  // Experimental features for performance
   experimental: {
-    // Enable optimizations
+    // Optimize package imports to reduce bundle size
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'framer-motion'],
   },
 
   // Security headers (only for web builds, not static exports)

@@ -1,33 +1,72 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+  ],
+}
 
 export const metadata: Metadata = {
-  title: 'SnapBeautify - Transform Your Photos Instantly | AI-Powered Image Enhancement',
+  title: 'SnapBeautify - Transform Your Screenshots Into Stunning Visuals | Free Online Tool',
   description:
-    'Professional-quality image enhancement that works entirely in your browser. No uploads, no learning curve, no compromises. AI-powered background removal, smart enhancement, and more.',
+    'Professional screenshot beautification that works entirely in your browser. Add custom backgrounds, device frames, and professional styling. 100% private - images never leave your device.',
   keywords: [
+    'screenshot beautifier',
     'image enhancement',
     'photo editor',
-    'AI photo',
+    'AI photo editor',
     'background removal',
-    'screenshot beautifier',
-    'image editor online',
+    'screenshot editor online',
     'free photo editor',
     'browser based editor',
+    'mockup generator',
+    'device frame mockup',
   ],
   authors: [{ name: 'SnapBeautify' }],
+  creator: 'SnapBeautify',
+  publisher: 'SnapBeautify',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   openGraph: {
-    title: 'SnapBeautify - Transform Your Photos Instantly',
+    title: 'SnapBeautify - Transform Your Screenshots Into Stunning Visuals',
     description:
-      'Professional-quality image enhancement that works entirely in your browser. AI-powered tools for stunning results.',
+      'Professional screenshot beautification in your browser. Add backgrounds, frames, and styling. 100% private.',
     type: 'website',
     url: 'https://snapbeautify.com',
+    siteName: 'SnapBeautify',
+    locale: 'en_US',
+    images: [
+      {
+        url: 'https://snapbeautify.com/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'SnapBeautify - Screenshot Beautification Tool',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SnapBeautify - Transform Your Photos Instantly',
+    title: 'SnapBeautify - Transform Your Screenshots Into Stunning Visuals',
     description:
-      'Professional-quality image enhancement that works entirely in your browser.',
+      'Professional screenshot beautification in your browser. 100% private.',
+    images: ['https://snapbeautify.com/og-image.png'],
   },
+  alternates: {
+    canonical: 'https://snapbeautify.com',
+  },
+  category: 'technology',
 }
 
 export default function LandingLayout({

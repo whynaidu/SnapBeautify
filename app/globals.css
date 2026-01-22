@@ -318,3 +318,153 @@
   content-visibility: auto;
   contain-intrinsic-size: 0 48px;
 }
+
+/* ============================================
+   PERFORMANCE-OPTIMIZED CSS ANIMATIONS
+   Replace Framer Motion for critical path
+   ============================================ */
+
+/* Fade in animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Fade in with upward movement */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale X animation for underline */
+@keyframes scale-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Animation classes */
+.animate-fade-in {
+  opacity: 0;
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-scale-x {
+  transform: scaleX(0);
+  animation: scale-x 0.8s ease-out forwards;
+}
+
+/* Disable animations on mobile for better TBT */
+@media (max-width: 768px) {
+  .animate-fade-in,
+  .animate-fade-in-up,
+  .animate-scale-x {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY UTILITIES
+   ============================================ */
+
+/* Screen reader only - visually hidden but accessible */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus visible - keyboard focus indicators */
+:focus-visible {
+  outline: 2px solid #005fcc;
+  outline-offset: 2px;
+}
+
+/* High contrast focus for dark mode */
+.dark :focus-visible {
+  outline-color: #60a5fa;
+}
+
+/* Ensure interactive elements have min tap target size (48px) */
+@media (max-width: 768px) {
+  button,
+  [role="button"],
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ============================================
+   CLS (Cumulative Layout Shift) PREVENTION
+   ============================================ */
+
+/* Reserve space for images to prevent layout shift */
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+/* Aspect ratio containers for embeds */
+.aspect-video {
+  aspect-ratio: 16 / 9;
+}
+
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
+
+/* Prevent font-swap layout shift */
+@font-face {
+  font-display: swap;
+  size-adjust: 100%;
+}
+
+/* ============================================
+   INP (Interaction to Next Paint) OPTIMIZATION
+   ============================================ */
+
+/* Use passive event listeners hint */
+html {
+  scroll-behavior: smooth;
+  touch-action: manipulation; /* Faster touch response */
+}
+
+/* Reduce paint complexity for animated elements */
+.will-animate {
+  will-change: transform, opacity;
+  contain: layout style paint;
+}
+
+/* Optimize heavy elements */
+.optimize-legibility {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

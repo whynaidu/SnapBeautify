@@ -122,9 +122,17 @@ export function Header() {
           ? 'bg-white dark:bg-black border-b border-zinc-200 dark:border-zinc-800 py-4'
           : 'bg-transparent py-6'
       )}
+      role="banner"
     >
       <Container>
-        <nav className="flex items-center justify-between">
+        {/* Skip to main content link for accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-black focus:text-white focus:rounded-lg"
+        >
+          Skip to main content
+        </a>
+        <nav className="flex items-center justify-between" aria-label="Main navigation">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <Logo />
@@ -187,14 +195,16 @@ export function Header() {
           <div className="flex items-center gap-2 md:hidden">
             <ModeToggle />
             <button
-              className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white"
+              className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-black dark:hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle menu"
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-menu"
             >
               {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
+                <X className="w-6 h-6" aria-hidden="true" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Menu className="w-6 h-6" aria-hidden="true" />
               )}
             </button>
           </div>
@@ -204,10 +214,13 @@ export function Header() {
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
+              id="mobile-menu"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               className="md:hidden mt-4 pb-4"
+              role="menu"
+              aria-label="Mobile navigation"
             >
               <div className="flex flex-col gap-1">
                 {navLinks.map((link) => {

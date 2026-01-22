@@ -235,53 +235,24 @@ function AuthGateInner({ children }: AuthGateProps) {
 
   // Show loading state until auth check is complete
   // Skip loader if coming from logout (authCheckDone is initialized to true in that case)
+  // Using pure CSS animations for better TBT (no framer-motion overhead)
   if (!authCheckDone) {
     return (
       <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center overflow-hidden" role="status" aria-live="polite" aria-label="Loading application">
-        <motion.div
-          className="flex flex-col items-center gap-6"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Animated rings */}
+        <div className="flex flex-col items-center gap-6 animate-fade-in">
+          {/* Animated rings using CSS */}
           <div className="relative" aria-hidden="true">
-            <motion.div
-              className="absolute inset-0 w-24 h-24 rounded-full border-4 border-zinc-200 dark:border-zinc-800"
-              animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <motion.div
-              className="absolute inset-0 w-24 h-24 rounded-full border-4 border-zinc-300 dark:border-zinc-700"
-              animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
-            />
-            <motion.div
-              className="relative w-24 h-24 rounded-2xl bg-black dark:bg-white flex items-center justify-center"
-              animate={{
-                rotate: [0, 5, -5, 0],
-                scale: [1, 1.05, 1],
-              }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-              >
-                <Sparkles className="w-12 h-12 text-white dark:text-black" />
-              </motion.div>
-            </motion.div>
+            <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-zinc-200 dark:border-zinc-800 animate-ping opacity-30" />
+            <div className="relative w-24 h-24 rounded-2xl bg-black dark:bg-white flex items-center justify-center">
+              <Sparkles className="w-12 h-12 text-white dark:text-black" />
+            </div>
           </div>
 
-          <motion.div
-            className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
+          <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400">
             <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
             <span className="text-lg font-medium">Loading SnapBeautify...</span>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -952,14 +923,14 @@ function AuthGateInner({ children }: AuthGateProps) {
   return <>{children}</>;
 }
 
-// Loading fallback for Suspense - matches the AuthGate loading animation to prevent flicker
+// Ultra-light loading fallback for Suspense - no framer-motion, pure CSS
 function AuthGateLoading() {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center overflow-hidden" role="status" aria-live="polite" aria-label="Loading application">
       <div className="flex flex-col items-center gap-6">
-        {/* Static version of the animated rings (no motion to avoid hydration issues) */}
+        {/* Static logo with CSS pulse animation */}
         <div className="relative" aria-hidden="true">
-          <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-zinc-200 dark:border-zinc-800 opacity-50" />
+          <div className="absolute inset-0 w-24 h-24 rounded-full border-4 border-zinc-200 dark:border-zinc-800 opacity-50 animate-pulse" />
           <div className="relative w-24 h-24 rounded-2xl bg-black dark:bg-white flex items-center justify-center">
             <Sparkles className="w-12 h-12 text-white dark:text-black" />
           </div>
