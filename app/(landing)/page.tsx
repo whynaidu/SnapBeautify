@@ -1,5 +1,4 @@
 import dynamic from 'next/dynamic'
-import Script from 'next/script'
 
 // Direct imports for above-the-fold content (loads immediately)
 import { Header } from '@/components/landing/header'
@@ -148,11 +147,9 @@ function SectionSkeleton({ height = 'h-96' }: { height?: string }) {
 export default function LandingPage() {
   return (
     <>
-      {/* Structured Data for SEO */}
-      <Script
-        id="structured-data"
+      {/* Structured Data for SEO - must render immediately for crawlers */}
+      <script
         type="application/ld+json"
-        strategy="lazyOnload"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 

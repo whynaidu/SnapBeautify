@@ -10,9 +10,9 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'SnapBeautify - Transform Your Screenshots Into Stunning Visuals | Free Online Tool',
+  title: 'SnapBeautify - Beautiful Screenshots in Seconds | Free Tool',
   description:
-    'Professional screenshot beautification that works entirely in your browser. Add custom backgrounds, device frames, and professional styling. 100% private - images never leave your device.',
+    'Transform screenshots into stunning visuals with backgrounds & device frames. Browser-based, 100% private.',
   keywords: [
     'screenshot beautifier',
     'image enhancement',

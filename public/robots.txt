@@ -1,0 +1,11 @@
+# robots.txt for SnapBeautify
+User-agent: *
+Allow: /
+
+# Block admin and API routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /auth/
+
+# Sitemap location
+Sitemap: https://snapbeautify.vercel.app/sitemap.xml
