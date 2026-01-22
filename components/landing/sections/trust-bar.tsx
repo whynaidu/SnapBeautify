@@ -1,8 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { Container } from '../layout/container'
-import { FadeIn } from '../animations/fade-in'
 import {
   Shield,
   Eye,
@@ -52,114 +50,95 @@ export function TrustBar() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:20px_20px]" />
 
       <Container className="relative z-10">
-        <FadeIn>
-          <div className="flex flex-col gap-8">
-            {/* Trust badges - main row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-              {trustBadges.map((badge, index) => {
-                const Icon = badge.icon
-                return (
-                  <motion.div
-                    key={badge.text}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -2 }}
-                    className="group relative"
-                  >
-                    <div className="flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm hover:shadow-md transition-all duration-300">
-                      {/* Icon with gradient background */}
-                      <div className={`relative flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${badge.color} flex items-center justify-center shadow-lg`}>
-                        <Icon className="w-6 h-6 text-white" />
-                        {/* Glow effect */}
-                        <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${badge.color} blur-lg opacity-0 group-hover:opacity-40 transition-opacity duration-300`} />
-                      </div>
-
-                      {/* Text content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-sm sm:text-base text-zinc-900 dark:text-white">
-                            {badge.text}
-                          </h3>
-                          <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                        </div>
-                        <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
-                          {badge.description}
-                        </p>
-                      </div>
+        <div className="flex flex-col gap-8">
+          {/* Trust badges - main row */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            {trustBadges.map((badge) => {
+              const Icon = badge.icon
+              return (
+                <div
+                  key={badge.text}
+                  className="group relative"
+                >
+                  <div className="flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-white dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm hover:shadow-md transition-shadow duration-300">
+                    {/* Icon with gradient background */}
+                    <div className={`relative flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br ${badge.color} flex items-center justify-center shadow-lg`}>
+                      <Icon className="w-6 h-6 text-white" />
                     </div>
-                  </motion.div>
-                )
-              })}
-            </div>
 
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="px-4 bg-white dark:bg-zinc-900 text-xs text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-                  <Shield className="w-3.5 h-3.5" />
-                  Secure Payment Options
-                </span>
-              </div>
-            </div>
-
-            {/* Payment methods */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
-              {paymentMethods.map((method, index) => {
-                const Icon = method.icon
-                return (
-                  <motion.div
-                    key={method.name}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.3 + index * 0.1 }}
-                    whileHover={{ scale: 1.02 }}
-                    className="group flex items-center gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-default"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-5 h-5 text-zinc-600 dark:text-zinc-300" />
-                    </div>
-                    <div className="text-left min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-zinc-900 dark:text-white leading-tight">
-                        {method.name}
-                      </p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-tight mt-0.5 truncate">
-                        {method.label}
+                    {/* Text content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-sm sm:text-base text-zinc-900 dark:text-white">
+                          {badge.text}
+                        </h3>
+                        <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      </div>
+                      <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+                        {badge.description}
                       </p>
                     </div>
-                  </motion.div>
-                )
-              })}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
 
-              {/* Razorpay badge - same style as other pills */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.6 }}
-                whileHover={{ scale: 1.02 }}
-                className="group flex items-center gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-default"
-              >
-                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="w-5 h-5 text-blue-500" />
-                </div>
-                <div className="text-left min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-white leading-tight">
-                    Razorpay
-                  </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-tight mt-0.5 truncate">
-                    Secure payments
-                  </p>
-                </div>
-              </motion.div>
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-zinc-300 dark:via-zinc-700 to-transparent" />
+            </div>
+            <div className="relative flex justify-center">
+              <span className="px-4 bg-white dark:bg-zinc-900 text-xs text-zinc-400 uppercase tracking-wider flex items-center gap-2">
+                <Shield className="w-3.5 h-3.5" />
+                Secure Payment Options
+              </span>
             </div>
           </div>
-        </FadeIn>
+
+          {/* Payment methods */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto">
+            {paymentMethods.map((method) => {
+              const Icon = method.icon
+              return (
+                <div
+                  key={method.name}
+                  className="group flex items-center gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-default"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0">
+                    <Icon className="w-5 h-5 text-zinc-600 dark:text-zinc-300" />
+                  </div>
+                  <div className="text-left min-w-0 flex-1">
+                    <p className="text-sm font-semibold text-zinc-900 dark:text-white leading-tight">
+                      {method.name}
+                    </p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-tight mt-0.5 truncate">
+                      {method.label}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+
+            {/* Razorpay badge - same style as other pills */}
+            <div
+              className="group flex items-center gap-3 px-4 py-3 rounded-2xl bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/50 shadow-sm hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-default"
+            >
+              <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-5 h-5 text-blue-500" />
+              </div>
+              <div className="text-left min-w-0 flex-1">
+                <p className="text-sm font-semibold text-zinc-900 dark:text-white leading-tight">
+                  Razorpay
+                </p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-tight mt-0.5 truncate">
+                  Secure payments
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </Container>
     </section>
   )

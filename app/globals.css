@@ -320,68 +320,9 @@
 }
 
 /* ============================================
-   PERFORMANCE-OPTIMIZED CSS ANIMATIONS
-   Replace Framer Motion for critical path
+   PERFORMANCE-OPTIMIZED CSS
+   No opacity:0 animations that delay LCP
    ============================================ */
-
-/* Fade in animation */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Fade in with upward movement */
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Scale X animation for underline */
-@keyframes scale-x {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-/* Animation classes */
-.animate-fade-in {
-  opacity: 0;
-  animation: fade-in 0.5s ease-out forwards;
-}
-
-.animate-fade-in-up {
-  opacity: 0;
-  animation: fade-in-up 0.6s ease-out forwards;
-}
-
-.animate-scale-x {
-  transform: scaleX(0);
-  animation: scale-x 0.8s ease-out forwards;
-}
-
-/* Disable animations on mobile for better TBT */
-@media (max-width: 768px) {
-  .animate-fade-in,
-  .animate-fade-in-up,
-  .animate-scale-x {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
 
 /* ============================================
    ACCESSIBILITY UTILITIES
@@ -411,15 +352,7 @@
   outline-color: #60a5fa;
 }
 
-/* Ensure interactive elements have min tap target size (48px) */
-@media (max-width: 768px) {
-  button,
-  [role="button"],
-  a {
-    min-height: 44px;
-    min-width: 44px;
-  }
-}
+/* Note: Tap target sizes handled by component styling */
 
 /* ============================================
    CLS (Cumulative Layout Shift) PREVENTION

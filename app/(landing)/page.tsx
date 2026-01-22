@@ -152,31 +152,32 @@ export default function LandingPage() {
       <Script
         id="structured-data"
         type="application/ld+json"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
       <Header />
 
-      <main id="main-content" className="min-h-screen" role="main" tabIndex={-1}>
+      <main id="main-content" className="min-h-screen">
         {/* Above the fold - static imports for immediate render */}
         <HeroSection />
         <TrustBar />
 
         {/* Below the fold - dynamic imports for reduced initial bundle */}
-        <section id="features" aria-label="Features">
+        <div id="features">
           <FeaturesSection />
-        </section>
-        <section id="how-it-works" aria-label="How It Works">
+        </div>
+        <div id="how-it-works">
           <HowItWorksSection />
-        </section>
-        <section id="pricing" aria-label="Pricing">
+        </div>
+        <div id="pricing">
           <PricingSection />
-        </section>
+        </div>
         <PrivacySection />
         <TestimonialsSection />
-        <section id="faq" aria-label="Frequently Asked Questions">
+        <div id="faq">
           <FAQSection />
-        </section>
+        </div>
         <CTAFinalSection />
       </main>
 

@@ -5,8 +5,6 @@ import Image from 'next/image'
 import { Badge } from '../shared/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '../layout/container'
-import { useReducedMotion } from '@/lib/hooks/useReducedMotion'
-import { useIsMobile } from '@/lib/hooks/useWindowSize'
 import {
   Sparkles,
   ArrowRight,
@@ -20,13 +18,13 @@ import {
   ImageIcon
 } from 'lucide-react'
 
-// Simplified, performant animated background - pure CSS, no framer-motion
-function AnimatedBackground() {
+// Static background - no animations, pure CSS
+function StaticBackground() {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden">
       <div className="absolute inset-0 bg-white dark:bg-black" />
 
-      {/* Grid pattern - CSS only, no animation */}
+      {/* Grid pattern - CSS only */}
       <div
         className="absolute inset-0 opacity-[0.08] dark:opacity-[0.12]"
         style={{
@@ -37,27 +35,20 @@ function AnimatedBackground() {
         }}
       />
 
-      {/* Static gradient orbs - NO ANIMATION, pure CSS */}
+      {/* Static gradient orbs */}
       <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-violet-500/15 dark:bg-violet-400/10 blur-3xl" />
       <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-pink-500/15 dark:bg-pink-400/10 blur-3xl" />
       <div className="hidden lg:block absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-blue-500/10 dark:bg-blue-400/10 blur-3xl" />
-
-      {/* Static decorative rings - NO rotation, desktop only */}
-      <div className="hidden lg:block absolute top-16 left-16 w-64 h-64 rounded-full border border-zinc-200/50 dark:border-zinc-700/50" />
-      <div className="hidden lg:block absolute bottom-16 right-16 w-72 h-72 rounded-full border border-zinc-200/50 dark:border-zinc-700/50" />
     </div>
   )
 }
 
-// Hero visual - no framer-motion, uses CSS animations for better LCP
+// Hero visual - completely static, no animations
 function HeroVisual() {
   return (
     <div className="relative w-full max-w-4xl mx-auto px-4 sm:px-0">
-      {/* Main app mockup - CSS animation instead of framer-motion */}
-      <div
-        className="relative bg-zinc-100 dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-2xl animate-fade-in-up"
-        style={{ animationDelay: '0.1s' }}
-      >
+      {/* Main app mockup */}
+      <div className="relative bg-zinc-100 dark:bg-zinc-900 rounded-2xl sm:rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-2xl">
         {/* App header bar */}
         <div className="flex items-center gap-2 p-3 sm:p-4 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex gap-1.5">
@@ -78,34 +69,29 @@ function HeroVisual() {
             {/* Before image - PRIORITY loading for LCP */}
             <div className="relative aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-zinc-200 dark:bg-zinc-800">
               <Image
-                src="/images/hero/before.png"
+                src="/images/hero/before.webp"
                 alt="Before beautification"
                 fill
                 priority
-                fetchPriority="high"
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
               />
-              {/* Before label */}
               <div className="absolute top-2 left-2 sm:top-3 sm:left-3 px-2 sm:px-3 py-1 rounded-full bg-black/70 text-white text-[10px] sm:text-xs font-medium">
                 Before
               </div>
-              {/* Dull overlay effect */}
               <div className="absolute inset-0 bg-zinc-400/20" />
             </div>
 
             {/* After image - PRIORITY loading for LCP */}
             <div className="relative aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-black dark:bg-white">
               <Image
-                src="/images/hero/after.png"
+                src="/images/hero/after.webp"
                 alt="After beautification"
                 fill
                 priority
-                fetchPriority="high"
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
               />
-              {/* After label */}
               <div className="absolute top-2 right-2 sm:top-3 sm:right-3 px-2 sm:px-3 py-1 rounded-full bg-green-500 text-white text-[10px] sm:text-xs font-medium flex items-center gap-1">
                 <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 After
@@ -113,7 +99,7 @@ function HeroVisual() {
             </div>
           </div>
 
-          {/* Action bar - static, no animation */}
+          {/* Action bar */}
           <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-black dark:bg-white flex items-center justify-center">
@@ -132,9 +118,8 @@ function HeroVisual() {
         </div>
       </div>
 
-      {/* Floating elements around the mockup - static, desktop only */}
-      {/* Upload card */}
-      <div className="absolute -left-8 top-1/4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-xl hidden lg:block animate-fade-in" style={{ animationDelay: '0.3s' }}>
+      {/* Floating elements - desktop only, static */}
+      <div className="absolute -left-8 top-1/4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-xl hidden lg:block">
         <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center mb-2">
           <ImageIcon className="w-6 h-6 text-white" />
         </div>
@@ -142,8 +127,7 @@ function HeroVisual() {
         <p className="text-zinc-500 text-xs">or click to upload</p>
       </div>
 
-      {/* Download card */}
-      <div className="absolute -right-8 top-1/3 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-xl hidden lg:block animate-fade-in" style={{ animationDelay: '0.4s' }}>
+      <div className="absolute -right-8 top-1/3 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-4 shadow-xl hidden lg:block">
         <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center mb-2">
           <Download className="w-6 h-6 text-white" />
         </div>
@@ -151,8 +135,7 @@ function HeroVisual() {
         <p className="text-zinc-500 text-xs">No watermark</p>
       </div>
 
-      {/* Processing speed indicator */}
-      <div className="absolute -right-4 bottom-20 bg-white dark:bg-zinc-900 rounded-full border border-zinc-200 dark:border-zinc-800 px-4 py-2 shadow-xl hidden lg:flex items-center gap-2 animate-fade-in" style={{ animationDelay: '0.5s' }}>
+      <div className="absolute -right-4 bottom-20 bg-white dark:bg-zinc-900 rounded-full border border-zinc-200 dark:border-zinc-800 px-4 py-2 shadow-xl hidden lg:flex items-center gap-2">
         <Zap className="w-4 h-4 text-yellow-500" />
         <span className="text-sm font-medium text-black dark:text-white">2.3s</span>
         <span className="text-xs text-zinc-500">avg. time</span>
@@ -161,7 +144,7 @@ function HeroVisual() {
   )
 }
 
-// Stats component - pure CSS animations
+// Stats component - static
 function Stats() {
   const stats = [
     { value: '10K+', label: 'Happy Users', icon: Users },
@@ -172,11 +155,7 @@ function Stats() {
   return (
     <div className="flex flex-wrap justify-center gap-8 lg:gap-16">
       {stats.map((stat, index) => (
-        <div
-          key={index}
-          className="text-center animate-fade-in-up"
-          style={{ animationDelay: `${0.6 + index * 0.1}s` }}
-        >
+        <div key={index} className="text-center">
           <div className="flex items-center justify-center gap-2 mb-1">
             <stat.icon className="w-5 h-5 text-zinc-400" />
             <span className="text-2xl lg:text-3xl font-bold text-black dark:text-white">
@@ -191,81 +170,58 @@ function Stats() {
 }
 
 export function HeroSection() {
-  // Respect user's motion preferences for accessibility
-  const reducedMotion = useReducedMotion()
-  const isMobile = useIsMobile()
-
-  // Disable animations on mobile for better TBT
-  const shouldAnimate = !reducedMotion && !isMobile
-
   return (
     <section className="relative min-h-screen flex flex-col justify-center pt-24 pb-16 lg:pt-32 lg:pb-24">
-      {/* Static Background - no framer-motion */}
-      <AnimatedBackground />
+      <StaticBackground />
 
       <Container className="relative z-10">
-        {/* Hero content - Centered, using CSS animations */}
+        {/* Hero content - NO animations, immediate render */}
         <div className="text-center mb-12 lg:mb-16">
-          <div className="animate-fade-in" style={{ animationDelay: '0s' }}>
-            <Badge variant="default" className="mb-6">
-              <Sparkles className="w-3 h-3 mr-2" aria-hidden="true" />
-              Screenshot Beautification Made Simple
-            </Badge>
-          </div>
+          <Badge variant="default" className="mb-6">
+            <Sparkles className="w-3 h-3 mr-2" aria-hidden="true" />
+            Screenshot Beautification Made Simple
+          </Badge>
 
-          <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-black dark:text-white mb-6 max-w-4xl mx-auto text-balance">
-              Make Your Screenshots{' '}
-              <span className="relative">
-                <span className="text-zinc-500">Stunning</span>
-                <span
-                  className="absolute -bottom-2 left-0 right-0 h-1 bg-black dark:bg-white rounded-full animate-scale-x origin-left"
-                  style={{ animationDelay: '0.5s' }}
-                />
-              </span>
-            </h1>
-          </div>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-black dark:text-white mb-6 max-w-4xl mx-auto text-balance">
+            Make Your Screenshots{' '}
+            <span className="relative">
+              <span className="text-zinc-500">Stunning</span>
+              <span className="absolute -bottom-2 left-0 right-0 h-1 bg-black dark:bg-white rounded-full" />
+            </span>
+          </h1>
 
-          <div className="animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            <p className="text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl mx-auto leading-relaxed text-pretty">
-              Transform screenshots into beautiful presentations with custom backgrounds, device frames,
-              and professional styling — all in your browser, completely private.
-            </p>
-          </div>
+          <p className="text-lg lg:text-xl text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl mx-auto leading-relaxed text-pretty">
+            Transform screenshots into beautiful presentations with custom backgrounds, device frames,
+            and professional styling — all in your browser, completely private.
+          </p>
 
-          <div className="animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <Link href="/app">
-                <Button
-                  size="lg"
-                  className="bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 h-14 px-8 text-base font-semibold rounded-full transition-transform hover:scale-105 active:scale-95"
-                >
-                  Start Beautifying Free
-                  <ArrowRight className="w-5 h-5 ml-2" aria-hidden="true" />
-                </Button>
-              </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <Link href="/app">
               <Button
-                variant="outline"
                 size="lg"
-                className="h-14 px-8 text-base font-semibold rounded-full border-zinc-300 dark:border-zinc-700 transition-transform hover:scale-105 active:scale-95"
+                className="bg-black dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 h-14 px-8 text-base font-semibold rounded-full"
               >
-                <Play className="w-5 h-5 mr-2 fill-current" aria-hidden="true" />
-                Watch Demo
+                Start Beautifying Free
+                <ArrowRight className="w-5 h-5 ml-2" aria-hidden="true" />
               </Button>
-            </div>
+            </Link>
+            <Button
+              variant="outline"
+              size="lg"
+              className="h-14 px-8 text-base font-semibold rounded-full border-zinc-300 dark:border-zinc-700"
+            >
+              <Play className="w-5 h-5 mr-2 fill-current" aria-hidden="true" />
+              Watch Demo
+            </Button>
           </div>
 
-          <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
-            <p className="text-sm text-zinc-500 mb-12">
-              ✓ No credit card required · ✓ Works on any device · ✓ 100% private
-            </p>
-          </div>
+          <p className="text-sm text-zinc-500 mb-12">
+            ✓ No credit card required · ✓ Works on any device · ✓ 100% private
+          </p>
         </div>
 
-        {/* Hero visual */}
         <HeroVisual />
 
-        {/* Stats */}
         <div className="mt-16 lg:mt-20">
           <Stats />
         </div>

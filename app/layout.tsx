@@ -55,29 +55,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
 
-        {/* Preload critical LCP images for landing page */}
-        <link
-          rel="preload"
-          href="/images/hero/after.png"
-          as="image"
-          fetchPriority="high"
-        />
-        <link
-          rel="preload"
-          href="/images/hero/before.png"
-          as="image"
-          fetchPriority="high"
-        />
-
         {/* DNS prefetch for analytics (non-blocking) */}
         <link rel="dns-prefetch" href="https://va.vercel-scripts.com" />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
-
-        {/*
-          REMOVED: Massive 50+ font families Google Fonts link (~200KB blocking)
-          Editor fonts are now lazy loaded via FontLoader component
-          This reduces initial bundle size significantly
-        */}
       </head>
       <body className="font-sans antialiased">
         <ErrorBoundary>
